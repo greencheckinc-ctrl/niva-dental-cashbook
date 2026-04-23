@@ -68,9 +68,10 @@ tr:hover td{background:#f9fbfc}
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
 .ov.open{display:flex}
 .modal{background:#fff;border-radius:10px;padding:20px;width:94%;max-width:520px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)}
-.mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #e8edf0}
-.mhdr span{font-weight:700;font-size:14px}
-.mbtns{display:flex;gap:7px;align-items:center}
+.mhdr{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #e8edf0}
+.mhdr-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mhdr span{font-weight:700;font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mbtns{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .xb{background:#c0392b;border:none;font-size:16px;cursor:pointer;color:#fff;line-height:1;width:28px;height:28px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}.xb:hover{background:#a93226;transform:scale(1.08)}
 .bwrap{border:1px solid #e0e8ee;border-radius:8px;padding:18px}
 .bh{text-align:center;margin-bottom:13px;padding-bottom:13px;border-bottom:1px solid #e8edf0}
@@ -106,18 +107,48 @@ tr:hover td{background:#f9fbfc}
 .vendor-dropdown .vd-add:hover{background:var(--pri-light)}
 
 .dmodal{background:#fff;border-radius:10px;padding:20px;width:94%;max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+/* LOGIN / LOGOUT MODALS */
+.auth-overlay{position:fixed;inset:0;background:rgba(13,107,138,.18);backdrop-filter:blur(4px);z-index:2000;display:none;align-items:center;justify-content:center}
+.auth-overlay.open{display:flex}
+/* COLLAPSIBLE NOTE BOXES */
+.note-collapsible .note-body{overflow:hidden;transition:max-height .35s ease,opacity .3s ease;max-height:3000px;opacity:1}
+.note-collapsible.collapsed .note-body{max-height:0 !important;opacity:0;pointer-events:none}
+.note-toggle-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-size:11px;font-weight:700;padding:0;font-family:Arial,sans-serif;transition:.15s;text-decoration:underline;text-underline-offset:2px}
+.note-toggle-arrow{display:inline-block;transition:transform .3s ease;font-size:10px;line-height:1}
+.note-collapsible.collapsed .note-toggle-arrow{transform:rotate(-90deg)}
+.auth-box{background:#fff;border-radius:14px;padding:28px 24px 22px;width:94%;max-width:360px;box-shadow:0 12px 48px rgba(0,0,0,.22);text-align:center}
+.auth-logo{width:54px;height:54px;border-radius:14px;background:var(--pri);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;color:#fff;box-shadow:0 4px 16px rgba(13,107,138,.3)}
+.auth-title{font-size:17px;font-weight:700;color:#222;margin-bottom:3px}
+.auth-sub{font-size:11px;color:#aaa;margin-bottom:18px}
+.auth-inp{width:100%;padding:10px 13px;border:1.5px solid #cdd5dd;border-radius:8px;font-size:13px;font-family:Arial,sans-serif;outline:none;transition:.2s;margin-bottom:10px;text-align:left}
+.auth-inp:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(13,107,138,.1)}
+.auth-err{color:#c0392b;font-size:11px;min-height:16px;margin-bottom:8px;text-align:left}
+.auth-btn{width:100%;padding:11px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;transition:.15s}
+.auth-btn.pri{background:var(--pri);color:#fff}.auth-btn.pri:hover{background:var(--pri-dark)}
+.auth-btn.sec{background:#f0f4f7;color:#444;margin-top:8px}.auth-btn.sec:hover{background:#e0e8ee}
+.auth-divider{border:none;border-top:1px solid #eee;margin:14px 0}
+.logout-icon{font-size:38px;margin-bottom:10px}
+.topbar-logout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;margin-left:12px;display:flex;align-items:center;gap:5px;transition:.15s}
+.topbar-logout-btn:hover{background:rgba(255,255,255,.28)}
 .card{background:#fff;border-radius:8px;border:1px solid #e0e8ee;padding:16px;margin-bottom:14px}
 
 /* SETTINGS STYLES */
 .settings-grid{display:grid;grid-template-columns:220px 1fr;gap:0;background:#fff;border-radius:10px;border:1px solid #e0e8ee;overflow:hidden;min-height:500px}
 .settings-sidebar{background:#f8fafc;border-right:1px solid #e0e8ee;padding:0}
 .settings-sidebar h3{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.6px;padding:16px 16px 8px}
-.setnav button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;border:none;background:transparent;font-size:13px;font-weight:600;color:#555;cursor:pointer;text-align:left;border-left:3px solid transparent;transition:.15s}
+.setnav button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;border:none;background:transparent;font-size:14px;font-weight:600;color:#555;cursor:pointer;text-align:left;border-left:3px solid transparent;transition:.15s}
 .setnav button:hover{background:#f0f4f7;color:#333}
 .setnav button.act{background:#fff;color:var(--pri);border-left-color:var(--pri);font-weight:700}
 .setnav button .icon{font-size:16px;width:20px;text-align:center}
 .settings-content{padding:22px;overflow-y:auto}
 .set-section{display:none}.set-section.act{display:block}
+/* When LAN Share or Firebase section is active, hide sidebar for clean view */
+.settings-grid:has(#set-lanshare.act) .settings-sidebar,
+.settings-grid:has(#set-firebase.act) .settings-sidebar,
+.settings-grid:has(#set-email.act) .settings-sidebar{display:none}
+.settings-grid:has(#set-lanshare.act),
+.settings-grid:has(#set-firebase.act),
+.settings-grid:has(#set-email.act){grid-template-columns:1fr}
 .set-title{font-size:15px;font-weight:700;color:#222;margin-bottom:4px}
 .set-sub{font-size:12px;color:#888;margin-bottom:20px}
 .set-group{margin-bottom:20px}
@@ -295,7 +326,7 @@ tr:hover td{background:#f9fbfc}
 .mob-set-accordion-btn.open .arrow{transform:rotate(180deg)}
 .mob-set-list{background:#fff;border:1px solid #e0e8ee;border-radius:8px;overflow:hidden;margin-bottom:12px;display:none}
 .mob-set-list.open{display:block}
-.mob-set-list button{display:flex;align-items:center;gap:10px;width:100%;padding:13px 16px;border:none;background:transparent;font-size:13px;font-weight:600;color:#444;cursor:pointer;text-align:left;border-bottom:1px solid #f0f3f5}
+.mob-set-list button{display:flex;align-items:center;gap:10px;width:100%;padding:13px 16px;border:none;background:transparent;font-size:14px;font-weight:600;color:#444;cursor:pointer;text-align:left;border-bottom:1px solid #f0f3f5}
 .mob-set-list button:last-child{border-bottom:none}
 .mob-set-list button.act{color:var(--pri);background:#f0f8fc;font-weight:700}
 .mob-set-list button .icon{font-size:16px;width:22px;text-align:center}
@@ -372,6 +403,11 @@ tr:hover td{background:#f9fbfc}
   /* Cash book filter row */
   #cbfr,#cbto{min-width:unset!important;width:100%}
 
+  /* Cash Book filter bar – full width stacked on mobile */
+  #vb-sbar{flex-direction:column;gap:7px}
+  #vb-sbar input,#vb-sbar select{width:100%;font-size:14px;padding:11px 13px}
+  #vb-sbar button{width:100%;font-size:14px;padding:12px;font-weight:700}
+
   /* Total box */
   .totbox{justify-content:stretch}
   .totinner{min-width:unset;width:100%}
@@ -407,6 +443,54 @@ tr:hover td{background:#f9fbfc}
   /* Stats in view bills */
   #cbstats,.stats{margin-bottom:10px}
 
+  /* ═══════════════════════════════════════
+     ADD PATIENT – TREATMENT ITEMS MOBILE
+     ═══════════════════════════════════════ */
+
+  /* Hide the desktop treatment table on mobile */
+  #tab-newbill .itb{display:none}
+
+  /* Mobile treatment item cards container */
+  #ib-mobile-cards{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+
+  /* Each treatment item as a card */
+  .mob-itm-card{background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:12px;position:relative}
+  .mob-itm-card .mic-num{position:absolute;top:10px;left:12px;font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px}
+  .mob-itm-card .mic-del{position:absolute;top:8px;right:8px;background:#fdecea;border:none;color:#c0392b;width:28px;height:28px;border-radius:7px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .mob-itm-card .mic-name{font-size:14px;font-weight:700;color:#222;margin-top:18px;margin-bottom:6px;padding-right:36px}
+  .mob-itm-card .mic-row{display:flex;gap:8px;margin-top:6px}
+  .mob-itm-card .mic-chip{flex:1;background:#f0f8fc;border-radius:8px;padding:7px 10px;text-align:center}
+  .mob-itm-card .mic-chip .mc-lbl{font-size:10px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+  .mob-itm-card .mic-chip .mc-val{font-size:14px;font-weight:700;color:var(--pri)}
+  .mob-itm-card .mic-chip.amt .mc-val{color:#1b6e35}
+  .mob-itm-card .mic-edit{width:100%;margin-top:8px;padding:8px;background:#f5f8fa;border:1px solid #e0e8ee;border-radius:8px;font-size:12px;font-weight:700;color:#444;cursor:pointer;text-align:center}
+  .mob-itm-card.editing{border:2px solid #f0a500;background:#fff8e1}
+
+  /* Add Item form – stacked on mobile */
+  #tab-newbill .addr{gap:8px}
+  #tab-newbill #ai-n,
+  #tab-newbill #ai-q,
+  #tab-newbill #ai-r{font-size:15px;padding:12px 14px;border-radius:8px}
+  #tab-newbill .addr .f:first-child{order:1}
+  #tab-newbill .addr .f:nth-child(2){order:2}
+  #tab-newbill .addr .f:nth-child(3){order:3}
+  #tab-newbill .addr button{order:4;padding:13px;font-size:14px;font-weight:700;border-radius:10px}
+
+  /* Empty state for mobile cards */
+  .ib-mobile-empty{text-align:center;padding:20px;color:#aaa;font-size:13px;background:#f9fbfc;border-radius:10px;border:1px dashed #d0dde5;display:none}
+  .ib-mobile-empty.show{display:block}
+
+  /* Save button – full width on mobile */
+  #tab-newbill [onclick="saveBillWithSync()"]{width:100%;padding:14px;font-size:15px;border-radius:10px}
+  #tab-newbill [onclick="clearForm()"]{width:100%;padding:14px;font-size:14px;border-radius:10px}
+  #tab-newbill div[style*="justify-content:flex-end"]{flex-direction:column-reverse;gap:8px}
+
+  /* Bill No row – keep side by side */
+  #tab-newbill .row:first-child{flex-direction:column}
+
+  /* Consultation charge note – hide on mobile to save space */
+  #tab-newbill .f > span[style*="line-height"]{font-size:10px}
+
   /* Vendor list grid */
   .vendor-list-grid{grid-template-columns:repeat(2,1fr)}
 
@@ -428,30 +512,208 @@ tr:hover td{background:#f9fbfc}
   .rep-filter-bar .f{min-width:100%!important}
 }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@200;400;700;900&family=Space+Mono&display=swap" rel="stylesheet"/>
+<style>
+
+</style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SPLASH SCREEN                                       -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="splash-screen" style="
+  position:fixed;inset:0;z-index:99999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#0a4f6e 0%,#0d6b8a 40%,#1b8c6e 100%);
+  font-family:'Segoe UI',Arial,sans-serif;
+  transition:opacity .6s ease;
+">
+  <!-- Animated background circles -->
+  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+    <div style="position:absolute;width:380px;height:380px;border-radius:50%;background:rgba(255,255,255,.04);top:-80px;right:-80px"></div>
+    <div style="position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.05);bottom:-60px;left:-60px"></div>
+    <div style="position:absolute;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.04);bottom:120px;right:60px"></div>
+  </div>
+
+  <!-- Content card -->
+  <div id="splash-card" style="
+    position:relative;text-align:center;padding:40px 48px;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+    border-radius:24px;backdrop-filter:blur(12px);
+    max-width:360px;width:88%;
+    animation:splashIn .6s cubic-bezier(.22,1,.36,1) both;
+  ">
+    <!-- Logo area: tooth icon only -->
+    <div id="splash-logo-wrap" style="margin-bottom:18px">
+      <div style="font-size:64px;line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))">🦷</div>
+    </div>
+
+    <!-- Clinic name -->
+    <div id="splash-clinic-name" style="
+      font-size:26px;font-weight:900;color:#fff;
+      letter-spacing:.5px;line-height:1.2;
+      text-shadow:0 2px 8px rgba(0,0,0,.25);
+      margin-bottom:6px;
+    ">Niva Dental</div>
+
+    <!-- Tagline -->
+    <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:22px;font-weight:400">
+      Clinic Management Software
+    </div>
+
+    <!-- Divider -->
+    <div style="height:1px;background:rgba(255,255,255,.18);margin-bottom:18px"></div>
+
+    <!-- Loading dots -->
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:20px">
+      <div class="splash-dot" style="animation-delay:0s"></div>
+      <div class="splash-dot" style="animation-delay:.2s"></div>
+      <div class="splash-dot" style="animation-delay:.4s"></div>
+    </div>
+
+    <!-- Developer credit -->
+    <div style="font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.3px">
+      Developed by <span style="color:rgba(255,255,255,.7);font-weight:700">GreenCheck Inc.</span>
+    </div>
+
+    <!-- Version -->
+    <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:6px;font-weight:600;letter-spacing:.5px">
+      V 1.26
+    </div>
+  </div>
+
+  <style>
+    @keyframes splashIn{from{opacity:0;transform:translateY(28px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes splashDot{0%,80%,100%{transform:scale(.4);opacity:.3}40%{transform:scale(1);opacity:1}}
+    .splash-dot{width:9px;height:9px;border-radius:50%;background:#fff;animation:splashDot 1.2s ease-in-out infinite}
+  </style>
+</div>
+
+<script>
+// ── SPLASH INIT ──
+(function(){
+  // Load CFG early to get clinic name + logo
+  function _readCFG(){
+    try{ return JSON.parse(localStorage.getItem('niva_cfg')||'{}'); }catch(e){ return {}; }
+  }
+  var cfg = _readCFG();
+  var clinicName = (cfg.clinic && cfg.clinic.name) ? cfg.clinic.name : '';
+  var logoData   = (cfg.logo  && cfg.logo.data)    ? cfg.logo.data   : '';
+
+  if(clinicName){
+    var el = document.getElementById('splash-clinic-name');
+    if(el) el.textContent = clinicName;
+  }
+  if(logoData){
+    var img   = document.getElementById('splash-logo-img');
+    if(img){ img.src = logoData; img.style.display = 'block'; }
+  }
+
+  // Dismiss after 2.6 s
+  setTimeout(function(){
+    var sp = document.getElementById('splash-screen');
+    if(sp){ sp.style.opacity='0'; setTimeout(function(){ sp.style.display='none'; }, 650); }
+    showLockAfterSplash();
+  }, 3200);
+})();
+
+// Lock screen / session init (runs AFTER splash fades)
+function showLockAfterSplash(){
+  var ls = document.getElementById('lockscreen');
+  sessionStorage.setItem('niva_unlocked','1');
+  sessionStorage.setItem('niva_login_time', Date.now().toString());
+  if(ls) ls.style.display = 'none';
+}
+</script>
+
 <!-- PASSWORD LOCK SCREEN -->
-<div id="lockscreen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0d6b8a 0%,#0a5570 100%);z-index:9999;display:flex;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:16px;padding:40px 32px;width:94%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center">
-    <div id="lock-logo-wrap" style="margin-bottom:12px">
-      <img id="lock-logo-img" src="" alt="" style="height:80px;width:80px;object-fit:contain;border-radius:12px;display:none;margin:0 auto"/>
-      <div id="lock-logo-tooth" style="font-size:52px;line-height:1">🦷</div>
+<style>
+.pin-dots{display:flex;gap:12px;justify-content:center;margin:18px 0 10px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #0d6b8a;background:#fff;transition:.15s}
+.pin-dot.filled{background:#0d6b8a;transform:scale(1.1)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:10px auto 0}
+.pin-key{padding:14px 0;border:1.5px solid #e0e8ee;border-radius:10px;font-size:20px;font-weight:700;color:#222;background:#fff;cursor:pointer;transition:.12s;user-select:none}
+.pin-key:hover{background:#daeef5;border-color:#0d6b8a}
+.pin-key:active{background:#b2dce8;transform:scale(.95)}
+.pin-key.del{font-size:16px;color:#888}
+.pin-key.wide{grid-column:span 2}
+@media(max-width:480px){#lockscreen > div{padding:28px 18px}.pin-key{padding:12px 0}}
+</style>
+<div id="lockscreen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0d6b8a 0%,#0a5570 100%);z-index:9999;display:none;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:36px 28px;width:94%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center">
+    <div id="lock-logo-wrap" style="margin-bottom:10px">
+      <img id="lock-logo-img" src="" alt="" style="height:72px;width:72px;object-fit:contain;border-radius:12px;display:none;margin:0 auto"/>
+      <div id="lock-logo-tooth" style="font-size:46px;line-height:1">🦷</div>
     </div>
-    <h2 id="lock-clinic-name" style="font-size:20px;font-weight:700;color:#0d6b8a;margin-bottom:3px">Niva Dental</h2>
-    <p style="font-size:11px;color:#aaa;margin-bottom:6px">Bhuyangdev, Ahmedabad</p>
-    <p style="font-size:12px;color:#888;margin-bottom:22px">Daily Cash Book &amp; Billing</p>
-    <p style="font-size:10px;color:#bbb;margin-bottom:16px;letter-spacing:.3px">Clinic Management Software<br>Development by <strong style="color:#2ecc71">GreenCheck inc.</strong></p>
-    <input id="lock-input" type="password" placeholder="Enter password" autocomplete="off"
-      style="width:100%;padding:12px 14px;border:1.5px solid #cdd5dd;border-radius:8px;font-size:15px;text-align:center;outline:none;margin-bottom:10px;font-family:Arial,sans-serif;transition:.2s"
-      onkeydown="if(event.key==='Enter')checkPassword()" onfocus="this.style.borderColor='#0d6b8a'" onblur="this.style.borderColor='#cdd5dd'"/>
-    <div id="lock-err" style="color:#c0392b;font-size:12px;margin-bottom:10px;min-height:16px"></div>
-    <button onclick="checkPassword()" style="width:100%;padding:12px;background:#0d6b8a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.3px">🔓 Unlock</button>
-    <div style="display:flex;justify-content:space-between;margin-top:12px">
-      <button onclick="showForgotPw()" style="background:none;border:none;color:#0d6b8a;font-size:11px;cursor:pointer;text-decoration:underline;padding:0">Forgot password?</button>
-      <button onclick="removePasswordPrompt()" style="background:none;border:none;color:#aaa;font-size:11px;cursor:pointer;text-decoration:underline;padding:0">Remove password</button>
+    <h2 id="lock-clinic-name" style="font-size:19px;font-weight:700;color:#0d6b8a;margin-bottom:2px">Niva Dental</h2>
+    <p style="font-size:11px;color:#aaa;margin-bottom:4px">Bhuyangdev, Ahmedabad</p>
+    <p style="font-size:10px;color:#bbb;margin-bottom:2px;letter-spacing:.3px">Clinic Management Software &nbsp;|&nbsp; <strong style="color:#2ecc71">GreenCheck inc.</strong></p>
+    <!-- PIN mode -->
+    <div id="lock-pin-mode">
+      <p style="font-size:12px;color:#888;margin-top:10px;margin-bottom:0">Enter 6-digit PIN</p>
+      <div class="pin-dots">
+        <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+        <div class="pin-dot" id="pd4"></div><div class="pin-dot" id="pd5"></div>
+      </div>
+      <div id="lock-err" style="color:#c0392b;font-size:12px;margin-bottom:4px;min-height:16px"></div>
+      <div class="pin-pad">
+        <button class="pin-key" onclick="pinPress('1')">1</button>
+        <button class="pin-key" onclick="pinPress('2')">2</button>
+        <button class="pin-key" onclick="pinPress('3')">3</button>
+        <button class="pin-key" onclick="pinPress('4')">4</button>
+        <button class="pin-key" onclick="pinPress('5')">5</button>
+        <button class="pin-key" onclick="pinPress('6')">6</button>
+        <button class="pin-key" onclick="pinPress('7')">7</button>
+        <button class="pin-key" onclick="pinPress('8')">8</button>
+        <button class="pin-key" onclick="pinPress('9')">9</button>
+        <button class="pin-key del" onclick="pinForgot()" style="font-size:11px;color:#0d6b8a">Forgot?</button>
+        <button class="pin-key" onclick="pinPress('0')">0</button>
+        <button class="pin-key del" onclick="pinDel()">⌫</button>
+      </div>
+      <div id="lock-attempts" style="margin-top:8px;font-size:11px;color:#c0392b;display:none"></div>
     </div>
-    <div id="lock-hint" style="margin-top:10px;font-size:11px;color:#bbb;display:none">First time? Contact admin to set up your password.</div>
-    <div id="lock-attempts" style="margin-top:8px;font-size:11px;color:#c0392b;display:none"></div>
+    <!-- Legacy password mode (fallback if no PIN set) -->
+    <div id="lock-pw-mode" style="display:none">
+      <p style="font-size:12px;color:#888;margin-top:12px;margin-bottom:8px">Enter Password</p>
+      <input id="lock-input" type="password" placeholder="Enter password" autocomplete="off"
+        style="width:100%;padding:11px 14px;border:1.5px solid #cdd5dd;border-radius:8px;font-size:15px;text-align:center;outline:none;margin-bottom:8px;font-family:Arial,sans-serif;transition:.2s"
+        onkeydown="if(event.key==='Enter')checkPassword()" onfocus="this.style.borderColor='#0d6b8a'" onblur="this.style.borderColor='#cdd5dd'"/>
+      <div id="lock-pw-err" style="color:#c0392b;font-size:12px;margin-bottom:8px;min-height:16px"></div>
+      <button onclick="checkPassword()" style="width:100%;padding:11px;background:#0d6b8a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">🔓 Unlock</button>
+      <div style="display:flex;justify-content:space-between;margin-top:10px">
+        <button onclick="showForgotPw()" style="background:none;border:none;color:#0d6b8a;font-size:11px;cursor:pointer;text-decoration:underline;padding:0">Forgot?</button>
+        <button onclick="removePasswordPrompt()" style="background:none;border:none;color:#aaa;font-size:11px;cursor:pointer;text-decoration:underline;padding:0">Remove password</button>
+      </div>
+      <div id="lock-hint" style="margin-top:8px;font-size:11px;color:#bbb;display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOGIN MODAL ══ -->
+<div class="auth-overlay" id="loginModal">
+  <div class="auth-box">
+    <div class="auth-logo">🦷</div>
+    <div class="auth-title" id="login-clinic-title">Niva Dental</div>
+    <div class="auth-sub">Sign in to continue</div>
+    <input class="auth-inp" id="login-user" type="text" placeholder="Username" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()"/>
+    <input class="auth-inp" id="login-pass" type="password" placeholder="Password" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div class="auth-err" id="login-err"></div>
+    <button class="auth-btn pri" onclick="doLogin()">🔓 Sign In</button>
+    <hr class="auth-divider"/>
+    <div style="font-size:10px;color:#bbb;text-align:center">Niva Dental &nbsp;|&nbsp; <strong style="color:#2ecc71">GreenCheck inc.</strong></div>
+  </div>
+</div>
+
+<!-- ══ LOGOUT MODAL ══ -->
+<div class="auth-overlay" id="logoutModal">
+  <div class="auth-box" style="max-width:320px">
+    <div class="logout-icon">👋</div>
+    <div class="auth-title">Sign Out?</div>
+    <div class="auth-sub" style="margin-bottom:20px">You will be returned to the login screen.</div>
+    <button class="auth-btn pri" style="background:#c0392b" onclick="doLogoutConfirm()">🔒 Yes, Sign Out</button>
+    <button class="auth-btn sec" onclick="closeLogoutModal()">Cancel</button>
   </div>
 </div>
 
@@ -462,7 +724,8 @@ tr:hover td{background:#f9fbfc}
     <div><h1 id="tb-name" style="display:none">&#9670; Niva Dental</h1><p id="tb-addr">Bhuyangdev, Ahmedabad &nbsp;|&nbsp; Daily Cash Book &amp; Billing</p></div>
   </div>
   <div class="topbar-r" id="tdate"></div>
-  <button onclick="doLogout()" title="Logout" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;margin-left:12px;display:flex;align-items:center;gap:5px">🔒 Logout</button>
+  <button class="topbar-logout-btn" onclick="openLogoutModal()" title="Logout">🔒 Logout</button>
+
 </div>
 <!-- MOBILE DRAWER OVERLAY -->
 <div class="mob-nav-overlay" id="mob-nav-overlay" onclick="closeMobDrawer()"></div>
@@ -486,7 +749,8 @@ tr:hover td{background:#f9fbfc}
     <button id="mob-nav-reports" onclick="showTab('reports',this);closeMobDrawer()"><span class="mdi">&#128202;</span> Reports</button>
     <button id="mob-nav-settings" onclick="showTab('settings',this);closeMobDrawer()"><span class="mdi">&#9881;</span> Settings</button>
     <div class="sep"></div>
-    <button onclick="doLogout();closeMobDrawer()" style="color:#c0392b"><span class="mdi">&#128274;</span> Logout</button>
+    <button onclick="openLogoutModal();closeMobDrawer()" style="color:#c0392b"><span class="mdi">&#128274;</span> Logout</button>
+
   </nav>
 </div>
 
@@ -549,6 +813,9 @@ tr:hover td{background:#f9fbfc}
     <div class="sec">Treatment items</div>
     <table class="itb"><thead><tr><th></th><th>Service / Treatment</th><th>No. of Tooth / Qty</th><th>Rate (&#8377;)</th><th>Amount (&#8377;)</th><th>Actions</th></tr></thead>
       <tbody id="ib"></tbody></table>
+    <!-- Mobile card view for treatment items -->
+    <div id="ib-mobile-cards"></div>
+    <div id="ib-mobile-empty"></div>
     <div class="addr">
       <div class="f" style="flex:3"><label>Service / Treatment</label><input id="ai-n" placeholder="e.g. Extraction, Root Canal, Scaling, Filling…"/></div>
       <div class="f" style="max-width:100px"><label>No. of Tooth / Qty</label><input id="ai-q" type="text" value="1" placeholder="1 or 11,12"/></div>
@@ -582,11 +849,14 @@ tr:hover td{background:#f9fbfc}
       <div class="sec" style="margin-bottom:10px">Payment details</div>
       <div class="row">
         <div class="f"><label>Payment Mode</label>
-          <select id="nb-md"><option>Cash</option><option>UPI</option><option>Card</option><option>Cheque</option></select></div>
+          <select id="nb-md" onchange="toggleNbUpiTxn()"><option>Cash</option><option>UPI</option><option>Card</option><option>Cheque</option></select></div>
         <div class="f"><label>Payment Type</label>
           <select id="nb-pt" onchange="togglePartPay()"><option value="Full">Full Payment</option><option value="Part">Part Payment</option></select></div>
         <div class="f"><label>Status</label>
           <select id="nb-st"><option value="Paid">Paid</option><option value="Pending">Pending</option></select></div>
+      </div>
+      <div id="nb-pay-ref-wrap" style="display:none" class="row">
+        <div class="f"><label id="nb-pay-ref-label">UPI Transaction ID <span style="font-weight:400;color:#aaa">(optional)</span></label><input id="nb-pay-ref" placeholder=""/></div>
       </div>
       <div id="part-pay-row" style="display:none" class="row">
         <div class="f"><label>Amount Paid Now (&#8377;)</label><input id="nb-paid" type="number" min="0" placeholder="0" oninput="recalc()"/></div>
@@ -604,7 +874,7 @@ tr:hover td{background:#f9fbfc}
 
 <!-- CASH BOOK (now = View Bills with full bill management) -->
 <div id="tab-cashbook" class="panel">
-  <div class="sbar">
+  <div class="sbar" id="vb-sbar">
     <input id="vbq" placeholder="🔍 Search by patient name or bill no…" oninput="renderVB()" style="flex:1;min-width:140px"/>
     <select id="vbst" onchange="renderVB()">
       <option value="">All status</option>
@@ -1422,13 +1692,19 @@ tr:hover td{background:#f9fbfc}
       <button class="act" onclick="showSetSection('clinic',this);closeMobSetMenu()"><span class="icon">&#127973;</span> Clinic Info</button>
       <button onclick="showSetSection('theme',this);closeMobSetMenu()"><span class="icon">&#127912;</span> Theme &amp; Colors</button>
       <button onclick="showSetSection('billing',this);closeMobSetMenu()"><span class="icon">&#128196;</span> Billing Options</button>
-      <button onclick="showSetSection('data',this);closeMobSetMenu()"><span class="icon">&#128190;</span> Data &amp; Backup</button>
-      <button onclick="showSetSection('email',this);closeMobSetMenu()"><span class="icon">&#128140;</span> Email Sync</button>
-      <button onclick="showSetSection('firebase',this);closeMobSetMenu()"><span class="icon">&#9889;</span> Live Sync (Firebase)</button>
-      <button onclick="showSetSection('localserver',this);closeMobSetMenu()"><span class="icon">&#128257;</span> Local Server Sync</button>
       <button onclick="showSetSection('printformat',this);closeMobSetMenu()"><span class="icon">&#128438;</span> Print Format</button>
+      <button onclick="showSetSection('apptmsg',this);closeMobSetMenu()"><span class="icon">&#128241;</span> Appointment Message</button>
+      <button onclick="showSetSection('security',this);closeMobSetMenu()"><span class="icon">&#128274;</span> Lock &amp; Security</button>
+      <button onclick="showSetSection('data',this);closeMobSetMenu()"><span class="icon">&#128190;</span> Data &amp; Backup</button>
       <button onclick="showSetSection('about',this);closeMobSetMenu()"><span class="icon">&#8505;</span> About</button>
-      <button onclick="openM('pwmodal');closeMobSetMenu()" style="color:#c0392b"><span class="icon">&#128274;</span> Change Password</button>
+      <div style="padding:13px 16px;font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.6px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f3f5" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.adv-arrow').textContent=this.nextElementSibling.style.display==='none'?'▶':'▼'">
+        ⚙ Advanced / Sync <span class="adv-arrow" style="font-size:9px">▶</span>
+      </div>
+      <div style="display:none">
+        <button onclick="showSetSection('email',this);closeMobSetMenu()" style="padding-left:28px"><span class="icon">&#128140;</span> Email Sync</button>
+        <button onclick="showSetSection('firebase',this);closeMobSetMenu()" style="padding-left:28px"><span class="icon">&#9889;</span> Live Sync (Firebase)</button>
+        <button onclick="showSetSection('lanshare',this);closeMobSetMenu()" style="padding-left:28px"><span class="icon">&#128225;</span> LAN Share</button>
+      </div>
     </div>
   </div>
 
@@ -1439,13 +1715,20 @@ tr:hover td{background:#f9fbfc}
         <button class="act" onclick="showSetSection('clinic',this)"><span class="icon">&#127973;</span>Clinic Info</button>
         <button onclick="showSetSection('theme',this)"><span class="icon">&#127912;</span>Theme &amp; Colors</button>
         <button onclick="showSetSection('billing',this)"><span class="icon">&#128196;</span>Billing Options</button>
-        <button onclick="showSetSection('data',this)"><span class="icon">&#128190;</span>Data &amp; Backup</button>
-        <button onclick="showSetSection('email',this)"><span class="icon">&#128140;</span>Email Sync</button>
-        <button onclick="showSetSection('firebase',this)"><span class="icon">&#9889;</span>Live Sync (Firebase)</button>
-        <button onclick="showSetSection('localserver',this)"><span class="icon">&#128257;</span>Local Server Sync</button>
         <button onclick="showSetSection('printformat',this)"><span class="icon">&#128438;</span>Print Format</button>
+        <button onclick="showSetSection('apptmsg',this)"><span class="icon">&#128241;</span>Appointment Message</button>
+        <button onclick="showSetSection('security',this)"><span class="icon">&#128274;</span>Lock &amp; Security</button>
+        <button onclick="showSetSection('data',this)"><span class="icon">&#128190;</span>Data &amp; Backup</button>
         <button onclick="showSetSection('about',this)"><span class="icon">&#8505;</span>About</button>
-        <button onclick="openM('pwmodal')" style="color:#c0392b;border-top:1px solid #e0e8ee;margin-top:8px"><span class="icon">&#128274;</span>Change Password</button>
+        <div id="adv-sync-hdr" style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;user-select:none;border-top:1px solid #f0f3f5" onclick="var d=document.getElementById('adv-sync-body');var open=d.style.display!=='none';d.style.display=open?'none':'block';document.getElementById('adv-sync-arrow').textContent=open?'▶':'▼'">
+          <span style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.6px">⚙ Advanced / Sync</span>
+          <span id="adv-sync-arrow" style="font-size:9px;color:#bbb">▶</span>
+        </div>
+        <div id="adv-sync-body" style="display:none">
+          <button onclick="showSetSection('email',this)" style="padding-left:28px"><span class="icon">&#128140;</span>Email Sync</button>
+          <button onclick="showSetSection('firebase',this)" style="padding-left:28px"><span class="icon">&#9889;</span>Live Sync (Firebase)</button>
+          <button onclick="showSetSection('lanshare',this)" style="padding-left:28px"><span class="icon">&#128225;</span>LAN Share</button>
+        </div>
       </div>
     </div>
     <div class="settings-content">
@@ -1622,6 +1905,10 @@ tr:hover td{background:#f9fbfc}
               <div><div class="tlabel" style="font-size:12px">Auto-save on logout</div><div class="tsub">Automatically overwrite the file when you log out</div></div>
               <label class="toggle"><input type="checkbox" id="tog-autosave-logout" onchange="saveAutoSaveSettings()"/><span class="toggle-slider"></span></label>
             </div>
+            <div class="toggle-row" style="padding:8px 0;border:none;border-top:1px solid #e8edf0;margin-top:4px">
+              <div><div class="tlabel" style="font-size:12px">&#128204; Auto-save on close / background</div><div class="tsub">Silently save when app is closed, tab hidden, or you navigate away</div></div>
+              <label class="toggle"><input type="checkbox" id="tog-autosave-exit" onchange="saveAutoSaveSettings()"/><span class="toggle-slider"></span></label>
+            </div>
           </div>
           <div id="autosave-last-saved" style="font-size:11px;color:#aaa;margin-top:6px;display:none">&#10003; Last saved: <span id="autosave-last-time">—</span></div>
           <div id="autosave-fs-warning" style="display:none;margin-top:10px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:9px 12px;font-size:11px;color:#7a5c00">
@@ -1670,9 +1957,9 @@ tr:hover td{background:#f9fbfc}
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:12px;border-bottom:1px solid #fdd">
             <div>
               <div style="font-size:13px;font-weight:700;color:#c0392b">&#128257; Clear Data + Local Server Config</div>
-              <div style="font-size:11px;color:#aaa;margin-top:2px">Deletes all bills, expenses and removes saved Local Server Sync settings. Firebase config kept.</div>
+              <div style="font-size:11px;color:#aaa;margin-top:2px">Deletes all bills and expenses. LAN Share session also reset. Firebase config kept.</div>
             </div>
-            <button class="btn bd sm" onclick="clearDataAndLocalServer()">&#128465; Clear + Local Server</button>
+            <button class="btn bd sm" onclick="clearDataAndLocalServer()">&#128465; Clear Bills &amp; Expenses</button>
           </div>
 
           <!-- Option 4: Clear Everything -->
@@ -1692,6 +1979,9 @@ tr:hover td{background:#f9fbfc}
 
       <!-- EMAIL SYNC -->
       <div id="set-email" class="set-section">
+        <div style="margin-bottom:14px">
+          <button class="btn bo sm" onclick="showSetSection('clinic',null)" style="font-size:12px;padding:6px 14px">&#8592; Back to Settings</button>
+        </div>
         <div class="set-title">&#128140; Email Sync &amp; Backup</div>
         <div class="set-sub">Send your daily cash book and backup directly to your email. Uses your device's default mail app (no password stored).</div>
 
@@ -1746,11 +2036,20 @@ tr:hover td{background:#f9fbfc}
 
       <!-- FIREBASE LIVE SYNC -->
       <div id="set-firebase" class="set-section">
+        <div style="margin-bottom:14px">
+          <button class="btn bo sm" onclick="showSetSection('clinic',null)" style="font-size:12px;padding:6px 14px">&#8592; Back to Settings</button>
+        </div>
         <div class="set-title">&#9889; Live Sync – Real-time Multi-device</div>
         <div class="set-sub">Use Google Firebase to sync bills across all your devices in real time — reception desk, doctor's room, and phone.</div>
 
-        <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:#7a5800">
-          <strong>How it works:</strong> Create a free Firebase project at <a href="https://console.firebase.google.com" target="_blank" style="color:var(--pri)">console.firebase.google.com</a>, enable Realtime Database, copy your config below and all devices on the same config sync instantly.
+        <div class="note-collapsible" id="note-fb-howit" style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px">
+            <strong style="font-size:12px;color:#7a5800">💡 How it works</strong>
+            <button class="note-toggle-btn" style="color:#7a5800" onclick="toggleNote('note-fb-howit')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow">▼</span></button>
+          </div>
+          <div class="note-body" style="padding:0 12px 12px;font-size:12px;color:#7a5800">
+            Create a free Firebase project at <a href="https://console.firebase.google.com" target="_blank" style="color:var(--pri)">console.firebase.google.com</a>, enable Realtime Database, copy your config below and all devices on the same config sync instantly.
+          </div>
         </div>
 
         <div class="sec">Firebase project config</div>
@@ -1775,8 +2074,14 @@ tr:hover td{background:#f9fbfc}
         </div>
 
         <div class="sec" style="margin-top:16px">🔒 Firebase Authentication (Email &amp; Password)</div>
-        <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:#1a5276">
-          <strong>Secure your data:</strong> Enable <strong>Email/Password</strong> sign-in in Firebase Console → Authentication → Sign-in method. Then enter your clinic's Firebase user credentials below. Only authenticated users can read/write your database.
+        <div class="note-collapsible" id="note-fb-auth" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px">
+            <strong style="font-size:11px;color:#1a5276">🔒 Secure your data</strong>
+            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-fb-auth')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow">▼</span></button>
+          </div>
+          <div class="note-body" style="padding:0 12px 10px;font-size:11px;color:#1a5276">
+            Enable <strong>Email/Password</strong> sign-in in Firebase Console → Authentication → Sign-in method. Then enter your clinic's Firebase user credentials below. Only authenticated users can read/write your database.
+          </div>
         </div>
         <div class="row">
           <div class="set-group" style="flex:1">
@@ -1835,8 +2140,12 @@ tr:hover td{background:#f9fbfc}
           <button class="btn bo" onclick="fbDisconnect()">&#9679; Disconnect</button>
         </div>
 
-        <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:12px;font-size:11px;color:#1a5276;line-height:1.7">
-          <strong>Step-by-step setup:</strong><br>
+        <div class="note-collapsible" id="note-fb-steps" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px">
+            <strong style="font-size:11px;color:#1a5276">📄 Step-by-step setup</strong>
+            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-fb-steps')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow">▼</span></button>
+          </div>
+          <div class="note-body" style="padding:0 12px 12px;font-size:11px;color:#1a5276;line-height:1.7">
           1. Go to <strong>console.firebase.google.com</strong> → Create project<br>
           2. Build → Realtime Database → Create database<br>
           3. <strong>Authentication → Sign-in method → Enable Email/Password</strong><br>
@@ -1844,6 +2153,7 @@ tr:hover td{background:#f9fbfc}
           5. Realtime Database → Rules → paste: <code style="background:#e3edf7;padding:1px 5px;border-radius:3px;font-size:10px">{"rules":{".read":"auth!=null",".write":"auth!=null"}}</code><br>
           6. Project Settings → Your apps → Add Web app → Copy config<br>
           7. Paste config + email + password above → Save &amp; Connect
+          </div>
         </div>
 
         <!-- FIREBASE CONFIG BACKUP & RESTORE -->
@@ -1859,96 +2169,204 @@ tr:hover td{background:#f9fbfc}
           </div>
           <div id="fb-restore-msg" style="font-size:11px;margin-top:8px;display:none"></div>
         </div>
+
+        <!-- AUTO WEEKLY FIREBASE BACKUP -->
+        <div class="sec" style="margin-top:20px">&#128197; Auto Weekly Firebase Backup</div>
+        <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:10px;padding:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#0d6b8a">&#128197; Weekly Auto Backup to Firebase</div>
+              <div style="font-size:11px;color:#888;margin-top:2px">Automatically push a full data snapshot to Firebase every 7 days</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="tog-fb-weekly" onchange="saveFBWeeklySettings()"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div id="fb-weekly-config" style="display:none">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
+              <div class="f" style="min-width:130px;flex:1">
+                <label>Backup Day</label>
+                <select id="fb-weekly-day" onchange="saveFBWeeklySettings()">
+                  <option value="0">Sunday</option>
+                  <option value="1">Monday</option>
+                  <option value="2" selected>Tuesday</option>
+                  <option value="3">Wednesday</option>
+                  <option value="4">Thursday</option>
+                  <option value="5">Friday</option>
+                  <option value="6">Saturday</option>
+                </select>
+              </div>
+              <div class="f" style="min-width:110px;flex:1">
+                <label>Backup Time</label>
+                <select id="fb-weekly-time" onchange="saveFBWeeklySettings()">
+                  <option value="08:00">08:00 AM</option>
+                  <option value="09:00" selected>09:00 AM</option>
+                  <option value="10:00">10:00 AM</option>
+                  <option value="18:00">06:00 PM</option>
+                  <option value="20:00">08:00 PM</option>
+                  <option value="22:00">10:00 PM</option>
+                </select>
+              </div>
+              <div class="f" style="min-width:110px;flex:1">
+                <label>Keep Last N Backups</label>
+                <select id="fb-weekly-keep" onchange="saveFBWeeklySettings()">
+                  <option value="4" selected>4 weeks</option>
+                  <option value="8">8 weeks</option>
+                  <option value="12">12 weeks</option>
+                  <option value="0">All (no limit)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #daeef5;border-radius:8px;padding:12px;margin-bottom:10px">
+              <div style="font-size:11px;font-weight:700;color:#0d6b8a;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">Backup Status</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <div id="fb-weekly-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;flex-shrink:0"></div>
+                <div style="flex:1">
+                  <div id="fb-weekly-status" style="font-size:12px;font-weight:700;color:#555">Not yet run</div>
+                  <div id="fb-weekly-last" style="font-size:11px;color:#aaa;margin-top:1px">Last backup: —</div>
+                </div>
+                <button class="btn bp sm" onclick="runFBWeeklyBackup(true)">&#128197; Backup Now</button>
+              </div>
+            </div>
+
+            <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:9px 12px;font-size:11px;color:#7a5c00">
+              &#9888; Backups are stored at <code style="background:#fef3c7;padding:1px 4px;border-radius:3px">weekly_backups/{date}/</code> in your Firebase Realtime Database. Firebase must be configured and connected above.
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- LOCAL SERVER SYNC -->
-      <div id="set-localserver" class="set-section">
-        <div class="set-title">&#128257; Local Server Sync – LAN / Wi-Fi</div>
-        <div class="set-sub">Run the included Node.js server on your PC/laptop and all devices on the same Wi-Fi will sync in real time — no internet required.</div>
-
-        <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:#1b5e20">
-          <strong>✅ Fully offline &amp; private.</strong> All data stays on your local network. No cloud, no Firebase needed.
+      <div id="set-lanshare" class="set-section">
+        <div style="margin-bottom:14px">
+          <button class="btn bo sm" onclick="showSetSection('clinic',null)" style="font-size:12px;padding:6px 14px">&#8592; Back to Settings</button>
         </div>
+        <div class="set-title">&#128225; LAN Share – Same Network Real-Time Sync</div>
+        <div class="set-sub">Ek device Host bano, baaki sab Join karo — same Wi-Fi / LAN par sab devices real-time sync honge. Koi server install karna nahi!</div>
 
-        <div class="sec">Server connection</div>
-        <div class="row">
-          <div class="set-group" style="flex:2">
-            <label>Server URL</label>
-            <input id="ls-url" placeholder="http://192.168.1.100:3456" value="http://localhost:3456"/>
-            <div class="hint">Enter your PC's local IP (e.g. http://192.168.1.10:3456). Find it by running <code>ipconfig</code> (Windows) or <code>ifconfig</code> (Mac/Linux).</div>
-          </div>
-          <div class="set-group" style="flex:1">
-            <label>Server Secret Key</label>
-            <input id="ls-secret" placeholder="niva-secret-key" type="password" value="niva-secret"/>
-            <div class="hint">Must match the key in server.js</div>
-          </div>
-        </div>
-        <div class="save-bar" style="margin-bottom:16px">
-          <button class="btn bg" onclick="lsSaveConfig()">&#10003; Save &amp; Connect</button>
-          <button class="btn bo" onclick="lsTestConnection()" style="margin-left:6px">&#9656; Test Connection</button>
-          <button class="btn bd" onclick="lsDisconnect()" style="margin-left:6px">&#9679; Disconnect</button>
-          <span class="saved-msg" id="ls-saved">&#10003; Config saved!</span>
-        </div>
-
-        <div class="sec">Connection status</div>
-        <div id="ls-status-box" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:14px;margin-bottom:14px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div id="ls-dot" style="width:12px;height:12px;border-radius:50%;background:#ccc;flex-shrink:0"></div>
-            <div>
-              <div id="ls-status-label" style="font-size:13px;font-weight:700;color:#555">Not connected</div>
-              <div id="ls-status-sub" style="font-size:11px;color:#aaa;margin-top:2px">Configure server URL above and click Save &amp; Connect</div>
+        <!-- HOW IT WORKS -->
+        <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:14px 16px;margin-bottom:18px">
+          <div style="font-size:13px;font-weight:700;color:#1b5e20;margin-bottom:8px">&#128161; Kaise kaam karta hai?</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px">
+            <div style="background:#fff;border-radius:8px;padding:10px;text-align:center;border:1px solid #c8e6c9">
+              <div style="font-size:22px">&#128421;</div>
+              <div style="font-size:12px;font-weight:700;color:#1b6e35;margin-top:4px">Step 1</div>
+              <div style="font-size:11px;color:#555;margin-top:2px">Ek device par <strong>Host</strong> bano — Room Code milega</div>
             </div>
-            <div id="ls-device-count" style="margin-left:auto;font-size:11px;color:#888"></div>
+            <div style="background:#fff;border-radius:8px;padding:10px;text-align:center;border:1px solid #c8e6c9">
+              <div style="font-size:22px">&#128241;</div>
+              <div style="font-size:12px;font-weight:700;color:#1b6e35;margin-top:4px">Step 2</div>
+              <div style="font-size:11px;color:#555;margin-top:2px">Doosre devices par same app kholo (same Wi-Fi)</div>
+            </div>
+            <div style="background:#fff;border-radius:8px;padding:10px;text-align:center;border:1px solid #c8e6c9">
+              <div style="font-size:22px">&#128279;</div>
+              <div style="font-size:12px;font-weight:700;color:#1b6e35;margin-top:4px">Step 3</div>
+              <div style="font-size:11px;color:#555;margin-top:2px"><strong>Join</strong> karo Room Code se — real-time sync shuru!</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:#2e7d32;background:#f1f8e9;border-radius:6px;padding:8px 10px">
+            &#9989; <strong>Same browser tabs:</strong> BroadcastChannel se instant sync &nbsp;|&nbsp; &#128225; <strong>Cross-device:</strong> Room Code se join karo — auto poll every 3 sec
           </div>
         </div>
 
-        <div class="sec">Sync options</div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Auto-sync on changes</div><div class="tsub">Push every new/edited bill &amp; expense to server instantly</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-lsautosync" checked/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Real-time listener</div><div class="tsub">Receive live updates from other devices when they add/edit records</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-lsrealtime" checked/><span class="toggle-slider"></span></label>
-        </div>
-
-        <div class="sec" style="margin-top:16px">Manual sync</div>
-        <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px">
-          <button class="btn bp" onclick="lsPushAll()">&#8593; Push All Data to Server</button>
-          <button class="btn bg" onclick="lsPullAll()">&#8595; Pull All Data from Server</button>
+        <!-- MODE TABS -->
+        <div style="display:flex;gap:0;background:#fff;border:1px solid #e0e8ee;border-radius:10px;overflow:hidden;margin-bottom:18px">
+          <button id="lan-tab-host" onclick="lanSwitchTab('host')" style="flex:1;padding:13px 8px;border:none;background:var(--pri);color:#fff;font-size:13px;font-weight:700;cursor:pointer">
+            &#128421; Host Bano
+          </button>
+          <button id="lan-tab-join" onclick="lanSwitchTab('join')" style="flex:1;padding:13px 8px;border:none;background:#f5f8fa;color:#666;font-size:13px;font-weight:700;cursor:pointer;border-left:1px solid #e0e8ee">
+            &#128279; Join Karo
+          </button>
         </div>
 
-        <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:14px;font-size:11px;color:#1a5276;line-height:1.9;margin-bottom:16px">
-          <strong>&#128196; Setup instructions:</strong><br>
-          1. Download the <strong>niva-server</strong> folder (see Files section below)<br>
-          2. Install Node.js from <strong>nodejs.org</strong> (free)<br>
-          3. Open a terminal in the server folder, run: <code style="background:#daeef5;padding:1px 5px;border-radius:3px">npm install</code><br>
-          4. Start the server: <code style="background:#daeef5;padding:1px 5px;border-radius:3px">node server.js</code><br>
-          5. Find your PC's local IP (<code>ipconfig</code> / <code>ifconfig</code>) and enter it above<br>
-          6. Open this app on any device on the same Wi-Fi — they all sync live!<br>
-          <br>
-          <strong>&#128274; Security:</strong> The server only accepts connections with the correct secret key. Change the default key in both <code>server.js</code> and the field above.
-        </div>
-
-        <div class="sec">Sync log</div>
-        <div id="ls-sync-log" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:10px;max-height:160px;overflow-y:auto;font-size:11px;color:#555;font-family:'Courier New',monospace">
-          <div style="color:#bbb;text-align:center;padding:8px">No sync activity yet.</div>
-        </div>
-        <div style="margin-top:7px"><button class="btn bo sm" onclick="lsClearLog()">Clear Log</button></div>
-
-        <!-- LOCAL SERVER CONFIG BACKUP & RESTORE -->
-        <div class="sec" style="margin-top:20px">&#128190; Local Server Config Backup &amp; Restore</div>
-        <div style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:14px">
-          <div style="font-size:12px;color:#666;margin-bottom:12px">Save your Local Server URL and secret key to a file so you can restore them quickly after a reset or on a new device.</div>
-          <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
-            <button class="btn bg" onclick="backupLSConfig()">&#128229; Backup Server Config</button>
-            <label class="btn bo" style="cursor:pointer;display:inline-flex;align-items:center;padding:7px 14px;font-size:12px;font-weight:700;margin:0">
-              &#128228; Restore Server Config
-              <input type="file" id="ls-restore-file" accept=".json" style="display:none" onchange="restoreLSConfig(this)"/>
-            </label>
+        <!-- HOST PANEL -->
+        <div id="lan-panel-host">
+          <div class="sec">&#128421; Host Settings</div>
+          <div style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:16px;margin-bottom:14px">
+            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">
+              <div class="f" style="max-width:200px">
+                <label>Room Code</label>
+                <input id="lan-room-code" placeholder="Auto generate…" style="font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"/>
+              </div>
+              <button class="btn bp" onclick="lanGenerateCode()" style="margin-bottom:2px">&#9881; Generate</button>
+            </div>
+            <div style="display:flex;gap:9px;flex-wrap:wrap">
+              <button class="btn bg" id="lan-host-btn" onclick="lanStartHost()">&#9654; Start Hosting</button>
+              <button class="btn bd" onclick="lanStopHost()">&#9632; Stop</button>
+            </div>
           </div>
-          <div id="ls-restore-msg" style="font-size:11px;margin-top:8px;display:none"></div>
+
+          <!-- Host Status -->
+          <div id="lan-host-status-box" style="display:none;background:#f0fff4;border:1.5px solid #a5d6a7;border-radius:10px;padding:14px;margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div id="lan-host-dot" style="width:12px;height:12px;border-radius:50%;background:#1b6e35;flex-shrink:0"></div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:700;color:#1b5e20">&#128225; Hosting Active</div>
+                <div id="lan-host-sub" style="font-size:11px;color:#2e7d32;margin-top:1px">Waiting for devices to join…</div>
+              </div>
+              <div id="lan-host-count" style="font-size:12px;color:#1b6e35;font-weight:700"></div>
+            </div>
+            <div style="background:#fff;border:1px solid #c8e6c9;border-radius:8px;padding:12px;text-align:center">
+              <div style="font-size:11px;color:#888;margin-bottom:6px">Room Code — share karo doosre devices se</div>
+              <div id="lan-display-code" style="font-size:30px;font-weight:900;letter-spacing:6px;color:var(--pri);font-family:'Courier New',monospace"></div>
+              <button class="btn bo sm" style="margin-top:10px;font-size:11px" onclick="lanCopyCode()">&#128203; Copy Code</button>
+            </div>
+          </div>
+
+          <!-- Sync toggles -->
+          <div class="toggle-row">
+            <div><div class="tlabel">Auto-sync on changes</div><div class="tsub">Har naye/edited bill aur expense ko turant broadcast karo</div></div>
+            <label class="toggle"><input type="checkbox" id="tog-lanautosync" checked/><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="tlabel">Real-time listener</div><div class="tsub">Doosre devices ke changes receive karo instantly</div></div>
+            <label class="toggle"><input type="checkbox" id="tog-lanrealtime" checked/><span class="toggle-slider"></span></label>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+            <button class="btn bp" onclick="lanPushAll()">&#8593; Push All Data to Guests</button>
+            <button class="btn bg" onclick="lanPullAll()">&#8595; Pull Latest from Host</button>
+          </div>
         </div>
+
+        <!-- JOIN PANEL -->
+        <div id="lan-panel-join" style="display:none">
+          <div class="sec">&#128279; Join a Host</div>
+          <div style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:16px;margin-bottom:14px">
+            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">
+              <div class="f">
+                <label>Room Code Enter Karo</label>
+                <input id="lan-join-code" placeholder="e.g. NIVA42" style="font-size:16px;font-weight:700;letter-spacing:3px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"/>
+              </div>
+            </div>
+            <div style="display:flex;gap:9px;flex-wrap:wrap">
+              <button class="btn bg" onclick="lanJoin()">&#128279; Join Room</button>
+              <button class="btn bd" onclick="lanLeave()">&#10006; Leave</button>
+            </div>
+          </div>
+
+          <!-- Join Status -->
+          <div id="lan-join-status-box" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:10px;padding:14px;margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div id="lan-join-dot" style="width:12px;height:12px;border-radius:50%;background:#ccc;flex-shrink:0"></div>
+              <div>
+                <div id="lan-join-status-label" style="font-size:13px;font-weight:700;color:#555">Not connected</div>
+                <div id="lan-join-status-sub" style="font-size:11px;color:#aaa;margin-top:1px">Room Code enter karo aur Join karo</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SYNC LOG -->
+        <div class="sec" style="margin-top:16px">&#128220; Sync Log</div>
+        <div id="lan-sync-log" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:10px;max-height:160px;overflow-y:auto;font-size:11px;color:#555;font-family:'Courier New',monospace">
+          <div style="color:#bbb;text-align:center;padding:8px">Abhi tak koi sync activity nahi.</div>
+        </div>
+        <div style="margin-top:7px"><button class="btn bo sm" onclick="lanClearLog()">Clear Log</button></div>
       </div>
 
       <!-- PRINT FORMAT -->
@@ -1979,8 +2397,14 @@ tr:hover td{background:#f9fbfc}
         </div>
 
         <div class="sec" style="margin-top:4px">Pre-printed stationery options</div>
-        <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#1a5276">
-          Use these when printing on stationery that already has your clinic name/logo pre-printed at the top.
+        <div class="note-collapsible" id="note-pf-stationery" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px">
+            <strong style="font-size:12px;color:#1a5276">💡 Pre-printed stationery tip</strong>
+            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-pf-stationery')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow">▼</span></button>
+          </div>
+          <div class="note-body" style="padding:0 14px 10px;font-size:12px;color:#1a5276">
+            Use these when printing on stationery that already has your clinic name/logo pre-printed at the top.
+          </div>
         </div>
         <div class="toggle-row">
           <div><div class="tlabel">Hide clinic name &amp; header</div><div class="tsub">Do not print clinic name, address, phone on bill (for pre-printed letterhead)</div></div>
@@ -2041,6 +2465,57 @@ tr:hover td{background:#f9fbfc}
         </div>
       </div>
 
+      <!-- APPOINTMENT MESSAGE TEMPLATE -->
+      <div id="set-apptmsg" class="set-section">
+        <div class="set-title">&#128241; Appointment Message Template</div>
+        <div class="set-sub">Customize the WhatsApp/SMS message sent when booking appointments. Use the placeholders shown below.</div>
+
+        <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#1a5276">
+          <div style="font-weight:700;margin-bottom:6px">&#128196; Available Placeholders:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <code style="background:#daeef5;padding:2px 8px;border-radius:4px;font-size:11px">{patient}</code>
+            <code style="background:#daeef5;padding:2px 8px;border-radius:4px;font-size:11px">{date}</code>
+            <code style="background:#daeef5;padding:2px 8px;border-radius:4px;font-size:11px">{time}</code>
+            <code style="background:#daeef5;padding:2px 8px;border-radius:4px;font-size:11px">{doctor}</code>
+            <code style="background:#daeef5;padding:2px 8px;border-radius:4px;font-size:11px">{purpose}</code>
+            <code style="background:#daeef5;padding:2px 8px;border-radius:4px;font-size:11px">{notes}</code>
+            <code style="background:#daeef5;padding:2px 8px;border-radius:4px;font-size:11px">{clinic}</code>
+            <code style="background:#daeef5;padding:2px 8px;border-radius:4px;font-size:11px">{address}</code>
+            <code style="background:#daeef5;padding:2px 8px;border-radius:4px;font-size:11px">{phone}</code>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#555">
+            &#9888; Use <strong>*text*</strong> for <strong>bold</strong> in WhatsApp &nbsp;|&nbsp; Use <strong>_text_</strong> for <em>italic</em>
+          </div>
+        </div>
+
+        <div class="set-group">
+          <label>WhatsApp Message Template</label>
+          <textarea id="apptmsg-wa-tmpl" style="min-height:200px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6" placeholder="Enter WhatsApp message template..." oninput="updateApptMsgPreview()"></textarea>
+          <div class="hint">This template is used for both "Book Appointment" (from bill view) and "Save &amp; Send WhatsApp" (from Appointments tab).</div>
+        </div>
+
+        <div class="set-group">
+          <label>SMS Message Template</label>
+          <textarea id="apptmsg-sms-tmpl" style="min-height:80px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6" placeholder="Enter SMS message template..."></textarea>
+          <div class="hint">Plain text only for SMS. Keep it short — no bold/italic formatting.</div>
+        </div>
+
+        <!-- Live Preview -->
+        <div class="set-group">
+          <label>Live Preview</label>
+          <div style="background:#075e54;border-radius:10px;padding:12px 14px;min-height:80px">
+            <div id="apptmsg-preview-box" style="background:#dcf8c6;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Courier New',monospace;line-height:1.6;color:#111;white-space:pre-wrap;word-break:break-word"></div>
+          </div>
+        </div>
+
+        <div class="save-bar">
+          <button class="btn bp" onclick="saveApptMsgTemplate()">&#10003; Save Template</button>
+          <button class="btn bo" onclick="resetApptMsgTemplate()">&#8635; Reset to Default</button>
+          <span class="saved-msg" id="apptmsg-saved">&#10003; Saved!</span>
+        </div>
+      </div>
+
+
       <!-- ABOUT -->
       <div id="set-about" class="set-section">
         <div class="about-box">
@@ -2062,6 +2537,131 @@ tr:hover td{background:#f9fbfc}
         </div>
       </div>
 
+
+      <!-- LOCK & SECURITY -->
+      <div id="set-security" class="set-section">
+        <div class="set-title">&#128274; Lock &amp; Security</div>
+        <div class="set-sub">Protect the app with a 6-digit PIN. Enabled by default — toggle off to open the app without a PIN.</div>
+
+        <!-- Toggle row -->
+        <div class="set-group">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#f8fafc;border:1px solid #e0e8ee;border-radius:10px;margin-bottom:16px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#222">&#128274; Lock Screen PIN</div>
+              <div style="font-size:11px;color:#888;margin-top:2px">Require 6-digit PIN on app open</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="tog-lock-pin" onchange="toggleLockPin(this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- PIN Setup area (shown when toggle is ON) -->
+        <div id="sec-pin-setup" style="display:none">
+          <div class="set-group">
+            <div style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:18px">
+              <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px">Set / Change 6-Digit PIN</div>
+
+              <!-- Current PIN (shown only if PIN already set) -->
+              <div id="sec-cur-pin-row" style="margin-bottom:10px;display:none">
+                <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CURRENT PIN</label>
+                <div style="display:flex;gap:6px">
+                  <input id="sec-cur-pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••••"
+                    style="flex:1;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif"
+                    onfocus="this.style.borderColor='#0d6b8a'" onblur="this.style.borderColor='#cdd5dd'"/>
+                </div>
+              </div>
+
+              <div style="margin-bottom:10px">
+                <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">NEW PIN (6 digits)</label>
+                <input id="sec-new-pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••••"
+                  style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif"
+                  onfocus="this.style.borderColor='#0d6b8a'" onblur="this.style.borderColor='#cdd5dd'"
+                  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)"/>
+              </div>
+
+              <div style="margin-bottom:14px">
+                <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CONFIRM NEW PIN</label>
+                <input id="sec-conf-pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••••"
+                  style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif"
+                  onfocus="this.style.borderColor='#0d6b8a'" onblur="this.style.borderColor='#cdd5dd'"
+                  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)"/>
+              </div>
+
+              <div id="sec-pin-err" style="color:#c0392b;font-size:12px;margin-bottom:10px;min-height:16px"></div>
+              <button class="btn bp" onclick="saveNewPin()" style="width:100%">&#128274; Save PIN</button>
+            </div>
+          </div>
+
+          <!-- Remove PIN -->
+          <div id="sec-remove-row" style="margin-top:10px;display:none">
+            <button class="btn bd sm" onclick="removePinPrompt()" style="width:100%">&#128275; Remove PIN Protection</button>
+          </div>
+        </div>
+
+        <!-- Info when lock is OFF -->
+        <div id="sec-lock-off-msg" style="display:none;background:#fff8e1;border:1px solid #f9ca24;border-radius:8px;padding:12px 14px;font-size:12px;color:#856404">
+          &#9888; Lock screen is <strong>disabled</strong>. Anyone with access to this device can open the app without a PIN.
+        </div>
+
+        <!-- ── LOGIN CREDENTIALS ── -->
+        <div style="margin-top:22px">
+          <div class="sec" style="margin-bottom:14px">&#128100; Login Credentials</div>
+
+          <!-- Login On/Off Toggle -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#f8fafc;border:1px solid #e0e8ee;border-radius:10px;margin-bottom:16px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#222">&#128275; Login Screen</div>
+              <div style="font-size:11px;color:#888;margin-top:2px" id="login-toggle-sub">Show login screen on app start</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="tog-login-screen" onchange="toggleLoginScreen(this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <!-- Change Credentials Card -->
+          <div id="login-creds-card" style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:18px">
+            <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px">Change Username &amp; Password</div>
+
+            <div style="margin-bottom:10px">
+              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">NEW USERNAME</label>
+              <input id="cred-user" type="text" placeholder="Enter new username" autocomplete="off"
+                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
+                onfocus="this.style.borderColor='#0d6b8a'" onblur="this.style.borderColor='#cdd5dd'"/>
+            </div>
+
+            <div style="margin-bottom:10px">
+              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CURRENT PASSWORD</label>
+              <input id="cred-cur-pass" type="password" placeholder="Enter current password" autocomplete="off"
+                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
+                onfocus="this.style.borderColor='#0d6b8a'" onblur="this.style.borderColor='#cdd5dd'"/>
+            </div>
+
+            <div style="margin-bottom:10px">
+              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">NEW PASSWORD</label>
+              <input id="cred-new-pass" type="password" placeholder="New password (min 4 chars)" autocomplete="off"
+                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
+                onfocus="this.style.borderColor='#0d6b8a'" onblur="this.style.borderColor='#cdd5dd'"/>
+            </div>
+
+            <div style="margin-bottom:14px">
+              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CONFIRM NEW PASSWORD</label>
+              <input id="cred-conf-pass" type="password" placeholder="Confirm new password" autocomplete="off"
+                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
+                onfocus="this.style.borderColor='#0d6b8a'" onblur="this.style.borderColor='#cdd5dd'"/>
+            </div>
+
+            <div id="cred-err" style="color:#c0392b;font-size:12px;margin-bottom:10px;min-height:16px"></div>
+            <div id="cred-ok" style="color:#1b6e35;font-size:12px;margin-bottom:10px;min-height:16px;display:none">&#10003; Credentials updated successfully!</div>
+
+            <button class="btn bp" onclick="saveLoginCreds()" style="width:100%">&#128274; Save Credentials</button>
+            <div style="margin-top:10px;font-size:11px;color:#aaa;text-align:center">Leave username blank to keep current username</div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 </div>
@@ -2085,9 +2685,12 @@ tr:hover td{background:#f9fbfc}
         <div class="f"><label>Doctor</label><input id="eb-dr"/></div>
         <div class="f"><label>Date</label><input id="eb-dt" type="date"/></div>
         <div class="f"><label>Payment Mode</label>
-          <select id="eb-md"><option>Cash</option><option>UPI</option><option>Card</option><option>Cheque</option></select></div>
+          <select id="eb-md" onchange="toggleEbUpiTxn()"><option>Cash</option><option>UPI</option><option>Card</option><option>Cheque</option></select></div>
         <div class="f"><label>Status</label>
           <select id="eb-st"><option value="Paid">Paid</option><option value="Pending">Pending</option></select></div>
+      </div>
+      <div id="eb-pay-ref-wrap" style="display:none" class="row">
+        <div class="f"><label id="eb-pay-ref-label">UPI Transaction ID <span style="font-weight:400;color:#aaa">(optional)</span></label><input id="eb-pay-ref" placeholder=""/></div>
       </div>
       <div class="row">
         <div class="f" style="flex:3"><label>Diagnosis / Notes</label><textarea id="eb-dg" style="min-height:44px;resize:vertical"></textarea></div>
@@ -2141,14 +2744,16 @@ tr:hover td{background:#f9fbfc}
 <div class="ov" id="bmodal">
   <div class="modal">
     <div class="mhdr">
-      <span id="bmodal-title">Bill</span>
+      <div class="mhdr-top">
+        <span id="bmodal-title">Bill</span>
+        <button class="xb" onclick="closeM('bmodal')">&times;</button>
+      </div>
       <div class="mbtns">
         <button class="btn brec sm" onclick="showRec()">&#128203; Receipt</button>
         <button class="btn bora sm" onclick="openEditBill(ab&&ab.id)">&#9998; Edit</button>
         <button class="btn bp sm" onclick="doPrint()">&#128438; Print</button>
         <button class="btn bwa sm" onclick="openShareModal('bill')">&#128242; WhatsApp</button>
         <button class="btn bsms sm" onclick="sendSMSBill()">&#128172; SMS</button>
-        <button class="xb" onclick="closeM('bmodal')">&times;</button>
       </div>
     </div>
     <div id="bcontent"></div>
@@ -2159,12 +2764,14 @@ tr:hover td{background:#f9fbfc}
 <div class="ov" id="rmodal">
   <div class="modal" style="max-width:380px">
     <div class="mhdr">
-      <span>&#128203; Receipt – <span id="rec-id"></span></span>
+      <div class="mhdr-top">
+        <span>&#128203; Receipt – <span id="rec-id"></span></span>
+        <button class="xb" onclick="closeM('rmodal')">&times;</button>
+      </div>
       <div class="mbtns">
         <button class="btn bp sm" onclick="printRec()">&#128438; Print</button>
         <button class="btn bwa sm" onclick="openShareModal('receipt')">&#128242; WhatsApp</button>
         <button class="btn bsms sm" onclick="sendSMSReceipt()">&#128172; SMS</button>
-        <button class="xb" onclick="closeM('rmodal')">&times;</button>
       </div>
     </div>
     <div id="rcontent"></div>
@@ -2428,6 +3035,14 @@ function updateTopbar(){
   }
   const ln=document.getElementById('lock-clinic-name');
   if(ln)ln.textContent=CFG.clinic.name||'Niva Dental';
+  // Keep splash in sync if still visible
+  const splashName=document.getElementById('splash-clinic-name');
+  if(splashName && CFG.clinic.name) splashName.textContent=CFG.clinic.name;
+  const splashImg=document.getElementById('splash-logo-img');
+  if(splashImg){
+    if(logo.data){splashImg.src=logo.data;splashImg.style.display='block';}
+    else{splashImg.style.display='none';}
+  }
   // Topbar logo
   if(tbLogo){
     if(logo.data){
@@ -2542,6 +3157,7 @@ function cancelEditItm(){
 function renderItms(){
   const cur=CFG.billing.currency||'₹';
   const consultVal=parseFloat((document.getElementById('nb-consult')||{}).value)||0;
+  // Desktop table
   document.getElementById('ib').innerHTML=nbi.length===0
     ?(consultVal>0
       ?'<tr><td colspan="7" style="text-align:center;color:#0d6b8a;padding:14px;font-weight:700">Consultation-only bill — no treatment items added.</td></tr>'
@@ -2560,6 +3176,42 @@ function renderItms(){
         <button class="btn bd sm" onclick="remItm(${i})" style="margin-left:3px">&times;</button>
       </td>
     </tr>`).join('');
+
+  // Mobile cards
+  const mobileCards=document.getElementById('ib-mobile-cards');
+  const mobileEmpty=document.getElementById('ib-mobile-empty');
+  if(mobileCards){
+    if(nbi.length===0){
+      mobileCards.innerHTML='';
+      if(mobileEmpty){
+        mobileEmpty.className='ib-mobile-empty show';
+        mobileEmpty.textContent=consultVal>0?'Consultation-only bill — no treatment items added.':'No items yet. Add treatment below.';
+      }
+    } else {
+      if(mobileEmpty) mobileEmpty.className='ib-mobile-empty';
+      mobileCards.innerHTML=nbi.map((it,i)=>`
+        <div class="mob-itm-card${_editItmIdx===i?' editing':''}">
+          <span class="mic-num">Item ${i+1}</span>
+          <button class="mic-del" onclick="remItm(${i})" title="Remove">✕</button>
+          <div class="mic-name">${it.n}${_editItmIdx===i?' <span style="font-size:10px;color:#d35400">(editing…)</span>':''}</div>
+          <div class="mic-row">
+            <div class="mic-chip">
+              <div class="mc-lbl">Tooth/Qty</div>
+              <div class="mc-val">${it.q}</div>
+            </div>
+            <div class="mic-chip">
+              <div class="mc-lbl">Rate</div>
+              <div class="mc-val">${cur}${it.r.toLocaleString('en-IN')}</div>
+            </div>
+            <div class="mic-chip amt">
+              <div class="mc-lbl">Amount</div>
+              <div class="mc-val">${cur}${it.a.toLocaleString('en-IN')}</div>
+            </div>
+          </div>
+          <button class="mic-edit" onclick="editItm(${i})">✏️ Edit this item</button>
+        </div>`).join('');
+    }
+  }
   recalc();
 }
 function recalc(){
@@ -2603,6 +3255,30 @@ function savePatientInfo(){
   const btn=document.getElementById('save-pt-btn');
   if(btn){const orig=btn.innerHTML;btn.innerHTML='&#10003; Saved!';btn.style.background='#1b6e35';setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';},2000);}
 }
+function _payRefConfig(mode){
+  if(mode==='UPI')    return {show:true, label:'UPI Transaction ID', ph:'e.g. 435768901234567…'};
+  if(mode==='Card')   return {show:true, label:'Card Transaction ID', ph:'e.g. 4111xxxx1234'};
+  if(mode==='Cheque') return {show:true, label:'Cheque No.', ph:'e.g. 001234'};
+  return {show:false, label:'', ph:''};
+}
+function toggleNbUpiTxn(){
+  const cfg=_payRefConfig(document.getElementById('nb-md').value);
+  const wrap=document.getElementById('nb-pay-ref-wrap');
+  const lbl=document.getElementById('nb-pay-ref-label');
+  const inp=document.getElementById('nb-pay-ref');
+  wrap.style.display=cfg.show?'flex':'none';
+  if(lbl) lbl.innerHTML=cfg.label+' <span style="font-weight:400;color:#aaa">(optional)</span>';
+  if(inp){ inp.placeholder=cfg.ph; if(!cfg.show) inp.value=''; }
+}
+function toggleEbUpiTxn(){
+  const cfg=_payRefConfig(document.getElementById('eb-md').value);
+  const wrap=document.getElementById('eb-pay-ref-wrap');
+  const lbl=document.getElementById('eb-pay-ref-label');
+  const inp=document.getElementById('eb-pay-ref');
+  wrap.style.display=cfg.show?'flex':'none';
+  if(lbl) lbl.innerHTML=cfg.label+' <span style="font-weight:400;color:#aaa">(optional)</span>';
+  if(inp){ inp.placeholder=cfg.ph; if(!cfg.show) inp.value=''; }
+}
 function clearForm(){
   nbi=[];
   _editItmIdx=-1;
@@ -2618,6 +3294,8 @@ function clearForm(){
   document.getElementById('nb-dc').value='0';
   document.getElementById('nb-consult').value='0';
   document.getElementById('nb-md').value='Cash';
+  document.getElementById('nb-pay-ref').value='';
+  document.getElementById('nb-pay-ref-wrap').style.display='none';
   document.getElementById('nb-pt').value='Full';
   document.getElementById('nb-st').value='Paid';
   document.getElementById('part-pay-row').style.display='none';
@@ -2650,6 +3328,8 @@ function saveBill(){
     consult,items:[...nbi],sub:s,disc:d,discLabel,discType,discVal:dv,total:s-d,
     payType,paidNow,balance,dueDate,
     mode:document.getElementById('nb-md').value,status:document.getElementById('nb-st').value,
+    upiTxn:'',
+    payRef:((['UPI','Card','Cheque'].includes(document.getElementById('nb-md').value))?document.getElementById('nb-pay-ref').value.trim():''),
     updatedAt:Date.now()};
   bills.unshift(b);sv();fbSyncBill(b);clearForm();openBill(b);renderAll();
   if(CFG.billing.autoPrint){setTimeout(()=>doPrint(),600);}
@@ -2713,7 +3393,7 @@ function buildBill(b){
       <span class="lbl">Age/Gender</span><span class="val">${b.age||'—'}</span>
       <span class="lbl">Mobile</span><span class="val">${b.phone||'—'}</span>
       ${docLine}
-      <span class="lbl">Payment</span><span class="val">${b.mode}</span>
+      <span class="lbl">Payment</span><span class="val">${b.mode}${(b.payRef||b.upiTxn)?'<br><span style="font-size:10px;color:#0d6b8a;font-weight:700">Ref: '+(b.payRef||b.upiTxn)+'</span>':''}</span>
       <span class="lbl">Status</span><span class="val" style="color:${b.status==='Paid'?'#1b6e35':'#8a5d0a'}">${b.status}</span>
     </div>
     ${diagLine}${rows}
@@ -2767,6 +3447,7 @@ function buildReceipt(b){
     ${b.disc>0?`<div class="ri"><span>Discount</span><span>- ${cur}${b.disc.toLocaleString('en-IN')}</span></div>`:''}
     <div class="rt"><span>TOTAL PAID</span><span>${cur}${b.total.toLocaleString('en-IN')}</span></div>
     <div class="ri" style="margin-top:5px"><span>Payment Mode</span><strong>${b.mode}</strong></div>
+    ${(b.payRef||b.upiTxn)?`<div class="ri"><span>Ref / Txn No.</span><strong style="color:#0d6b8a">${b.payRef||b.upiTxn}</strong></div>`:''}
     <div class="ri"><span>Status</span><strong style="color:${b.status==='Paid'?'#1b6e35':'#8a5d0a'}">${b.status.toUpperCase()}</strong></div>
     ${b.payType==='Part'?`<hr class="rdash"/>
     <div style="font-size:10px;font-weight:900;letter-spacing:1px;margin-bottom:3px">PAYMENT HISTORY :</div>
@@ -2968,33 +3649,162 @@ function openApptModal(id){
 
 function buildApptMsg(){
   const b=_apptBill;if(!b)return'';
-  const C=CFG.clinic;
   const date=document.getElementById('appt-date').value;
   const time=document.getElementById('appt-time').value;
   const doctor=document.getElementById('appt-doctor').value.trim();
   const purpose=document.getElementById('appt-purpose').value.trim();
   const notes=document.getElementById('appt-notes').value.trim();
-  const fmtDate=date?new Date(date).toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}):'—';
-  const fmtTime=time?(()=>{const [h,m]=time.split(':');const hr=+h;return (hr%12||12)+':'+m+' '+(hr<12?'AM':'PM');})():'';
-  return `Dear *${b.patient}*,
-
-Your appointment has been scheduled at *${C.name}*.
-
-📅 Date   : *${fmtDate}*
-🕐 Time   : *${fmtTime}*${doctor?'\n👨‍⚕️ Doctor : *'+doctor+'*':''}${purpose?'\n🦷 Purpose: '+purpose:''}${notes?'\n📝 Notes : '+notes:''}
-
-📍 ${C.addr}
-📞 ${C.phone}
-
-Please arrive 5–10 minutes early. To reschedule, call us.
-
-See you soon! 😊
-_${C.name}_`;
+  return buildApptMsgFromTemplate(b.patient, date, time, doctor, purpose, notes, b.phone||'');
 }
 
 function refreshApptMsg(){
   document.getElementById('appt-msg-preview').value=buildApptMsg();
 }
+
+// ══════════════════════════════════════════════════════
+// APPOINTMENT MESSAGE TEMPLATE SYSTEM
+// ══════════════════════════════════════════════════════
+
+var DEF_APPT_WA_TMPL = `Dear *{patient}*,
+
+Your appointment has been scheduled at *{clinic}*.
+
+📅 Date   : *{date}*
+🕐 Time   : *{time}*
+👨‍⚕️ Doctor : *{doctor}*
+🦷 Purpose: {purpose}
+📝 Notes  : {notes}
+
+📍 {address}
+📞 {phone}
+
+Please arrive 5–10 minutes early. To reschedule, call us.
+
+See you soon! 😊
+_{clinic}_`;
+
+var DEF_APPT_SMS_TMPL = `{clinic}: Dear {patient}, appt on {date} at {time} for {purpose}. Doctor: {doctor}. {address}. Ph: {phone}`;
+
+function getApptWATmpl(){
+  return (CFG.apptMsg && CFG.apptMsg.wa) || DEF_APPT_WA_TMPL;
+}
+function getApptSMSTmpl(){
+  return (CFG.apptMsg && CFG.apptMsg.sms) || DEF_APPT_SMS_TMPL;
+}
+
+function applyApptTmpl(tmpl, vars){
+  return tmpl
+    .replace(/\{patient\}/g, vars.patient||'')
+    .replace(/\{date\}/g, vars.date||'')
+    .replace(/\{time\}/g, vars.time||'')
+    .replace(/\{doctor\}/g, vars.doctor||'')
+    .replace(/\{purpose\}/g, vars.purpose||'')
+    .replace(/\{notes\}/g, vars.notes||'')
+    .replace(/\{clinic\}/g, vars.clinic||'')
+    .replace(/\{address\}/g, vars.address||'')
+    .replace(/\{phone\}/g, vars.phone||'');
+}
+
+// Clean up empty placeholder lines (e.g. "👨‍⚕️ Doctor : " when doctor is blank)
+function cleanApptMsg(msg){
+  return msg
+    .split('\n')
+    .filter(function(line){
+      // Remove lines that end with just empty value or contain only whitespace after colon
+      var stripped = line.replace(/^[\s\S]*?:\s*$/, '').trim();
+      if(stripped === '' && /:\s*$/.test(line.trim())) return false;
+      return true;
+    })
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n'); // Collapse 3+ newlines to 2
+}
+
+function buildApptMsgFromTemplate(patient, date, time, doctor, purpose, notes, phone){
+  var C = CFG.clinic;
+  var fDate = date ? new Date(date).toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : '—';
+  var fTime = time ? (function(){var p=time.split(':');var hr=+p[0];return (hr%12||12)+':'+p[1]+' '+(hr<12?'AM':'PM');})() : '';
+  var vars = {
+    patient: patient||'',
+    date: fDate,
+    time: fTime,
+    doctor: doctor||'',
+    purpose: purpose||'',
+    notes: notes||'',
+    clinic: C.name||'',
+    address: C.addr||'',
+    phone: C.phone||''
+  };
+  return cleanApptMsg(applyApptTmpl(getApptWATmpl(), vars));
+}
+
+function buildApptSMSFromTemplate(patient, date, time, doctor, purpose, phone){
+  var C = CFG.clinic;
+  var fDate = date ? new Date(date).toLocaleDateString('en-IN') : '—';
+  var fTime = time ? (function(){var p=time.split(':');var hr=+p[0];return (hr%12||12)+':'+p[1]+' '+(hr<12?'AM':'PM');})() : '';
+  var vars = {
+    patient: patient||'',
+    date: fDate,
+    time: fTime,
+    doctor: doctor||'',
+    purpose: purpose||'',
+    notes: '',
+    clinic: C.name||'',
+    address: C.addr||'',
+    phone: C.phone||''
+  };
+  return applyApptTmpl(getApptSMSTmpl(), vars);
+}
+
+// Load template into settings form
+function loadApptMsgForm(){
+  var waEl = document.getElementById('apptmsg-wa-tmpl');
+  var smsEl = document.getElementById('apptmsg-sms-tmpl');
+  if(waEl) waEl.value = getApptWATmpl();
+  if(smsEl) smsEl.value = getApptSMSTmpl();
+  updateApptMsgPreview();
+}
+
+function updateApptMsgPreview(){
+  var waEl = document.getElementById('apptmsg-wa-tmpl');
+  var previewEl = document.getElementById('apptmsg-preview-box');
+  if(!waEl || !previewEl) return;
+  var C = CFG.clinic;
+  var sampleVars = {
+    patient: 'Ravi Shah',
+    date: new Date().toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}),
+    time: '10:00 AM',
+    doctor: C.doctor||'Dr. Niva',
+    purpose: 'Root Canal Follow-up',
+    notes: 'Bring previous X-Ray',
+    clinic: C.name||'Niva Dental',
+    address: C.addr||'Bhuyangdev, Ahmedabad',
+    phone: C.phone||'079-26850000'
+  };
+  var preview = cleanApptMsg(applyApptTmpl(waEl.value, sampleVars));
+  previewEl.textContent = preview;
+}
+
+function saveApptMsgTemplate(){
+  var waEl = document.getElementById('apptmsg-wa-tmpl');
+  var smsEl = document.getElementById('apptmsg-sms-tmpl');
+  if(!CFG.apptMsg) CFG.apptMsg = {};
+  CFG.apptMsg.wa = waEl ? waEl.value : DEF_APPT_WA_TMPL;
+  CFG.apptMsg.sms = smsEl ? smsEl.value : DEF_APPT_SMS_TMPL;
+  saveSettings(CFG);
+  var m = document.getElementById('apptmsg-saved');
+  if(m){ m.classList.add('show'); setTimeout(function(){ m.classList.remove('show'); }, 2500); }
+}
+
+function resetApptMsgTemplate(){
+  if(!confirm('Reset to default appointment message template?')) return;
+  if(!CFG.apptMsg) CFG.apptMsg = {};
+  CFG.apptMsg.wa = DEF_APPT_WA_TMPL;
+  CFG.apptMsg.sms = DEF_APPT_SMS_TMPL;
+  saveSettings(CFG);
+  loadApptMsgForm();
+}
+
+
 
 function saveApptToStorage(){
   if(!_apptBill)return;
@@ -3016,6 +3826,7 @@ function saveApptToStorage(){
   appointments.unshift(appt);
   svAppt();
   renderDash();
+  if(typeof renderVB==='function') renderVB();
 }
 
 function saveApptOnly(){
@@ -3055,13 +3866,11 @@ function sendApptSMS(){
   saveApptToStorage();
   const phone=document.getElementById('appt-phone').value.trim().replace(/\D/g,'');
   const b=_apptBill;if(!b)return;
-  const C=CFG.clinic;
   const date=document.getElementById('appt-date').value;
   const time=document.getElementById('appt-time').value;
+  const doctor=document.getElementById('appt-doctor').value.trim();
   const purpose=document.getElementById('appt-purpose').value.trim();
-  const fmtDate=date?new Date(date).toLocaleDateString('en-IN'):'—';
-  const fmtTime=time?(()=>{const [h,m]=time.split(':');const hr=+h;return (hr%12||12)+':'+m+' '+(hr<12?'AM':'PM');})():'';
-  const msg=`${C.name}: Dear ${b.patient}, your appointment is on ${fmtDate} at ${fmtTime}${purpose?' for '+purpose:''}. Address: ${C.addr}. Ph: ${C.phone}`;
+  const msg=buildApptSMSFromTemplate(b.patient, date, time, doctor, purpose, phone);
   const url=phone?`sms:+91${phone}?body=${encodeURIComponent(msg)}`:`sms:?body=${encodeURIComponent(msg)}`;
   window.location.href=url;
 }
@@ -3198,17 +4007,27 @@ function showSetSection(name,btn){
   document.querySelectorAll('.set-section').forEach(s=>s.classList.remove('act'));
   document.querySelectorAll('.setnav button').forEach(b=>b.classList.remove('act'));
   document.querySelectorAll('.mob-set-list button').forEach(b=>b.classList.remove('act'));
-  document.getElementById('set-'+name).classList.add('act');
-  btn.classList.add('act');
-  // update mobile accordion label
-  const lbl=document.getElementById('mob-set-current-label');
-  if(lbl){const ic=btn.querySelector('.icon');lbl.textContent=(ic?ic.textContent+' ':'')+btn.textContent.replace(ic?ic.textContent:'','').trim();}
-  // sync mob-set-list active
+  var sec=document.getElementById('set-'+name);
+  if(!sec)return;
+  sec.classList.add('act');
+  if(btn){
+    btn.classList.add('act');
+    const lbl=document.getElementById('mob-set-current-label');
+    if(lbl){const ic=btn.querySelector('.icon');lbl.textContent=(ic?ic.textContent+' ':'')+btn.textContent.replace(ic?ic.textContent:'','').trim();}
+  }
   document.querySelectorAll('.mob-set-list button').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+name+"'"))b.classList.add('act');});
+  document.querySelectorAll('.setnav button').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+name+"'"))b.classList.add('act');});
   if(name==='clinic')loadClinicForm();
   if(name==='theme'){loadThemeForm();renderThemeGrid();}
   if(name==='billing')loadBillingForm();
   if(name==='data'){updateDataStats();initAutoSaveUI();}
+  if(name==='apptmsg'){loadApptMsgForm();}
+  if(name==='email'||name==='firebase'||name==='lanshare'){
+    var body=document.getElementById('adv-sync-body');
+    var arrow=document.getElementById('adv-sync-arrow');
+    if(body){body.style.display='block';}
+    if(arrow){arrow.textContent='▼';}
+  }
 }
 function loadClinicForm(){
   const C=CFG.clinic;
@@ -3637,37 +4456,40 @@ function clearDataAndFirebase(){
   alert('✅ All bills, expenses and Firebase config cleared.\nLocal Server config is untouched.');
 }
 
-// ── CLEAR DATA + LOCAL SERVER CONFIG ──
+// ── CLEAR DATA + LAN SHARE ──
 function clearDataAndLocalServer(){
-  if(!confirm('This will permanently delete ALL bills, expenses and your Local Server Sync configuration.\nFirebase config will be kept.\n\nAre you sure?'))return;
-  if(!confirm('Second confirmation: Delete data + Local Server config? This cannot be undone.'))return;
+  if(!confirm("This will permanently delete ALL bills and expenses. Continue?"))return;
+  if(!confirm("Second confirmation: Delete data? This cannot be undone."))return;
   bills=[];sv();
   expenses=[];svExp();
-  localStorage.removeItem('niva_ls_config');
-  _lsConfig={};
-  if(_lsSocket){try{_lsSocket.disconnect();}catch(e){}_lsSocket=null;_lsConnected=false;}
-  // Clear Local Server UI fields
-  const urlEl=document.getElementById('ls-url');const secEl=document.getElementById('ls-secret');
-  if(urlEl)urlEl.value='';if(secEl)secEl.value='';
+  localStorage.removeItem("niva_ls_config");
+  lanStopHost(); lanLeave();
   renderAll();
-  alert('✅ All bills, expenses and Local Server config cleared.\nFirebase config is untouched.');
+  alert("✅ All bills and expenses cleared.");
 }
-
 // ── CLEAR EVERYTHING ──
 function clearAllData(){
   if(!confirm('This will permanently delete ALL bills, expenses, Firebase config, Local Server config and all clinic settings.\n\nAre you sure?'))return;
   if(!confirm('Final confirmation: Delete EVERYTHING? This cannot be undone.'))return;
   bills=[];sv();
   expenses=[];svExp();
-  localStorage.removeItem('niva_ls_config');
-  _lsConfig={};
-  if(_lsSocket){try{_lsSocket.disconnect();}catch(e){}_lsSocket=null;_lsConnected=false;}
   CFG={clinic:{...DEF_CLINIC},theme:{...DEF_THEME},billing:{...DEF_BILLING}};
   saveSettings(CFG);applyTheme(CFG.theme.color);updateTopbar();renderAll();
   alert('✅ Everything has been cleared and reset to defaults.');
 }
 
 // ── RENDER FUNCTIONS ──────────────────────────────────────────────────────────
+// ── Real-time Appt button label helper ───────────────────────────────────────
+function getApptLabel(billId){
+  if(!billId) return '📅 Appt';
+  const a = appointments.find(x => x.billId === billId && x.status === 'Scheduled');
+  if(!a || !a.date) return '📅 Appt';
+  const d = new Date(a.date);
+  const day = d.getDate();
+  const mon = d.toLocaleString('en-IN', {month:'short'});
+  return '📅 ' + mon + ' ' + day;
+}
+
 function renderDash(){
   const td=bills.filter(b=>b.date===tod);
   const tot=td.reduce((s,b)=>s+b.total,0);
@@ -3730,19 +4552,20 @@ function renderDash(){
               <span class="badge ${b.status==='Paid'?'bpd':'bpn'}" style="margin-top:4px;display:inline-block">${b.status}</span>
             </div>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;margin-bottom:8px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;">
             <span style="color:#1b6e35;font-weight:700">✓ ${cur}${collected.toLocaleString('en-IN')}</span>
             ${pendAmt>0?`<span style="color:#e67e22;font-weight:700">⏳ ${cur}${pendAmt.toLocaleString('en-IN')}</span>`:''}
             <span class="badge bm">${b.mode}</span>
           </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="btn bo sm" onclick="openBill(bills.find(x=>x.id==='${b.id}'))">&#128196; Bill</button>
-            <button class="btn bp sm" onclick="printIndividualBill('${b.id}')">&#128438; Print</button>
-            ${b.status==='Pending'?`<button class="btn bg sm" onclick="openMarkPaid('${b.id}')">&#10003; Collect</button>`:''}
-            <button class="btn bwa sm" onclick="quickShareWA('${b.id}')">&#128242;</button>
-            <button class="btn sm" style="background:#7c3aed;color:#fff" onclick="openApptModal('${b.id}')">&#128197; Appt</button>
-            <button class="btn bd sm" onclick="askDel('${b.id}')">&#128465;</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <button class="btn bo sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="openBill(bills.find(x=>x.id==='${b.id}'))">📄 View Bill</button>
+            <button class="btn bp sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="printIndividualBill('${b.id}')">🖨️ Print</button>
+            <button class="btn brec sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="printIndividualReceipt('${b.id}')">🧾 Receipt</button>
+            <button class="btn bwa sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="quickShareWA('${b.id}')">📱 WhatsApp</button>
+            <button class="btn sm" style="background:#7c3aed;color:#fff;font-size:13px;padding:10px 8px;text-align:center;border-radius:6px" onclick="openApptModal('${b.id}')">${getApptLabel(b.id)}</button>
+            ${b.status==='Pending'?`<button class="btn bg sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="openMarkPaid('${b.id}')">✅ Collect</button>`:`<div></div>`}
           </div>
+          <button class="btn bd sm" style="width:100%;margin-top:6px;font-size:13px;padding:9px;text-align:center" onclick="askDel('${b.id}')">🗑️ Delete</button>
         </div>`;}).join('')}`;
   } else {
     document.getElementById('dtable').innerHTML=`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="min-width:700px"><thead><tr><th>Bill No.</th><th>Patient</th><th>Treatment</th><th>Mode</th><th>Amount</th><th>Collected</th><th>Pending</th><th>Status</th><th>Actions</th></tr></thead>
@@ -3766,7 +4589,7 @@ function renderDash(){
         ${b.status==='Pending'?`<button class="btn bg sm" onclick="openMarkPaid('${b.id}')">&#10003; Collect</button>`:''}
         <button class="btn bwa sm" onclick="quickShareWA('${b.id}')">&#128242;</button>
         <button class="btn bsms sm" onclick="quickShareSMS('${b.id}')">&#128172;</button>
-        <button class="btn sm" style="background:#7c3aed;color:#fff" onclick="openApptModal('${b.id}')">&#128197; Appt</button>
+        <button class="btn sm" style="background:#7c3aed;color:#fff" onclick="openApptModal('${b.id}')">${getApptLabel(b.id)}</button>
         <button class="btn bd sm" onclick="askDel('${b.id}')">&#128465; Delete</button>
       </div></td>
     </tr>`;}).join('')}</tbody></table></div>`;
@@ -3857,11 +4680,11 @@ function renderDashAppts(){
         ${a.doctor?`<span>👨‍⚕️ ${a.doctor}</span>`:''}
         ${a.notes?`<span style="color:#888;font-style:italic">📝 ${a.notes}</span>`:''}
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">
-        <button class="btn bwa sm" onclick="apptResendWA('${a.id}')">&#128242; WA</button>
-        <button class="btn bsms sm" onclick="apptResendSMS('${a.id}')">&#128172; SMS</button>
-        <button class="btn bg sm" onclick="markApptDone('${a.id}')">&#10003; Done</button>
-        <button class="btn bd sm" onclick="deleteAppt('${a.id}')">&#128465; Delete</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;">
+        <button class="btn bwa sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="apptResendWA('${a.id}')">📱 WhatsApp</button>
+        <button class="btn bsms sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="apptResendSMS('${a.id}')">💬 SMS</button>
+        <button class="btn bg sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="markApptDone('${a.id}')">✅ Done</button>
+        <button class="btn bd sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="deleteAppt('${a.id}')">🗑️ Delete</button>
       </div>
     </div>`;
 
@@ -3944,13 +4767,15 @@ function apptResendSMS(id){
 function markApptDone(id){
   const a=appointments.find(x=>x.id===id);if(!a)return;
   if(!confirm('Mark appointment for '+a.patient+' as Done?'))return;
-  a.status='Done';svAppt();renderDashAppts();
+  a.status='Done';svAppt();renderDashAppts();renderDash();
+  if(typeof renderVB==='function') renderVB();
 }
 
 function deleteAppt(id){
   const a=appointments.find(x=>x.id===id);if(!a)return;
   if(!confirm('Delete this appointment for '+a.patient+'?'))return;
-  appointments=appointments.filter(x=>x.id!==id);svAppt();renderDashAppts();
+  appointments=appointments.filter(x=>x.id!==id);svAppt();renderDashAppts();renderDash();
+  if(typeof renderVB==='function') renderVB();
 }
 
 // ── PRESCRIPTION MODULE ───────────────────────────────────────────────────────
@@ -4854,6 +5679,74 @@ function renderCB(){
 
   if(!all.length){document.getElementById('cbtable').innerHTML='<div class="empty">No records found.</div>';return;}
 
+  const isMobCB=window.innerWidth<=700;
+
+  if(isMobCB){
+    document.getElementById('cbtable').innerHTML=all.map(row=>{
+      if(row._type==='bill'){
+        const _rowCol=(row.status==='Paid'&&row.payType!=='Part')?row.total:((row.paidNow||0)+(row.payHistory||[]).reduce((s,p)=>s+(p.amt||0),0));
+        const _rowBal=row.status==='Paid'?0:(row.balance!=null?row.balance:Math.max(0,row.total-_rowCol));
+        return `<div style="background:#fff;border:1px solid #e0e8ee;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                <span class="badge bm" style="font-size:10px">BILL</span>
+                <span style="font-size:11px;color:#aaa">${row.id}</span>
+                <span style="font-size:11px;color:#aaa">· ${new Date(row.date).toLocaleDateString('en-IN')}</span>
+              </div>
+              <div style="font-size:15px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${row.patient}</div>
+              ${row.phone?`<div style="font-size:12px;color:#888;margin-top:1px">📱 ${row.phone}</div>`:''}
+              ${row.diag?`<div style="font-size:11px;color:#555;margin-top:3px;background:#f7fbfd;padding:4px 8px;border-radius:6px;border-left:3px solid var(--pri)">🦷 ${row.diag}</div>`:''}
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:17px;font-weight:700;color:#1b6e35">${cur}${_rowCol.toLocaleString('en-IN')}</div>
+              ${_rowBal>0?`<div style="font-size:11px;color:#e67e22;font-weight:700">Bal: ${cur}${_rowBal.toLocaleString('en-IN')}</div>`:''}
+              <span class="badge ${row.status==='Paid'?'bpd':'bpn'}" style="margin-top:4px;display:inline-block">${row.status}${row.payType==='Part'&&_rowBal>0?' (Part)':''}</span>
+              <div style="font-size:11px;color:#888;margin-top:2px"><span class="badge bm">${row.mode}</span></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+            <button class="btn bo sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="openBill(bills.find(x=>x.id==='${row.id}'))">📄 View Bill</button>
+            <button class="btn brec sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="openRecDirect('${row.id}')">🧾 Receipt</button>
+            <button class="btn bp sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="printIndividualBill('${row.id}')">🖨️ Print</button>
+            <button class="btn bwa sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="quickShareWA('${row.id}')">📱 WhatsApp</button>
+          </div>
+          <button class="btn bd sm" style="width:100%;margin-top:6px;font-size:13px;padding:9px;text-align:center" onclick="askDel('${row.id}')">🗑️ Delete</button>
+        </div>`;
+      } else {
+        return `<div style="background:#fffdf5;border:1px solid #f5e8d0;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                <span class="badge" style="background:#fde8d8;color:#8a3a00;font-size:10px">EXP</span>
+                <span style="font-size:11px;color:#aaa">${row.id}</span>
+                <span style="font-size:11px;color:#aaa">· ${new Date(row.date).toLocaleDateString('en-IN')}</span>
+              </div>
+              ${row.vendor?`<div style="font-size:15px;font-weight:700;color:#0a5570">${row.vendor}</div>`:''}
+              <div style="font-size:${row.vendor?'13':'15'}px;font-weight:${row.vendor?'400':'700'};color:#333;margin-top:2px">${row.desc}</div>
+              <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
+                <span class="badge bm" style="font-size:10px">${row.cat}</span>
+                <span class="badge bm" style="font-size:10px">${row.mode}</span>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:17px;font-weight:700;color:#c0392b">${cur}${row.amt.toLocaleString('en-IN')}</div>
+              <span class="badge ${row.status==='Paid'?'bpd':'bpn'}" style="margin-top:4px;display:inline-block">${row.status}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button class="btn bo sm" style="flex:1;font-size:13px;padding:10px 8px;text-align:center" onclick="openEditExp('${row.id}')">✏️ Edit</button>
+            ${row.status!=='Paid'
+              ?`<button class="btn bg sm" style="flex:1;font-size:13px;padding:10px 8px;text-align:center" onclick="markExpPaid('${row.id}')">✅ Mark Paid</button>`
+              :''}
+            <button class="btn bd sm" style="flex:1;font-size:13px;padding:10px 8px;text-align:center" onclick="deleteExp('${row.id}');renderCB()">🗑️ Delete</button>
+          </div>
+        </div>`;
+      }
+    }).join('');
+    return;
+  }
+
   const rows=all.map(row=>{
     if(row._type==='bill'){
       const _rowCol=(row.status==='Paid'&&row.payType!=='Part')?row.total:((row.paidNow||0)+(row.payHistory||[]).reduce((s,p)=>s+(p.amt||0),0));
@@ -5008,29 +5901,34 @@ function renderVB(){
     document.getElementById('vbtable').innerHTML=f.map(b=>{
       const treatmentText=(b.items&&b.items.length)?b.items.map(it=>it.n+(it.q&&it.q!='1'?' ×'+it.q:'')).join(', '):'';
       const balAmt=b.status!=='Paid'&&(b.balance||0)>0?(b.balance||0):0;
-      return `<div style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:12px 14px;margin-bottom:8px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px">
-          <div>
-            <div style="font-size:14px;font-weight:700;color:#222">${b.patient}</div>
-            ${b.phone?`<div style="font-size:12px;color:#888;margin-top:1px">📱 ${b.phone}</div>`:''}
-            <div style="font-size:11px;color:#aaa;margin-top:2px">${b.id} &nbsp;·&nbsp; ${new Date(b.date).toLocaleDateString('en-IN')}</div>
+      const isPending=b.status!=='Paid';
+      return `<div style="background:#fff;border:1px solid #e0e8ee;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+        <!-- Header row: name + amount -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:15px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.patient}</div>
+            ${b.phone?`<div style="font-size:12px;color:#888;margin-top:2px">📱 ${b.phone}</div>`:''}
+            <div style="font-size:11px;color:#aaa;margin-top:2px">${b.id} · ${new Date(b.date).toLocaleDateString('en-IN')}</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
-            <div style="font-size:15px;font-weight:700;color:var(--pri)">${cur}${b.total.toLocaleString('en-IN')}</div>
-            ${balAmt>0?`<div style="font-size:11px;color:#c0392b;font-weight:600">Bal: ${cur}${balAmt.toLocaleString('en-IN')}</div>`:''}
-            <span class="badge ${b.status==='Paid'?'bpd':'bpn'}" style="margin-top:3px;display:inline-block">${b.status}</span>
+            <div style="font-size:17px;font-weight:700;color:var(--pri)">${cur}${b.total.toLocaleString('en-IN')}</div>
+            ${balAmt>0?`<div style="font-size:11px;color:#c0392b;font-weight:700">Bal: ${cur}${balAmt.toLocaleString('en-IN')}</div>`:''}
+            <span class="badge ${b.status==='Paid'?'bpd':'bpn'}" style="margin-top:4px;display:inline-block">${b.status}</span>
           </div>
         </div>
-        ${treatmentText?`<div style="font-size:11px;color:#555;margin-bottom:8px">🦷 ${treatmentText}</div>`:''}
-        <div style="display:flex;gap:5px;flex-wrap:wrap">
-          <button class="btn bo sm" onclick="openBill(bills.find(x=>x.id==='${b.id}'))">📄 View</button>
-          <button class="btn bp sm" onclick="printIndividualBill('${b.id}')">🖨</button>
-          <button class="btn brec sm" onclick="printIndividualReceipt('${b.id}')">🧾</button>
-          <button class="btn bwa sm" onclick="quickShareWA('${b.id}')">📱</button>
-          <button class="btn sm" style="background:#7b2d8b;color:#fff" onclick="openApptModal('${b.id}')">📅</button>
-          ${b.status!=='Paid'?`<button class="btn bg sm" onclick="openMarkPaid('${b.id}')">✓ Collect</button>`:''}
-          <button class="btn bd sm" onclick="askDel('${b.id}')">🗑</button>
+        ${treatmentText?`<div style="font-size:12px;color:#555;margin-bottom:10px;background:#f7fbfd;padding:6px 10px;border-radius:7px;border-left:3px solid var(--pri)">🦷 ${treatmentText}</div>`:''}
+        <!-- Button grid: 2 columns on mobile -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+          <button class="btn bo sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="openBill(bills.find(x=>x.id==='${b.id}'))">📄 View Bill</button>
+          <button class="btn bp sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="printIndividualBill('${b.id}')">🖨️ Print Bill</button>
+          <button class="btn brec sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="printIndividualReceipt('${b.id}')">🧾 Receipt</button>
+          <button class="btn bwa sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="quickShareWA('${b.id}')">📱 WhatsApp</button>
+          <button class="btn sm" style="background:#7b2d8b;color:#fff;font-size:13px;padding:10px 8px;text-align:center;border-radius:6px" onclick="openApptModal('${b.id}')">${getApptLabel(b.id)}</button>
+          ${isPending?`<button class="btn bg sm" style="font-size:13px;padding:10px 8px;text-align:center" onclick="openMarkPaid('${b.id}')">✅ Collect</button>`
+          :`<div></div>`}
         </div>
+        <!-- Delete – full width, subtle -->
+        <button class="btn bd sm" style="width:100%;margin-top:6px;font-size:13px;padding:9px;text-align:center" onclick="askDel('${b.id}')">🗑️ Delete</button>
       </div>`;
     }).join('');
     return;
@@ -5059,7 +5957,7 @@ function renderVB(){
       <button class="btn brec sm" onclick="printIndividualReceipt('${b.id}')" title="Print receipt">&#128203; Receipt</button>
       <button class="btn bwa sm" onclick="quickShareWA('${b.id}')">&#128242; WA</button>
       <button class="btn bsms sm" onclick="quickShareSMS('${b.id}')">&#128172; SMS</button>
-      <button class="btn" style="background:#7b2d8b;color:#fff;font-size:11px;padding:4px 9px" onclick="openApptModal('${b.id}')">&#128197; Appt</button>
+      <button class="btn" style="background:#7b2d8b;color:#fff;font-size:11px;padding:4px 9px" onclick="openApptModal('${b.id}')">${getApptLabel(b.id)}</button>
       ${b.status!=='Paid'?`<button class="btn bg sm" onclick="openMarkPaid('${b.id}')">&#10003; Paid</button>`:''}
       <button class="btn bd sm" onclick="askDel('${b.id}')">&#128465; Delete</button>
     </div></td>
@@ -5348,6 +6246,44 @@ function renderExp(){
     <div class="stat"><div class="lb">Records</div><div class="vl">${f.length}</div></div>
     ${topCat?`<div class="stat"><div class="lb">Top Category</div><div class="vl b" style="font-size:13px">${topCat[0]}</div></div>`:''}`;
   if(!f.length){document.getElementById('exp-table').innerHTML='<div class="empty">No expenses found. Click + Add Expense to start.</div>';return;}
+
+  const isMobExp=window.innerWidth<=700;
+  if(isMobExp){
+    document.getElementById('exp-table').innerHTML=f.map(e=>`
+      <div style="background:#fffdf5;border:1px solid #f5e8d0;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+              <span class="badge" style="background:#fde8d8;color:#8a3a00;font-size:10px">${e.cat}</span>
+              <span style="font-size:11px;color:#aaa">${e.id} · ${new Date(e.date).toLocaleDateString('en-IN')}</span>
+            </div>
+            ${e.vendor?`<div style="font-size:15px;font-weight:700;color:#0a5570">${e.vendor}</div>`:''}
+            <div style="font-size:${e.vendor?'13':'15'}px;font-weight:${e.vendor?'400':'700'};color:#333;margin-top:2px">${e.desc}</div>
+            ${e.notes?`<div style="font-size:11px;color:#aaa;margin-top:2px;font-style:italic">📝 ${e.notes}</div>`:''}
+            <div style="margin-top:5px;display:flex;gap:5px;flex-wrap:wrap">
+              <span class="badge bm" style="font-size:10px">${e.mode}</span>
+              ${e.ref?`<span style="font-size:11px;color:#888">Ref: ${e.ref}</span>`:''}
+              ${(e.payRef||e.upiTxn)?`<span style="font-size:11px;color:#0d6b8a;font-weight:700">Ref: ${e.payRef||e.upiTxn}</span>`:''}
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:18px;font-weight:700;color:#c0392b">${cur}${e.amt.toLocaleString('en-IN')}</div>
+            <span class="badge ${e.status==='Paid'?'bpd':'bpn'}" style="margin-top:4px;display:inline-block">${e.status}</span>
+            ${e.due&&e.status==='Pending'?`<div style="font-size:10px;color:#e67e22;margin-top:2px">Due: ${new Date(e.due).toLocaleDateString('en-IN')}</div>`:''}
+            ${e.paiddate&&e.status==='Paid'?`<div style="font-size:10px;color:#1b6e35;margin-top:2px">Paid: ${new Date(e.paiddate).toLocaleDateString('en-IN')}</div>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn bo sm" style="flex:1;font-size:13px;padding:10px 8px;text-align:center" onclick="openEditExp('${e.id}')">✏️ Edit</button>
+          ${e.status!=='Paid'
+            ?`<button class="btn bg sm" style="flex:1;font-size:13px;padding:10px 8px;text-align:center" onclick="markExpPaid('${e.id}')">✅ Mark Paid</button>`
+            :''}
+          <button class="btn bd sm" style="flex:1;font-size:13px;padding:10px 8px;text-align:center" onclick="deleteExp('${e.id}')">🗑️ Delete</button>
+        </div>
+      </div>`).join('');
+    return;
+  }
+
   document.getElementById('exp-table').innerHTML=`<table><thead><tr><th>Date</th><th>ID</th><th>Category</th><th>Vendor / Supplier</th><th>Description</th><th>Ref No.</th><th>Mode</th><th>Paid Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
   <tbody>${f.map(e=>`<tr>
     <td>${new Date(e.date).toLocaleDateString('en-IN')}</td>
@@ -5356,7 +6292,7 @@ function renderExp(){
     <td style="font-weight:600;color:#0a5570">${e.vendor||'<span style="color:#bbb">—</span>'}</td>
     <td>${e.desc}${e.notes?'<br><span style="font-size:10px;color:#aaa">'+e.notes+'</span>':''}</td>
     <td style="color:#888">${e.ref||'—'}</td>
-    <td>${e.mode}${e.upiTxn?'<br><span style="font-size:10px;color:#0d6b8a;font-weight:700">Txn: '+e.upiTxn+'</span>':''}</td>
+    <td>${e.mode}${(e.payRef||e.upiTxn)?'<br><span style="font-size:10px;color:#0d6b8a;font-weight:700">Ref: '+(e.payRef||e.upiTxn)+'</span>':''}</td>
     <td style="color:#1b6e35;font-size:11px">${e.paiddate?new Date(e.paiddate).toLocaleDateString('en-IN'):'—'}</td>
     <td style="font-weight:700;color:#c0392b">${cur}${e.amt.toLocaleString('en-IN')}</td>
     <td><span class="badge ${e.status==='Paid'?'bpd':'bpn'}">${e.status}${e.due&&e.status==='Pending'?'<br><span style="font-size:9px">Due: '+new Date(e.due).toLocaleDateString('en-IN')+'</span>':''}</span></td>
@@ -5616,7 +6552,7 @@ function showTab(name,btn){
   // sync mobile drawer highlight
   const mobBtn=document.getElementById('mob-nav-'+name);
   if(mobBtn)mobBtn.classList.add('act');
-  if(name==='settings'){loadClinicForm();renderThemeGrid();loadBillingForm();loadEmailForm();loadFBForm();loadPFForm();}
+  if(name==='settings'){loadClinicForm();renderThemeGrid();loadBillingForm();loadEmailForm();loadFBForm();loadPFForm();loadApptMsgForm();}
   if(name==='expenses')renderExp();
   if(name==='reports'){setTimeout(()=>{genRepCashBook();populateVendorChips();},100);}
   if(name==='prescription'){initRxTab();}
@@ -5944,62 +6880,6 @@ function restoreFBConfig(input) {
       msg.textContent = '✅ Firebase config restored! Click Save & Connect to activate.';
       // Auto-scroll to Save button
       document.getElementById('fb-saved').scrollIntoView({behavior:'smooth', block:'center'});
-    } catch(err) {
-      msg.style.display = 'block';
-      msg.style.color = '#c0392b';
-      msg.textContent = '❌ Could not read file: ' + err.message;
-    }
-    input.value = '';
-  };
-  reader.readAsText(file);
-}
-
-// ── LOCAL SERVER CONFIG BACKUP & RESTORE ─────────────────────────────────────
-function backupLSConfig() {
-  const cfg = lsLoadConfig();
-  if (!cfg.url && !cfg.secret) {
-    alert('No Local Server config found. Please enter and save your server settings first.');
-    return;
-  }
-  const backup = { type: 'niva-localserver-config', version: 1, saved: new Date().toISOString(), localserver: cfg };
-  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'niva-localserver-config-' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function restoreLSConfig(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const msg = document.getElementById('ls-restore-msg');
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data.type !== 'niva-localserver-config' || !data.localserver) {
-        msg.style.display = 'block';
-        msg.style.color = '#c0392b';
-        msg.textContent = '❌ Invalid file. Please select a Local Server config backup file.';
-        return;
-      }
-      const cfg = data.localserver;
-      // Populate UI fields
-      const urlEl  = document.getElementById('ls-url');
-      const secEl  = document.getElementById('ls-secret');
-      const autoEl = document.getElementById('tog-lsautosync');
-      const rtEl   = document.getElementById('tog-lsrealtime');
-      if (urlEl)  urlEl.value  = cfg.url    || '';
-      if (secEl)  secEl.value  = cfg.secret || '';
-      if (autoEl) autoEl.checked = cfg.autoSync !== false;
-      if (rtEl)   rtEl.checked   = cfg.realtime !== false;
-      // Save to localStorage
-      lsSaveConfigToStorage(cfg);
-      _lsConfig = cfg;
-      msg.style.display = 'block';
-      msg.style.color = '#1b6e35';
-      msg.textContent = '✅ Local Server config restored! Click Save & Connect to activate.';
     } catch(err) {
       msg.style.display = 'block';
       msg.style.color = '#c0392b';
@@ -6489,7 +7369,7 @@ function printAllBills(){
       <span class="lbl">Age/Gender</span><span class="val">${b.age||'—'}</span>
       <span class="lbl">Mobile</span><span class="val">${b.phone||'—'}</span>
       ${BO.showDoctor?`<span class="lbl">Doctor</span><span class="val">${b.doctor}</span>`:''}
-      <span class="lbl">Payment</span><span class="val">${b.mode}</span>
+      <span class="lbl">Payment</span><span class="val">${b.mode}${(b.payRef||b.upiTxn)?'<br><span style="font-size:10px;color:#0d6b8a;font-weight:700">Ref: '+(b.payRef||b.upiTxn)+'</span>':''}</span>
       <span class="lbl">Status</span><span class="val" style="color:${b.status==='Paid'?'#1b6e35':'#8a5d0a'}">${b.status}</span>
     </div>
     ${BO.showDiag?`<div class="bdiag"><strong>Diagnosis:</strong> ${b.diag||'—'}</div>`:''}
@@ -6606,18 +7486,9 @@ renderItms();renderAll();
     return true;
   }
 
-  // ── SESSION CHECK: if already logged in this tab/session, skip lock ──
-  if(sessionStorage.getItem('niva_unlocked')==='1' && checkSessionTimeout()){
-    document.getElementById('lockscreen').style.display='none';
-  } else if(!localStorage.getItem('niva_pw_v2') && !localStorage.getItem('niva_pw')){
-    // Password was removed — auto-unlock
-    sessionStorage.setItem('niva_unlocked','1');
-    sessionStorage.setItem('niva_login_time', Date.now().toString());
-    document.getElementById('lockscreen').style.display='none';
-  } else {
-    updateLockoutUI();
-    document.getElementById('lock-input').focus();
-  }
+  // ── SESSION CHECK: lockscreen display is now controlled by showLockAfterSplash() ──
+  // Just init lockout UI state so it's ready when shown
+  updateLockoutUI();
 })();
 
 async function checkPassword(){
@@ -6688,6 +7559,7 @@ function initAutoSaveUI(){
   const fname=cfg.fileName||'';
   const lastSaved=cfg.lastSaved||'';
   const autoOnLogout=!!cfg.autoOnLogout;
+  const autoOnExit=!!cfg.autoOnExit;
 
   const pathEl=document.getElementById('autosave-path-display');
   const subEl=document.getElementById('autosave-path-sub');
@@ -6697,12 +7569,14 @@ function initAutoSaveUI(){
   const lastEl=document.getElementById('autosave-last-saved');
   const lastTimeEl=document.getElementById('autosave-last-time');
   const togEl=document.getElementById('tog-autosave-logout');
+  const togExitEl=document.getElementById('tog-autosave-exit');
   const warnEl=document.getElementById('autosave-fs-warning');
 
   if(!('showSaveFilePicker' in window)){
     warnEl.style.display='block';
   }
   togEl.checked=autoOnLogout;
+  if(togExitEl) togExitEl.checked=autoOnExit;
 
   if(fname){
     pathEl.textContent=fname;
@@ -6792,6 +7666,8 @@ async function saveNow(){
 function saveAutoSaveSettings(){
   const cfg=getAutoSaveSettings();
   cfg.autoOnLogout=document.getElementById('tog-autosave-logout').checked;
+  const exitEl=document.getElementById('tog-autosave-exit');
+  cfg.autoOnExit=exitEl?exitEl.checked:false;
   setAutoSaveSettings(cfg);
 }
 
@@ -6894,6 +7770,15 @@ function openEditBill(id){
   document.getElementById('eb-dg').value=b.diag||'';
   document.getElementById('eb-dc').value=b.disc||0;
   document.getElementById('eb-md').value=b.mode||'Cash';
+  (function(){
+    const cfg=_payRefConfig(b.mode||'Cash');
+    const wrap=document.getElementById('eb-pay-ref-wrap');
+    const lbl=document.getElementById('eb-pay-ref-label');
+    const inp=document.getElementById('eb-pay-ref');
+    if(wrap) wrap.style.display=cfg.show?'flex':'none';
+    if(lbl) lbl.innerHTML=cfg.label+' <span style="font-weight:400;color:#aaa">(optional)</span>';
+    if(inp){ inp.placeholder=cfg.ph; inp.value=b.payRef||b.upiTxn||''; }
+  })();
   document.getElementById('eb-st').value=b.status||'Paid';
   document.getElementById('eb-billno').value=b.id||'';
   eRenderItems();
@@ -6994,6 +7879,8 @@ function saveEditBill(){
     items:[...editItems],
     sub:s,disc:d,total:s-d,
     mode:document.getElementById('eb-md').value,
+    upiTxn:'',
+    payRef:((['UPI','Card','Cheque'].includes(document.getElementById('eb-md').value))?document.getElementById('eb-pay-ref').value.trim():''),
     status:document.getElementById('eb-st').value,
     consult:bills[idx].consult||0,
     payType:bills[idx].payType||'Full',
@@ -7474,261 +8361,269 @@ function shareRepVendor(){
 
 // Auto-populate vendor chips when vendor section is shown
 
-// ── LOCAL SERVER SYNC (Socket.io) ─────────────────────────────────────────────
-let _lsSocket = null;
-let _lsConnected = false;
-let _lsConfig = {};
+// ── LAN SHARE (BroadcastChannel + localStorage polling) ──────────────────────
+let _lanChannel    = null;   // BroadcastChannel for same-browser tabs
+let _lanIsHost     = false;
+let _lanRoomCode   = '';
+let _lanPollTimer  = null;
+let _lanHostTimer  = null;   // heartbeat from host
+let _lanGuestCount = 0;
 
-function lsLoadConfig() {
-  try { return JSON.parse(localStorage.getItem('niva_ls_config') || '{}'); } catch(e) { return {}; }
-}
-function lsSaveConfigToStorage(c) { localStorage.setItem('niva_ls_config', JSON.stringify(c)); }
+const LAN_LS_PREFIX = 'niva_lan_';
 
-function lsLog(msg, type) {
-  const el = document.getElementById('ls-sync-log');
+function lanLog(msg, type) {
+  const el = document.getElementById('lan-sync-log');
   if (!el) return;
-  const colors = { info: '#0d6b8a', success: '#1b6e35', error: '#c0392b', warn: '#8a5d0a' };
+  const colors = { info:'#0d6b8a', success:'#1b6e35', error:'#c0392b', warn:'#8a5d0a' };
   const color = colors[type] || '#555';
-  const time = new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const time = new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   const line = `<div style="padding:2px 0;border-bottom:1px solid #f0f3f5;color:${color}"><span style="color:#aaa">[${time}]</span> ${msg}</div>`;
-  if (el.firstChild && el.firstChild.textContent && el.firstChild.textContent.includes('No sync activity')) el.innerHTML = '';
+  if (el.firstChild && el.firstChild.textContent && el.firstChild.textContent.includes('koi sync')) el.innerHTML = '';
   el.insertAdjacentHTML('afterbegin', line);
-  // Keep only last 50 lines
-  while (el.children.length > 50) el.removeChild(el.lastChild);
+  while (el.children.length > 60) el.removeChild(el.lastChild);
 }
 
-function lsClearLog() {
-  const el = document.getElementById('ls-sync-log');
+function lanClearLog() {
+  const el = document.getElementById('lan-sync-log');
   if (el) el.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px">Log cleared.</div>';
 }
 
-function lsSetStatus(connected, label, sub, deviceCount) {
-  _lsConnected = connected;
-  const dot = document.getElementById('ls-dot');
-  const lbl = document.getElementById('ls-status-label');
-  const sublbl = document.getElementById('ls-status-sub');
-  const dcEl = document.getElementById('ls-device-count');
-  if (dot) dot.style.background = connected ? '#1b6e35' : '#ccc';
-  if (lbl) lbl.textContent = label || (connected ? 'Connected' : 'Not connected');
-  if (sublbl) sublbl.textContent = sub || '';
-  if (dcEl) dcEl.textContent = deviceCount ? '📱 ' + deviceCount + ' device(s) online' : '';
+function lanSwitchTab(tab) {
+  const isHost = tab === 'host';
+  document.getElementById('lan-tab-host').style.background = isHost ? 'var(--pri)' : '#f5f8fa';
+  document.getElementById('lan-tab-host').style.color      = isHost ? '#fff' : '#666';
+  document.getElementById('lan-tab-join').style.background = isHost ? '#f5f8fa' : 'var(--pri)';
+  document.getElementById('lan-tab-join').style.color      = isHost ? '#666' : '#fff';
+  document.getElementById('lan-panel-host').style.display  = isHost ? 'block' : 'none';
+  document.getElementById('lan-panel-join').style.display  = isHost ? 'none'  : 'block';
 }
 
-function lsInitSocket(url, secret) {
-  if (_lsSocket) { _lsSocket.disconnect(); _lsSocket = null; }
-
-  // Dynamically load socket.io client if not loaded
-  if (typeof io === 'undefined') {
-    const script = document.createElement('script');
-    script.src = url.replace(/\/$/, '') + '/socket.io/socket.io.js';
-    script.onload = () => { lsConnectSocket(url, secret); };
-    script.onerror = () => {
-      lsSetStatus(false, 'Connection failed', 'Could not load Socket.io from server. Is the server running?');
-      lsLog('❌ Failed to load socket.io from server. Make sure server is running at ' + url, 'error');
-    };
-    document.head.appendChild(script);
-  } else {
-    lsConnectSocket(url, secret);
-  }
+function lanGenerateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  document.getElementById('lan-room-code').value = code;
 }
 
-function lsConnectSocket(url, secret) {
+// ── HOST ──────────────────────────────────────────────────────────────────────
+function lanStartHost() {
+  const code = (document.getElementById('lan-room-code').value || '').trim().toUpperCase();
+  if (!code) { lanGenerateCode(); setTimeout(lanStartHost, 50); return; }
+  _lanRoomCode  = code;
+  _lanIsHost    = true;
+  _lanGuestCount = 0;
+
+  // Write initial snapshot to localStorage so guests can poll
+  _lanWriteSnapshot();
+
+  // BroadcastChannel for same-browser tabs
+  _lanOpenChannel(code);
+
+  // Heartbeat: keep writing snapshot every 5 s so guests know host is alive
+  if (_lanHostTimer) clearInterval(_lanHostTimer);
+  _lanHostTimer = setInterval(() => {
+    _lanWriteSnapshot();
+    _lanBroadcast({ type:'heartbeat', code });
+  }, 5000);
+
+  // Show status
+  document.getElementById('lan-host-status-box').style.display = 'block';
+  document.getElementById('lan-display-code').textContent = code;
+  document.getElementById('lan-host-sub').textContent = 'Active – Room: ' + code;
+  document.getElementById('lan-host-count').textContent = '';
+  lanLog('✅ Hosting started – Room: ' + code, 'success');
+  lanLog('📋 Doosre devices par same app kholo, LAN Share → Join, code: ' + code + ' daalo', 'info');
+}
+
+function lanStopHost() {
+  _lanIsHost = false;
+  if (_lanHostTimer) { clearInterval(_lanHostTimer); _lanHostTimer = null; }
+  _lanCloseChannel();
+  localStorage.removeItem(LAN_LS_PREFIX + _lanRoomCode);
+  document.getElementById('lan-host-status-box').style.display = 'none';
+  _lanRoomCode = '';
+  lanLog('⏹ Hosting stopped', 'warn');
+}
+
+function _lanWriteSnapshot() {
+  if (!_lanRoomCode) return;
   try {
-    _lsSocket = io(url, {
-      auth: { secret },
-      reconnection: true,
-      reconnectionDelay: 2000,
-      reconnectionAttempts: 10,
-      timeout: 8000
-    });
+    const snap = { bills, expenses, ts: Date.now(), host: true };
+    localStorage.setItem(LAN_LS_PREFIX + _lanRoomCode, JSON.stringify(snap));
+  } catch(e) { lanLog('❌ Snapshot write error: ' + e.message, 'error'); }
+}
 
-    _lsSocket.on('connect', () => {
-      lsSetStatus(true, '✅ Connected to local server', 'Real-time sync active – ' + url);
-      lsLog('✅ Connected to local server: ' + url, 'success');
-      addSyncHistory('LocalServer', 'Connected to ' + url);
-      // Pull latest data on connect if setting enabled
-      const cfg = lsLoadConfig();
-      if (cfg.realtime) {
-        _lsSocket.emit('request_full_sync');
-      }
-    });
+// ── JOIN ──────────────────────────────────────────────────────────────────────
+function lanJoin() {
+  const code = (document.getElementById('lan-join-code').value || '').trim().toUpperCase();
+  if (!code) { alert('Room Code enter karo.'); return; }
+  _lanRoomCode = code;
+  _lanIsHost   = false;
 
-    _lsSocket.on('disconnect', (reason) => {
-      lsSetStatus(false, '⚠ Disconnected', 'Reason: ' + reason);
-      lsLog('⚠ Disconnected: ' + reason, 'warn');
-    });
+  _lanOpenChannel(code);
 
-    _lsSocket.on('connect_error', (err) => {
-      lsSetStatus(false, '❌ Connection error', err.message);
-      lsLog('❌ Connection error: ' + err.message, 'error');
-    });
+  // Immediately try to pull from localStorage (same-device host)
+  _lanPollHost();
 
-    _lsSocket.on('reconnect', (n) => {
-      lsLog('♻ Reconnected after ' + n + ' attempt(s)', 'success');
-      lsSetStatus(true, '✅ Reconnected', 'Real-time sync restored');
-    });
+  // Poll every 3 seconds for cross-device updates via localStorage
+  if (_lanPollTimer) clearInterval(_lanPollTimer);
+  _lanPollTimer = setInterval(_lanPollHost, 3000);
 
-    _lsSocket.on('device_count', (count) => {
-      lsSetStatus(true, '✅ Connected', 'Real-time sync active – ' + url, count);
-    });
+  _lanSetJoinStatus(true, '🔄 Connected – Room: ' + code, 'Syncing every 3 sec…');
+  lanLog('🔗 Joined room: ' + code, 'success');
+}
 
-    // ── Incoming changes from other devices ──
-    _lsSocket.on('bill_added', (bill) => {
-      if (bills.find(b => b.id === bill.id)) return; // already have it
-      bills.unshift(bill);
-      sv();
+function lanLeave() {
+  if (_lanPollTimer) { clearInterval(_lanPollTimer); _lanPollTimer = null; }
+  _lanCloseChannel();
+  _lanRoomCode = '';
+  _lanIsHost   = false;
+  _lanSetJoinStatus(false, 'Not connected', 'Room Code enter karo aur Join karo');
+  lanLog('👋 Room leave kiya', 'warn');
+}
+
+let _lanLastPullTs = 0;
+function _lanPollHost() {
+  if (!_lanRoomCode) return;
+  try {
+    const raw = localStorage.getItem(LAN_LS_PREFIX + _lanRoomCode);
+    if (!raw) { _lanSetJoinStatus(false, '⏳ Host nahi mila', 'Room: ' + _lanRoomCode + ' – Host start karo'); return; }
+    const snap = JSON.parse(raw);
+    if (snap.ts && snap.ts > _lanLastPullTs) {
+      _lanLastPullTs = snap.ts;
+      if (snap.bills   && Array.isArray(snap.bills))    { bills    = snap.bills;    sv(); }
+      if (snap.expenses && Array.isArray(snap.expenses)) { expenses = snap.expenses; svExp(); }
       renderAll();
-      lsLog('📥 New bill received: ' + bill.id + ' – ' + bill.patient, 'info');
-    });
+      const t = new Date(snap.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      _lanSetJoinStatus(true, '✅ Synced – Room: ' + _lanRoomCode, 'Last update: ' + t);
+      lanLog('📥 Data received from host – ' + (snap.bills||[]).length + ' bills, ' + (snap.expenses||[]).length + ' expenses', 'success');
+    }
+  } catch(e) { lanLog('⚠ Poll error: ' + e.message, 'warn'); }
+}
 
-    _lsSocket.on('bill_updated', (bill) => {
-      const idx = bills.findIndex(b => b.id === bill.id);
-      if (idx >= 0) { bills[idx] = bill; sv(); renderAll(); lsLog('📥 Bill updated: ' + bill.id, 'info'); }
-    });
+function _lanSetJoinStatus(connected, label, sub) {
+  const dot = document.getElementById('lan-join-dot');
+  const lbl = document.getElementById('lan-join-status-label');
+  const sl  = document.getElementById('lan-join-status-sub');
+  if (dot) dot.style.background = connected ? '#1b6e35' : '#ccc';
+  if (lbl) lbl.textContent = label || '';
+  if (sl)  sl.textContent  = sub   || '';
+}
 
-    _lsSocket.on('bill_deleted', (id) => {
-      const idx = bills.findIndex(b => b.id === id);
-      if (idx >= 0) { bills.splice(idx, 1); sv(); renderAll(); lsLog('📥 Bill deleted: ' + id, 'warn'); }
-    });
+// ── BROADCASTCHANNEL (same browser / tabs) ────────────────────────────────────
+function _lanOpenChannel(code) {
+  _lanCloseChannel();
+  if (typeof BroadcastChannel === 'undefined') return;
+  try {
+    _lanChannel = new BroadcastChannel('niva_lan_' + code);
+    _lanChannel.onmessage = _lanOnMessage;
+    lanLog('📡 BroadcastChannel open – ' + code, 'info');
+  } catch(e) {}
+}
 
-    _lsSocket.on('expense_added', (exp) => {
-      if (expenses.find(e => e.id === exp.id)) return;
-      expenses.unshift(exp);
-      svExp();
-      renderExp(); renderCB();
-      lsLog('📥 New expense received: ' + exp.id + ' – ' + exp.desc, 'info');
-    });
+function _lanCloseChannel() {
+  if (_lanChannel) { try { _lanChannel.close(); } catch(e){} _lanChannel = null; }
+}
 
-    _lsSocket.on('expense_updated', (exp) => {
-      const idx = expenses.findIndex(e => e.id === exp.id);
-      if (idx >= 0) { expenses[idx] = exp; svExp(); renderExp(); renderCB(); lsLog('📥 Expense updated: ' + exp.id, 'info'); }
-    });
+function _lanBroadcast(msg) {
+  if (_lanChannel) { try { _lanChannel.postMessage(msg); } catch(e){} }
+}
 
-    _lsSocket.on('expense_deleted', (id) => {
-      const idx = expenses.findIndex(e => e.id === id);
-      if (idx >= 0) { expenses.splice(idx, 1); svExp(); renderExp(); renderCB(); lsLog('📥 Expense deleted: ' + id, 'warn'); }
-    });
+function _lanOnMessage(e) {
+  const d = e.data;
+  if (!d || !d.type) return;
+  const tog = document.getElementById('tog-lanrealtime');
+  if (tog && !tog.checked) return;
 
-    _lsSocket.on('full_sync', (data) => {
-      if (data.bills && Array.isArray(data.bills)) {
-        bills = data.bills;
-        sv();
-      }
-      if (data.expenses && Array.isArray(data.expenses)) {
-        expenses = data.expenses;
-        svExp();
-      }
-      renderAll();
-      lsLog('📥 Full sync received: ' + (data.bills||[]).length + ' bills, ' + (data.expenses||[]).length + ' expenses', 'success');
-    });
-
-  } catch(e) {
-    lsSetStatus(false, '❌ Error', e.message);
-    lsLog('❌ Error: ' + e.message, 'error');
+  if (d.type === 'bill_add') {
+    if (!bills.find(b => b.id === d.bill.id)) { bills.unshift(d.bill); sv(); renderAll(); lanLog('📥 New bill (tab): ' + d.bill.id + ' – ' + d.bill.patient, 'info'); }
+  } else if (d.type === 'bill_update') {
+    const idx = bills.findIndex(b => b.id === d.bill.id);
+    if (idx >= 0) { bills[idx] = d.bill; sv(); renderAll(); lanLog('📥 Bill updated (tab): ' + d.bill.id, 'info'); }
+  } else if (d.type === 'bill_delete') {
+    const idx = bills.findIndex(b => b.id === d.id);
+    if (idx >= 0) { bills.splice(idx, 1); sv(); renderAll(); lanLog('📥 Bill deleted (tab): ' + d.id, 'warn'); }
+  } else if (d.type === 'expense_add') {
+    if (!expenses.find(x => x.id === d.exp.id)) { expenses.unshift(d.exp); svExp(); renderExp(); renderCB(); lanLog('📥 Expense (tab): ' + d.exp.id, 'info'); }
+  } else if (d.type === 'expense_update') {
+    const idx = expenses.findIndex(x => x.id === d.exp.id);
+    if (idx >= 0) { expenses[idx] = d.exp; svExp(); renderExp(); renderCB(); lanLog('📥 Expense updated (tab): ' + d.exp.id, 'info'); }
+  } else if (d.type === 'expense_delete') {
+    const idx = expenses.findIndex(x => x.id === d.id);
+    if (idx >= 0) { expenses.splice(idx, 1); svExp(); renderExp(); renderCB(); lanLog('📥 Expense deleted (tab): ' + d.id, 'warn'); }
+  } else if (d.type === 'full_sync') {
+    if (d.bills)    { bills    = d.bills;    sv(); }
+    if (d.expenses) { expenses = d.expenses; svExp(); }
+    renderAll();
+    lanLog('📥 Full sync (tab): ' + (d.bills||[]).length + ' bills', 'success');
   }
 }
 
-function lsSaveConfig() {
-  const url = (document.getElementById('ls-url').value || '').trim().replace(/\/$/, '');
-  const secret = (document.getElementById('ls-secret').value || '').trim();
-  if (!url) { alert('Enter the server URL.'); return; }
-  if (!secret) { alert('Enter the secret key.'); return; }
-  const cfg = { url, secret,
-    autoSync: document.getElementById('tog-lsautosync').checked,
-    realtime: document.getElementById('tog-lsrealtime').checked
-  };
-  lsSaveConfigToStorage(cfg);
-  _lsConfig = cfg;
-  const savedEl = document.getElementById('ls-saved');
-  if (savedEl) { savedEl.style.display = 'inline'; setTimeout(() => savedEl.style.display = 'none', 2000); }
-  lsLog('⚙ Config saved. Connecting to ' + url + '…', 'info');
-  lsInitSocket(url, secret);
+// ── MANUAL PUSH / PULL ────────────────────────────────────────────────────────
+function lanPushAll() {
+  if (!_lanRoomCode) { alert('Pehle Host start karo ya Room join karo.'); return; }
+  _lanWriteSnapshot();
+  _lanBroadcast({ type:'full_sync', bills, expenses });
+  lanLog('⬆ Full data pushed – ' + bills.length + ' bills, ' + expenses.length + ' expenses', 'success');
+  alert('✅ Sab data push ho gaya!');
 }
 
-function lsTestConnection() {
-  const url = (document.getElementById('ls-url').value || '').trim().replace(/\/$/, '');
-  if (!url) { alert('Enter the server URL first.'); return; }
-  fetch(url + '/health').then(r => r.json()).then(d => {
-    lsLog('✅ Server health check OK – v' + (d.version || '?') + ', uptime: ' + Math.floor((d.uptime||0)/60) + 'min', 'success');
-    alert('✅ Server is running!\nVersion: ' + (d.version || '?') + '\nConnected devices: ' + (d.clients || 0));
-  }).catch(e => {
-    lsLog('❌ Health check failed: ' + e.message, 'error');
-    alert('❌ Cannot reach server at ' + url + '\n\nMake sure:\n1. The server is running (node server.js)\n2. Your device is on the same Wi-Fi\n3. The URL/port is correct');
-  });
+function lanPullAll() {
+  if (!_lanRoomCode) { alert('Pehle Room join karo.'); return; }
+  _lanPollHost();
+  lanLog('⬇ Pull requested…', 'info');
 }
 
-function lsDisconnect() {
-  if (_lsSocket) { _lsSocket.disconnect(); _lsSocket = null; }
-  lsSetStatus(false, 'Disconnected', 'Manually disconnected');
-  lsLog('⏹ Disconnected from server', 'warn');
+function lanCopyCode() {
+  const code = document.getElementById('lan-display-code').textContent;
+  if (!code) return;
+  navigator.clipboard ? navigator.clipboard.writeText(code).then(()=>{ lanLog('📋 Code copied: ' + code, 'info'); }).catch(()=>{ prompt('Room Code:', code); }) : prompt('Room Code:', code);
 }
 
-function lsPushAll() {
-  if (!_lsSocket || !_lsConnected) { alert('Not connected to server. Connect first.'); return; }
-  _lsSocket.emit('push_full', { bills, expenses }, (ack) => {
-    if (ack && ack.ok) {
-      lsLog('⬆ Full data pushed: ' + bills.length + ' bills, ' + expenses.length + ' expenses', 'success');
-      alert('✅ All data pushed to server successfully!');
-    } else {
-      lsLog('❌ Push failed: ' + (ack && ack.error ? ack.error : 'Unknown error'), 'error');
-    }
-  });
+// ── EMIT STUBS (called by bill/expense save/edit/delete) ──────────────────────
+function lsEmitBillUpdate(bill) {
+  const tog = document.getElementById('tog-lanautosync');
+  if (!_lanRoomCode || !(tog && tog.checked)) return;
+  _lanBroadcast({ type:'bill_update', bill });
+  if (_lanIsHost) { _lanWriteSnapshot(); lanLog('⬆ Bill update broadcast: ' + bill.id, 'info'); }
+}
+function lsEmitBillDelete(id) {
+  const tog = document.getElementById('tog-lanautosync');
+  if (!_lanRoomCode || !(tog && tog.checked)) return;
+  _lanBroadcast({ type:'bill_delete', id });
+  if (_lanIsHost) { _lanWriteSnapshot(); lanLog('⬆ Bill delete broadcast: ' + id, 'warn'); }
+}
+function lsEmitExpenseAdd(exp) {
+  const tog = document.getElementById('tog-lanautosync');
+  if (!_lanRoomCode || !(tog && tog.checked)) return;
+  _lanBroadcast({ type:'expense_add', exp });
+  if (_lanIsHost) { _lanWriteSnapshot(); lanLog('⬆ Expense broadcast: ' + exp.id, 'info'); }
+}
+function lsEmitExpenseUpdate(exp) {
+  const tog = document.getElementById('tog-lanautosync');
+  if (!_lanRoomCode || !(tog && tog.checked)) return;
+  _lanBroadcast({ type:'expense_update', exp });
+  if (_lanIsHost) { _lanWriteSnapshot(); lanLog('⬆ Expense update broadcast: ' + exp.id, 'info'); }
+}
+function lsEmitExpenseDelete(id) {
+  const tog = document.getElementById('tog-lanautosync');
+  if (!_lanRoomCode || !(tog && tog.checked)) return;
+  _lanBroadcast({ type:'expense_delete', id });
+  if (_lanIsHost) { _lanWriteSnapshot(); lanLog('⬆ Expense delete broadcast: ' + id, 'warn'); }
 }
 
-function lsPullAll() {
-  if (!_lsSocket || !_lsConnected) { alert('Not connected to server. Connect first.'); return; }
-  _lsSocket.emit('request_full_sync');
-  lsLog('⬇ Pull requested…', 'info');
-}
-
-// ── Socket sync after saveBill ──
-// Wraps saveBill for live-sync without causing a hoisting conflict.
-// The button calls saveBillWithSync() instead of saveBill() directly.
+// ── saveBillWithSync (wraps saveBill for LAN auto-push) ───────────────────────
 function saveBillWithSync() {
   const saved = saveBill();
   if (!saved) return;
-  const cfg = lsLoadConfig();
-  if (_lsSocket && _lsConnected && cfg.autoSync && bills.length) {
-    _lsSocket.emit('bill_add', bills[0]);
-    lsLog('⬆ Bill pushed: ' + bills[0].id + ' – ' + bills[0].patient, 'info');
+  const tog = document.getElementById('tog-lanautosync');
+  if (_lanRoomCode && tog && tog.checked && bills.length) {
+    _lanBroadcast({ type:'bill_add', bill: bills[0] });
+    if (_lanIsHost) _lanWriteSnapshot();
+    lanLog('⬆ New bill broadcast: ' + bills[0].id + ' – ' + bills[0].patient, 'info');
   }
 }
 
-function lsEmitBillUpdate(bill) {
-  const cfg = lsLoadConfig();
-  if (_lsSocket && _lsConnected && cfg.autoSync) {
-    _lsSocket.emit('bill_update', bill);
-    lsLog('⬆ Bill update pushed: ' + bill.id, 'info');
-  }
-}
-function lsEmitBillDelete(id) {
-  const cfg = lsLoadConfig();
-  if (_lsSocket && _lsConnected && cfg.autoSync) {
-    _lsSocket.emit('bill_delete', id);
-    lsLog('⬆ Bill delete pushed: ' + id, 'warn');
-  }
-}
-function lsEmitExpenseAdd(exp) {
-  const cfg = lsLoadConfig();
-  if (_lsSocket && _lsConnected && cfg.autoSync) {
-    _lsSocket.emit('expense_add', exp);
-    lsLog('⬆ Expense pushed: ' + exp.id + ' – ' + exp.desc, 'info');
-  }
-}
-function lsEmitExpenseUpdate(exp) {
-  const cfg = lsLoadConfig();
-  if (_lsSocket && _lsConnected && cfg.autoSync) {
-    _lsSocket.emit('expense_update', exp);
-    lsLog('⬆ Expense update pushed: ' + exp.id, 'info');
-  }
-}
-function lsEmitExpenseDelete(id) {
-  const cfg = lsLoadConfig();
-  if (_lsSocket && _lsConnected && cfg.autoSync) {
-    _lsSocket.emit('expense_delete', id);
-    lsLog('⬆ Expense delete pushed: ' + id, 'warn');
-  }
-}
 
 // ═══════════════════════════════════════════════════════
 // APPOINTMENTS TAB – Full Dedicated Screen
@@ -7881,12 +8776,14 @@ function markApptDoneTab(id){
   const a=appointments.find(x=>x.id===id);if(!a)return;
   if(!confirm('Mark appointment for '+a.patient+' as Done?'))return;
   a.status='Done';svAppt();renderApptTabFull();renderDash();
+  if(typeof renderVB==='function') renderVB();
 }
 
 function deleteApptTab(id){
   const a=appointments.find(x=>x.id===id);if(!a)return;
   if(!confirm('Delete appointment for '+a.patient+'?'))return;
   appointments=appointments.filter(x=>x.id!==id);svAppt();renderApptTabFull();renderDash();
+  if(typeof renderVB==='function') renderVB();
 }
 
 function editApptTab(id){
@@ -7966,6 +8863,7 @@ function saveQuickAppt(){
     alert('✅ Appointment saved for '+patient+' on '+_fmtApptDate(date)+'!');
   }
   svAppt();clearQuickApptForm();renderApptTabFull();renderDash();
+  if(typeof renderVB==='function') renderVB();
   showApptSub('today', document.getElementById('appt-sub-btn-today'));
 }
 
@@ -8006,28 +8904,6 @@ function clearQuickApptForm(){
   document.getElementById('qa-suggestions').innerHTML='';
 }
 
-// Auto-connect if config exists
-(function() {
-  const cfg = lsLoadConfig();
-  _lsConfig = cfg;
-  if (cfg.url && cfg.secret) {
-    // Restore UI
-    const urlEl = document.getElementById('ls-url');
-    const secEl = document.getElementById('ls-secret');
-    const autoEl = document.getElementById('tog-lsautosync');
-    const rtEl = document.getElementById('tog-lsrealtime');
-    if (urlEl) urlEl.value = cfg.url;
-    if (secEl) secEl.value = cfg.secret;
-    if (autoEl) autoEl.checked = cfg.autoSync !== false;
-    if (rtEl) rtEl.checked = cfg.realtime !== false;
-    if (cfg.realtime !== false) {
-      lsLog('⚙ Auto-connecting to ' + cfg.url + '…', 'info');
-      setTimeout(() => lsInitSocket(cfg.url, cfg.secret), 1500);
-    }
-  }
-})();
-
-// ═══════════════════════════════════════════
 // MOBILE / ANDROID HELPER FUNCTIONS
 // ═══════════════════════════════════════════
 
@@ -8338,15 +9214,13 @@ function saveAndSendApptSMS() {
 }
 
 function _sendApptWA(a) {
-  const C = CFG.clinic;
-  const msg = `Dear *${a.patient}*,\n\nYour appointment at *${C.name}*:\n📅 ${fmtApptDate(a.date)}\n🕐 ${fmtApptTime(a.time) || 'As per schedule'}${a.purpose ? '\n🦷 ' + a.purpose : ''}\n\n📍 ${C.addr || ''}\n📞 ${C.phone || ''}\n\nPlease arrive 5 minutes early. For queries call us.`;
+  const msg = buildApptMsgFromTemplate(a.patient, a.date, a.time, a.doctor||'', a.purpose||'', a.notes||'', a.phone||'');
   const phone = (a.phone || '').replace(/\D/g, '').slice(-10);
   const url = phone ? `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
 }
 function _sendApptSMS(a) {
-  const C = CFG.clinic;
-  const msg = `${C.name}: Dear ${a.patient}, appt on ${new Date(a.date).toLocaleDateString('en-IN')} at ${fmtApptTime(a.time)||'TBD'}${a.purpose?' for '+a.purpose:''}. ${C.addr||''}. Ph: ${C.phone||''}`;
+  const msg = buildApptSMSFromTemplate(a.patient, a.date, a.time, a.doctor||'', a.purpose||'', a.phone||'');
   const phone = (a.phone || '').replace(/\D/g, '');
   window.location.href = phone ? `sms:+91${phone}?body=${encodeURIComponent(msg)}` : `sms:?body=${encodeURIComponent(msg)}`;
 }
@@ -8355,6 +9229,240 @@ function _sendApptSMS(a) {
 if (typeof svAppt === 'undefined') {
   function svAppt() { try { localStorage.setItem('niva_appointments', JSON.stringify(appointments)); } catch(e) {} }
 }
+
+
+// ══════════════════════════════════════════════════════
+// 6-DIGIT PIN LOCK SYSTEM
+// ══════════════════════════════════════════════════════
+(function(){
+  var _pin = '';
+  var MAX_PIN_ATTEMPTS = 5;
+  var PIN_LOCKOUT_MS = 5 * 60 * 1000;
+
+  function sha256(str){
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+      .then(buf => Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''));
+  }
+  function getStoredPin(){ return localStorage.getItem('niva_pin_v1'); }
+  function lockEnabled(){ return localStorage.getItem('niva_lock_enabled') !== '0'; }
+  function getPinAttempts(){ try{return JSON.parse(localStorage.getItem('niva_pin_attempts')||'{"count":0,"lockedUntil":0}');}catch(e){return{count:0,lockedUntil:0};} }
+  function setPinAttempts(o){ localStorage.setItem('niva_pin_attempts', JSON.stringify(o)); }
+  function resetPinAttempts(){ setPinAttempts({count:0,lockedUntil:0}); }
+
+  function updateDots(){
+    for(var i=0;i<6;i++){
+      var d=document.getElementById('pd'+i);
+      if(d) d.className='pin-dot'+(_pin.length>i?' filled':'');
+    }
+  }
+
+  window.pinPress = function(digit){
+    var attEl=document.getElementById('lock-attempts');
+    var st=getPinAttempts();
+    if(st.lockedUntil>Date.now()){updatePinLockoutUI();return;}
+    if(_pin.length>=6) return;
+    _pin+=digit;
+    updateDots();
+    if(_pin.length===6) setTimeout(window.checkPin, 120);
+  };
+
+  window.pinDel = function(){
+    _pin=_pin.slice(0,-1);
+    updateDots();
+    var errEl=document.getElementById('lock-err');
+    if(errEl) errEl.textContent='';
+  };
+
+  window.checkPin = async function(){
+    var errEl=document.getElementById('lock-err');
+    var stored=getStoredPin();
+    var st=getPinAttempts();
+    if(st.lockedUntil>Date.now()){updatePinLockoutUI();_pin='';updateDots();return;}
+    if(!stored){
+      // No PIN set — use legacy password check
+      document.getElementById('lock-pin-mode').style.display='none';
+      document.getElementById('lock-pw-mode').style.display='block';
+      document.getElementById('lock-input').focus();
+      _pin='';updateDots();return;
+    }
+    var h = await sha256(_pin);
+    if(h===stored){
+      resetPinAttempts();
+      sessionStorage.setItem('niva_unlocked','1');
+      sessionStorage.setItem('niva_login_time',Date.now().toString());
+      var ls=document.getElementById('lockscreen');
+      ls.style.transition='opacity 0.3s ease';
+      ls.style.opacity='0';
+      setTimeout(function(){ls.style.display='none';ls.style.opacity='1';},300);
+      if(errEl) errEl.textContent='';
+      document.getElementById('lock-attempts').style.display='none';
+      _pin='';updateDots();
+    } else {
+      var newCount=(st.count||0)+1;
+      var newState;
+      if(newCount>=MAX_PIN_ATTEMPTS){
+        newState={count:newCount,lockedUntil:Date.now()+PIN_LOCKOUT_MS};
+        if(errEl) errEl.textContent='Too many attempts. Locked 5 min.';
+        startPinLockoutTick();
+      } else {
+        newState={count:newCount,lockedUntil:0};
+        var rem=MAX_PIN_ATTEMPTS-newCount;
+        if(errEl) errEl.textContent='Wrong PIN. '+rem+' attempt'+(rem>1?'s':'')+' left.';
+      }
+      setPinAttempts(newState);
+      updatePinLockoutUI();
+      _pin='';updateDots();
+      // Shake
+      var box=document.getElementById('lockscreen').firstElementChild;
+      box.style.transform='translateX(-8px)';
+      setTimeout(function(){box.style.transform='translateX(8px)';},80);
+      setTimeout(function(){box.style.transform='none';},160);
+    }
+  };
+
+  function updatePinLockoutUI(){
+    var attEl=document.getElementById('lock-attempts');
+    var st=getPinAttempts();
+    var now=Date.now();
+    if(st.lockedUntil>now){
+      var secsLeft=Math.ceil((st.lockedUntil-now)/1000);
+      var mins=Math.floor(secsLeft/60),secs=secsLeft%60;
+      attEl.textContent='Locked. Try again in '+mins+':'+String(secs).padStart(2,'0');
+      attEl.style.display='block';
+    } else {
+      if(st.count>0){
+        attEl.textContent=st.count+' failed attempt'+(st.count>1?'s':'')+'.';
+        attEl.style.display='block';
+      } else attEl.style.display='none';
+    }
+  }
+
+  var _pinTick=null;
+  function startPinLockoutTick(){
+    if(_pinTick) return;
+    _pinTick=setInterval(function(){
+      var st=getPinAttempts();
+      if(st.lockedUntil<=Date.now()){clearInterval(_pinTick);_pinTick=null;resetPinAttempts();}
+      updatePinLockoutUI();
+    },1000);
+  }
+
+  window.pinForgot = async function(){
+    var ans=prompt('To reset PIN, enter the clinic name exactly as in Settings:\n(Case sensitive)');
+    if(!ans) return;
+    var clinicName=(typeof CFG!=='undefined'&&CFG.clinic&&CFG.clinic.name)||'Niva Dental';
+    if(ans.trim()===clinicName.trim()){
+      var newPin=prompt('Identity verified!\nEnter a new 6-digit PIN:');
+      if(!newPin||!/^\d{6}$/.test(newPin)){alert('PIN must be exactly 6 digits.');return;}
+      var conf=prompt('Confirm new PIN:');
+      if(newPin!==conf){alert('PINs do not match.');return;}
+      var h=await sha256(newPin);
+      localStorage.setItem('niva_pin_v1',h);
+      localStorage.setItem('niva_lock_enabled','1');
+      resetPinAttempts();
+      sessionStorage.setItem('niva_unlocked','1');
+      sessionStorage.setItem('niva_login_time',Date.now().toString());
+      document.getElementById('lockscreen').style.display='none';
+      alert('✓ PIN reset! You are now logged in.');
+    } else {
+      alert('Incorrect clinic name. PIN reset denied.\nHint: Check Settings → Clinic Info.');
+    }
+  };
+
+  // ── Settings: toggle lock on/off ──
+  window.toggleLockPin = function(on){
+    if(on){
+      localStorage.setItem('niva_lock_enabled','1');
+      refreshSecurityUI();
+    } else {
+      if(!confirm('Disable lock screen?\nAnyone with device access can open the app without a PIN.')) {
+        document.getElementById('tog-lock-pin').checked=true; return;
+      }
+      localStorage.setItem('niva_lock_enabled','0');
+      refreshSecurityUI();
+    }
+  };
+
+  window.refreshSecurityUI = function(){
+    var hasPIN=!!getStoredPin();
+    var isOn=lockEnabled();
+    var togEl=document.getElementById('tog-lock-pin');
+    if(togEl) togEl.checked=isOn;
+    var curRow=document.getElementById('sec-cur-pin-row');
+    var removeRow=document.getElementById('sec-remove-row');
+    var setup=document.getElementById('sec-pin-setup');
+    var offMsg=document.getElementById('sec-lock-off-msg');
+    if(isOn){
+      if(setup) setup.style.display='block';
+      if(offMsg) offMsg.style.display='none';
+    } else {
+      if(setup) setup.style.display='none';
+      if(offMsg) offMsg.style.display='block';
+    }
+    if(curRow) curRow.style.display=hasPIN?'block':'none';
+    if(removeRow) removeRow.style.display=hasPIN?'block':'none';
+    ['sec-cur-pin','sec-new-pin','sec-conf-pin'].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.value='';
+    });
+    var e=document.getElementById('sec-pin-err');if(e)e.textContent='';
+  };
+
+  window.saveNewPin = async function(){
+    var errEl=document.getElementById('sec-pin-err');
+    var hasPIN=!!getStoredPin();
+    var newPin=document.getElementById('sec-new-pin').value;
+    var confPin=document.getElementById('sec-conf-pin').value;
+    if(hasPIN){
+      var curPin=document.getElementById('sec-cur-pin').value;
+      if(!/^\d{6}$/.test(curPin)){errEl.textContent='Current PIN must be 6 digits.';return;}
+      var curH=await sha256(curPin);
+      if(curH!==getStoredPin()){errEl.textContent='Current PIN is incorrect.';return;}
+    }
+    if(!/^\d{6}$/.test(newPin)){errEl.textContent='New PIN must be exactly 6 digits.';return;}
+    if(newPin!==confPin){errEl.textContent='PINs do not match.';return;}
+    var h=await sha256(newPin);
+    localStorage.setItem('niva_pin_v1',h);
+    localStorage.setItem('niva_lock_enabled','1');
+    resetPinAttempts();
+    errEl.textContent='';
+    ['sec-cur-pin','sec-new-pin','sec-conf-pin'].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.value='';
+    });
+    refreshSecurityUI();
+    alert('✓ PIN saved successfully!');
+  };
+
+  window.removePinPrompt = async function(){
+    var cur=prompt('Enter current PIN to remove PIN protection:');
+    if(!cur) return;
+    if(!/^\d{6}$/.test(cur)){alert('PIN must be 6 digits.');return;}
+    var h=await sha256(cur);
+    if(h!==getStoredPin()){alert('Incorrect PIN.');return;}
+    if(!confirm('Remove PIN protection?\nApp will open without a PIN.')) return;
+    localStorage.removeItem('niva_pin_v1');
+    localStorage.setItem('niva_lock_enabled','0');
+    resetPinAttempts();
+    refreshSecurityUI();
+    alert('✓ PIN removed. App will open without a PIN.');
+  };
+
+  // ── Init: lockscreen is hidden by default, splash will call showLockAfterSplash() ──
+  // Just set up lockout tick if needed (for when lockscreen IS shown)
+  if(getPinAttempts().lockedUntil > Date.now()) startPinLockoutTick();
+})();
+
+// ── Override doLogout – lock screen disabled ──
+window.doLogout=async function(){
+  if(!confirm('Log out of Niva Dental?')) return;
+  location.reload();
+};
+
+// ── Override showSetSection to init security UI ──
+var _origShowSetSection=window.showSetSection;
+window.showSetSection=function(id,btn){
+  if(typeof _origShowSetSection==='function') _origShowSetSection(id,btn);
+  if(id==='security') setTimeout(window.refreshSecurityUI,10);
+};
 
 </script>
 
@@ -8365,6 +9473,588 @@ if (typeof svAppt === 'undefined') {
 <div style="text-align:center;padding:10px 16px;font-size:11px;color:#aaa;background:#f8fafc;border-top:1px solid #e8edf0;margin-top:4px;line-height:1.8">
   Clinic Management Software &nbsp;|&nbsp; Development by &nbsp;<strong style="color:#27ae60;letter-spacing:.3px">GreenCheck inc.</strong>
 </div>
+
+
+<script>
+// ══════════════════════════════════════════════════════
+// AUTO-SAVE ON CLOSE / BACKGROUND / NAVIGATE AWAY
+// ══════════════════════════════════════════════════════
+(function(){
+
+  // ── Silent write to file handle (no UI prompts) ──
+  async function silentSaveToFile(){
+    if(!_autoSaveHandle) return false;
+    try{
+      const data = JSON.stringify(buildSaveData(), null, 2);
+      const writable = await _autoSaveHandle.createWritable();
+      await writable.write(data);
+      await writable.close();
+      const cfg = getAutoSaveSettings();
+      cfg.lastSaved = new Date().toISOString();
+      setAutoSaveSettings(cfg);
+      return true;
+    } catch(e){
+      console.warn('Auto-save on exit failed:', e);
+      return false;
+    }
+  }
+
+  // ── Download backup as JSON file (fallback for no file handle) ──
+  function downloadBackupSilent(){
+    try{
+      const data = JSON.stringify(buildSaveData(), null, 2);
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const now = new Date();
+      const stamp = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+      a.href = url;
+      a.download = 'niva-dental-backup-'+stamp+'.json';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 500);
+    } catch(e){
+      console.warn('Auto-download backup failed:', e);
+    }
+  }
+
+  // ── Check if auto-save on exit is enabled ──
+  function exitSaveEnabled(){
+    const cfg = getAutoSaveSettings();
+    return !!cfg.autoOnExit;
+  }
+
+  // ── Perform the exit save (file handle or download) ──
+  async function doExitSave(){
+    if(!exitSaveEnabled()) return;
+    if(_autoSaveHandle){
+      await silentSaveToFile();
+    } else {
+      // Fallback: trigger download
+      downloadBackupSilent();
+    }
+  }
+
+  // ── visibilitychange: fires when tab hidden, app backgrounded, screen locked ──
+  document.addEventListener('visibilitychange', async function(){
+    if(document.visibilityState === 'hidden'){
+      await doExitSave();
+    }
+  });
+
+  // ── pagehide: fires on tab close, browser close, navigation away (more reliable than beforeunload) ──
+  window.addEventListener('pagehide', async function(e){
+    if(exitSaveEnabled() && _autoSaveHandle){
+      // Use synchronous-style for pagehide — file API may not fully complete but we try
+      try{
+        const data = JSON.stringify(buildSaveData(), null, 2);
+        // Best-effort: use keepalive beacon pattern can't send files, so just attempt write
+        _autoSaveHandle.createWritable().then(w => w.write(data).then(() => w.close()));
+      } catch(e){ console.warn('pagehide save attempt:', e); }
+    }
+  });
+
+  // ── beforeunload: last resort for page unload (can't do async here reliably) ──
+  // We use this just to trigger the download fallback if needed
+  window.addEventListener('beforeunload', function(e){
+    if(!exitSaveEnabled()) return;
+    // If no file handle, nothing we can reliably do in beforeunload
+    // visibilitychange (hidden) fires before beforeunload and handles the download
+  });
+
+  // ── Toast notification after save ──
+  // Override doExitSave to show a brief toast on successful save
+  const _origDoExitSave = doExitSave;
+  window._exitSaveActive = false;
+  window.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible' && window._exitSaveActive){
+      window._exitSaveActive = false;
+      // Show a brief toast that save happened
+      const cfg = getAutoSaveSettings();
+      if(cfg.lastSaved){
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1b6e35;color:#fff;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:700;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .4s';
+        toast.textContent = '✓ Auto-saved on exit: ' + (cfg.fileName || 'backup downloaded');
+        document.body.appendChild(toast);
+        setTimeout(()=>{ toast.style.opacity='0'; setTimeout(()=>toast.remove(),400); }, 3000);
+      }
+    }
+  });
+
+})();
+</script>
+
+
+<script>
+// ══════════════════════════════════════════════════════
+// AUTO WEEKLY FIREBASE BACKUP
+// ══════════════════════════════════════════════════════
+(function(){
+
+  var STORAGE_KEY = 'niva_fb_weekly';
+
+  function getWeeklyCfg(){
+    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); }
+    catch(e){ return {}; }
+  }
+  function setWeeklyCfg(o){ localStorage.setItem(STORAGE_KEY, JSON.stringify(o)); }
+
+  // ── Save settings from UI ──
+  window.saveFBWeeklySettings = function(){
+    var cfg = getWeeklyCfg();
+    var togEl = document.getElementById('tog-fb-weekly');
+    var dayEl = document.getElementById('fb-weekly-day');
+    var timeEl = document.getElementById('fb-weekly-time');
+    var keepEl = document.getElementById('fb-weekly-keep');
+    cfg.enabled = togEl ? togEl.checked : false;
+    cfg.day = dayEl ? parseInt(dayEl.value) : 2;
+    cfg.time = timeEl ? timeEl.value : '09:00';
+    cfg.keep = keepEl ? parseInt(keepEl.value) : 4;
+    setWeeklyCfg(cfg);
+    var configDiv = document.getElementById('fb-weekly-config');
+    if(configDiv) configDiv.style.display = cfg.enabled ? 'block' : 'none';
+    updateWeeklyStatusUI();
+    if(cfg.enabled) scheduleWeeklyCheck();
+  };
+
+  // ── Load settings into UI ──
+  window.initFBWeeklyUI = function(){
+    var cfg = getWeeklyCfg();
+    var togEl = document.getElementById('tog-fb-weekly');
+    var dayEl = document.getElementById('fb-weekly-day');
+    var timeEl = document.getElementById('fb-weekly-time');
+    var keepEl = document.getElementById('fb-weekly-keep');
+    var configDiv = document.getElementById('fb-weekly-config');
+    if(togEl) togEl.checked = !!cfg.enabled;
+    if(dayEl && cfg.day !== undefined) dayEl.value = cfg.day;
+    if(timeEl && cfg.time) timeEl.value = cfg.time;
+    if(keepEl && cfg.keep !== undefined) keepEl.value = cfg.keep;
+    if(configDiv) configDiv.style.display = cfg.enabled ? 'block' : 'none';
+    updateWeeklyStatusUI();
+  };
+
+  function updateWeeklyStatusUI(){
+    var cfg = getWeeklyCfg();
+    var dot = document.getElementById('fb-weekly-dot');
+    var statusEl = document.getElementById('fb-weekly-status');
+    var lastEl = document.getElementById('fb-weekly-last');
+    if(!dot || !statusEl) return;
+    if(!cfg.enabled){
+      dot.style.background = '#ccc';
+      statusEl.textContent = 'Disabled';
+      statusEl.style.color = '#aaa';
+      return;
+    }
+    var lastRun = cfg.lastRun;
+    var lastOk = cfg.lastSuccess;
+    if(lastOk){
+      dot.style.background = '#1b6e35';
+      statusEl.textContent = 'Active – last backup successful';
+      statusEl.style.color = '#1b6e35';
+      if(lastEl) lastEl.textContent = 'Last backup: ' + new Date(lastOk).toLocaleString('en-IN') + ' · ' + (cfg.lastKey||'');
+    } else if(lastRun){
+      dot.style.background = '#c0392b';
+      statusEl.textContent = 'Last run failed';
+      statusEl.style.color = '#c0392b';
+      if(lastEl) lastEl.textContent = 'Last attempt: ' + new Date(lastRun).toLocaleString('en-IN');
+    } else {
+      dot.style.background = '#f39c12';
+      statusEl.textContent = 'Enabled – waiting for scheduled time';
+      statusEl.style.color = '#0d6b8a';
+      var nextDay = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][cfg.day||2];
+      if(lastEl) lastEl.textContent = 'Will run every ' + nextDay + ' at ' + (cfg.time||'09:00');
+    }
+  }
+
+  // ── Build backup payload ──
+  function buildWeeklyPayload(){
+    return {
+      _type: 'weekly_backup',
+      _app: 'Niva Dental Cash Book',
+      _savedAt: new Date().toISOString(),
+      _version: 3,
+      clinic: (typeof CFG !== 'undefined') ? CFG.clinic : {},
+      settings: (typeof CFG !== 'undefined') ? CFG : {},
+      bills: (typeof bills !== 'undefined') ? bills : [],
+      expenses: (typeof expenses !== 'undefined') ? expenses : []
+    };
+  }
+
+  // ── Run the weekly backup ──
+  window.runFBWeeklyBackup = async function(manual){
+    var cfg = getWeeklyCfg();
+    if(!cfg.enabled && !manual){return;}
+
+    // Check Firebase is configured
+    var F = (typeof DEF_FB !== 'undefined' && typeof CFG !== 'undefined')
+      ? {...DEF_FB, ...(CFG.firebase||{})}
+      : null;
+    if(!F || !F.dburl){
+      if(manual) alert('⚠ Firebase not configured. Please set up Firebase first in Settings → Live Sync (Firebase).');
+      return;
+    }
+
+    var dot = document.getElementById('fb-weekly-dot');
+    var statusEl = document.getElementById('fb-weekly-status');
+    if(dot) dot.style.background = '#f39c12';
+    if(statusEl){ statusEl.textContent = 'Running backup…'; statusEl.style.color = '#f39c12'; }
+
+    var now = new Date();
+    var dateKey = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+    var timeKey = String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
+    var backupKey = dateKey + '_' + timeKey;
+    var path = 'weekly_backups/' + backupKey;
+
+    cfg.lastRun = Date.now();
+    setWeeklyCfg(cfg);
+
+    try{
+      // Sign in first
+      if(typeof fbSignIn === 'function') await fbSignIn();
+
+      // Push backup snapshot
+      await fbPUT(path, buildWeeklyPayload());
+
+      // ── Prune old backups (keep last N) ──
+      var keep = cfg.keep || 4;
+      if(keep > 0){
+        try{
+          var existing = await fbGET('weekly_backups');
+          if(existing && typeof existing === 'object'){
+            var keys = Object.keys(existing).sort();
+            var toDelete = keys.slice(0, Math.max(0, keys.length - keep));
+            for(var k of toDelete){
+              await fbDELETE('weekly_backups/' + k);
+            }
+          }
+        } catch(e){ console.warn('Prune old backups failed:', e); }
+      }
+
+      cfg.lastSuccess = Date.now();
+      cfg.lastKey = backupKey;
+      setWeeklyCfg(cfg);
+      updateWeeklyStatusUI();
+
+      // Toast
+      showWeeklyToast('✅ Weekly Firebase backup saved: ' + backupKey, '#1b6e35');
+      if(manual) alert('✅ Backup successful!\n\nSaved to Firebase at: weekly_backups/' + backupKey);
+
+    } catch(e){
+      setWeeklyCfg(cfg);
+      updateWeeklyStatusUI();
+      showWeeklyToast('❌ Weekly backup failed: ' + e.message, '#c0392b');
+      if(manual) alert('❌ Backup failed: ' + e.message + '\n\nMake sure Firebase is connected.');
+      console.error('Weekly backup error:', e);
+    }
+  };
+
+  function showWeeklyToast(msg, color){
+    var toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:'+color+';color:#fff;padding:10px 20px;border-radius:8px;font-size:12px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.25);max-width:90vw;text-align:center';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(function(){
+      toast.style.transition = 'opacity .4s';
+      toast.style.opacity = '0';
+      setTimeout(function(){ toast.remove(); }, 400);
+    }, 4000);
+  }
+
+  // ── Scheduler: check every minute if it's time to run ──
+  var _weeklyTimer = null;
+
+  function shouldRunNow(){
+    var cfg = getWeeklyCfg();
+    if(!cfg.enabled) return false;
+    var now = new Date();
+    var day = now.getDay();
+    var hh = String(now.getHours()).padStart(2,'0');
+    var mm = String(now.getMinutes()).padStart(2,'0');
+    var curTime = hh + ':' + mm;
+    if(day !== (cfg.day || 2)) return false;
+    if(curTime !== (cfg.time || '09:00')) return false;
+    // Don't run if already ran today
+    if(cfg.lastSuccess){
+      var lastDate = new Date(cfg.lastSuccess).toDateString();
+      if(lastDate === now.toDateString()) return false;
+    }
+    return true;
+  }
+
+  function tickWeekly(){
+    if(shouldRunNow()){
+      window.runFBWeeklyBackup(false);
+    }
+  }
+
+  window.scheduleWeeklyCheck = function(){
+    if(_weeklyTimer) clearInterval(_weeklyTimer);
+    var cfg = getWeeklyCfg();
+    if(!cfg.enabled) return;
+    // Check every minute
+    _weeklyTimer = setInterval(tickWeekly, 60 * 1000);
+    // Also check immediately on open (in case missed while app was closed)
+    checkMissedWeeklyBackup();
+  };
+
+  // ── If app was closed and the scheduled time passed, run now ──
+  function checkMissedWeeklyBackup(){
+    var cfg = getWeeklyCfg();
+    if(!cfg.enabled) return;
+    var now = new Date();
+    var scheduledDay = cfg.day !== undefined ? cfg.day : 2;
+    var scheduledTime = cfg.time || '09:00';
+    var [sh, sm] = scheduledTime.split(':').map(Number);
+    // Find last scheduled run date
+    var checkDate = new Date();
+    var daysBack = 0;
+    while(daysBack < 7){
+      if(checkDate.getDay() === scheduledDay){
+        var scheduledDT = new Date(checkDate);
+        scheduledDT.setHours(sh, sm, 0, 0);
+        if(scheduledDT <= now){
+          // Check if we already ran after this scheduled time
+          if(!cfg.lastSuccess || cfg.lastSuccess < scheduledDT.getTime()){
+            // Missed — run now (silently)
+            setTimeout(function(){ window.runFBWeeklyBackup(false); }, 3000);
+          }
+          break;
+        }
+      }
+      checkDate.setDate(checkDate.getDate() - 1);
+      daysBack++;
+    }
+  }
+
+  // ── fbDELETE helper (if not already defined) ──
+  if(typeof window.fbDELETE === 'undefined'){
+    window.fbDELETE = async function(path){
+      const F = {...DEF_FB, ...(CFG.firebase||{})};
+      const base = (F.dburl||'').replace(/\/$/, '');
+      const syncKey = (F.synckey||'niva-dental').replace(/[^a-zA-Z0-9_-]/g,'_');
+      const token = (typeof _fbAuthToken !== 'undefined' && _fbAuthToken) ? _fbAuthToken : null;
+      const url = base + '/' + syncKey + '/' + path + '.json' + (token ? '?auth=' + token : '');
+      const r = await fetch(url, { method: 'DELETE' });
+      if(!r.ok) throw new Error('DELETE failed: ' + r.status);
+    };
+  }
+
+  // ── Init on page load ──
+  window.addEventListener('load', function(){
+    var cfg = getWeeklyCfg();
+    if(cfg.enabled) scheduleWeeklyCheck();
+  });
+
+  // ── Hook into showSetSection for Firebase tab ──
+  var _origShowSetSection2 = window.showSetSection;
+  window.showSetSection = function(id, btn){
+    if(typeof _origShowSetSection2 === 'function') _origShowSetSection2(id, btn);
+    if(id === 'firebase') setTimeout(window.initFBWeeklyUI, 10);
+  };
+
+})();
+</script>
+
+<script>
+// ══ COLLAPSIBLE NOTE BOXES ══
+window.toggleNote = function(id){
+  var box = document.getElementById(id);
+  if(!box) return;
+  var isCollapsed = box.classList.contains('collapsed');
+  box.classList.toggle('collapsed');
+  var btn = box.querySelector('.note-toggle-btn');
+  if(btn){
+    var label = btn.querySelector('.note-toggle-label');
+    var arrow = btn.querySelector('.note-toggle-arrow');
+    if(label) label.textContent = isCollapsed ? 'Hide' : 'Show';
+    // arrow rotates via CSS
+  }
+  // persist state
+  try{ localStorage.setItem('note_state_'+id, isCollapsed?'open':'closed'); }catch(e){}
+};
+
+window.addEventListener('load', function(){
+  // Restore note states
+  document.querySelectorAll('.note-collapsible[id]').forEach(function(box){
+    try{
+      var state = localStorage.getItem('note_state_'+box.id);
+      if(state === 'closed') box.classList.add('collapsed');
+      var btn = box.querySelector('.note-toggle-btn');
+      if(btn){
+        var label = btn.querySelector('.note-toggle-label');
+        if(label) label.textContent = box.classList.contains('collapsed') ? 'Show' : 'Hide';
+      }
+    }catch(e){}
+  });
+});
+(function(){
+  // Default credentials (username: admin, password: admin)
+  // Stored in localStorage as SHA-256 hashes
+  var LS_USER = 'niva_auth_user';
+  var LS_PASS = 'niva_auth_pass';
+  var SESSION_KEY = 'niva_auth_session';
+
+  async function sha256(str){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function initDefaultCreds(){
+    if(!localStorage.getItem(LS_USER)){
+      localStorage.setItem(LS_USER, await sha256('admin'));
+    }
+    if(!localStorage.getItem(LS_PASS)){
+      localStorage.setItem(LS_PASS, await sha256('admin'));
+    }
+  }
+
+  function isLoggedIn(){
+    return sessionStorage.getItem(SESSION_KEY) === '1';
+  }
+
+  function showLoginModal(){
+    document.getElementById('loginModal').classList.add('open');
+    document.getElementById('login-user').value = '';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-err').textContent = '';
+    // Sync clinic name
+    try{
+      var name = (typeof CFG !== 'undefined' && CFG.clinic && CFG.clinic.name) ? CFG.clinic.name : (localStorage.getItem('niva_cfg') ? JSON.parse(localStorage.getItem('niva_cfg')).clinic.name : 'Niva Dental');
+      if(name) document.getElementById('login-clinic-title').textContent = name;
+    }catch(e){}
+    setTimeout(function(){ document.getElementById('login-user').focus(); }, 120);
+  }
+
+  function hideLoginModal(){
+    document.getElementById('loginModal').classList.remove('open');
+  }
+
+  window.openLogoutModal = function(){
+    document.getElementById('logoutModal').classList.add('open');
+  };
+
+  window.closeLogoutModal = function(){
+    document.getElementById('logoutModal').classList.remove('open');
+  };
+
+  window.doLogoutConfirm = async function(){
+    // Run existing auto-save logic if available
+    try{
+      var cfg = (typeof getAutoSaveSettings === 'function') ? getAutoSaveSettings() : {};
+      if(cfg.autoOnLogout && typeof _autoSaveHandle !== 'undefined' && _autoSaveHandle){
+        if(typeof writeAutoSaveFile === 'function') await writeAutoSaveFile();
+      }
+    }catch(e){}
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem('niva_unlocked');
+    window.closeLogoutModal();
+    showLoginModal();
+  };
+
+  // Override existing doLogout to use our modal
+  window.doLogout = function(){
+    window.openLogoutModal();
+  };
+
+  window.doLogin = async function(){
+    var user = document.getElementById('login-user').value.trim();
+    var pass = document.getElementById('login-pass').value;
+    var errEl = document.getElementById('login-err');
+    if(!user || !pass){ errEl.textContent = 'Please enter username and password.'; return; }
+    var hUser = await sha256(user);
+    var hPass = await sha256(pass);
+    var storedUser = localStorage.getItem(LS_USER);
+    var storedPass = localStorage.getItem(LS_PASS);
+    if(hUser === storedUser && hPass === storedPass){
+      sessionStorage.setItem(SESSION_KEY, '1');
+      hideLoginModal();
+    } else {
+      errEl.textContent = 'Incorrect username or password.';
+      document.getElementById('login-pass').value = '';
+      document.getElementById('login-pass').focus();
+    }
+  };
+
+  // On page load: init creds then check session
+  window.addEventListener('load', async function(){
+    await initDefaultCreds();
+    // Init login toggle state — default is DISABLED (must be explicitly turned ON)
+    var loginEnabled = localStorage.getItem('niva_login_enabled');
+    var tog = document.getElementById('tog-login-screen');
+    if(loginEnabled === '1'){
+      if(tog) tog.checked = true;
+      updateLoginToggleUI(true);
+      if(!isLoggedIn()){
+        showLoginModal();
+      }
+    } else {
+      if(tog) tog.checked = false;
+      updateLoginToggleUI(false);
+    }
+  });
+
+  function updateLoginToggleUI(enabled){
+    var card = document.getElementById('login-creds-card');
+    var sub = document.getElementById('login-toggle-sub');
+    if(card) card.style.opacity = enabled ? '1' : '0.5';
+    if(sub) sub.textContent = enabled ? 'Show login screen on app start' : 'Login screen is disabled';
+  }
+
+  window.toggleLoginScreen = function(enabled){
+    localStorage.setItem('niva_login_enabled', enabled ? '1' : '0');
+    updateLoginToggleUI(enabled);
+    if(enabled){
+      // Mark as logged in for this session so page doesn't immediately lock
+      sessionStorage.setItem(SESSION_KEY, '1');
+    }
+  };
+
+  // Init toggle UI when security section opens
+  var _origShowSetSectionAuth = window.showSetSection;
+  window.showSetSection = function(id, btn){
+    if(typeof _origShowSetSectionAuth === 'function') _origShowSetSectionAuth(id, btn);
+    if(id === 'security'){
+      var loginEnabled = localStorage.getItem('niva_login_enabled');
+      var tog = document.getElementById('tog-login-screen');
+      if(tog) tog.checked = (loginEnabled === '1');
+      updateLoginToggleUI(loginEnabled === '1');
+    }
+  };
+
+  window.saveLoginCreds = async function(){
+    var newUser = document.getElementById('cred-user').value.trim();
+    var curPass = document.getElementById('cred-cur-pass').value;
+    var newPass = document.getElementById('cred-new-pass').value;
+    var confPass = document.getElementById('cred-conf-pass').value;
+    var errEl = document.getElementById('cred-err');
+    var okEl = document.getElementById('cred-ok');
+    errEl.textContent = ''; okEl.style.display = 'none';
+
+    if(!curPass){ errEl.textContent = 'Please enter your current password.'; return; }
+
+    var hCur = await sha256(curPass);
+    if(hCur !== localStorage.getItem(LS_PASS)){ errEl.textContent = 'Current password is incorrect.'; return; }
+
+    if(newPass){
+      if(newPass.length < 4){ errEl.textContent = 'New password must be at least 4 characters.'; return; }
+      if(newPass !== confPass){ errEl.textContent = 'New passwords do not match.'; return; }
+      localStorage.setItem(LS_PASS, await sha256(newPass));
+    }
+
+    if(newUser){
+      localStorage.setItem(LS_USER, await sha256(newUser));
+    }
+
+    document.getElementById('cred-user').value = '';
+    document.getElementById('cred-cur-pass').value = '';
+    document.getElementById('cred-new-pass').value = '';
+    document.getElementById('cred-conf-pass').value = '';
+    okEl.style.display = 'block';
+    setTimeout(function(){ okEl.style.display = 'none'; }, 3000);
+  };
+
+})();
+</script>
 
 </body>
 </html>
