@@ -5,8 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="#0d6b8a"/>
-<link rel="manifest" href="manifest.json"/>
-<link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Niva%20Dental%22,%22short_name%22:%22Niva%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%230d6b8a%22,%22theme_color%22:%22%230d6b8a%22,%22icons%22:[{%22src%22:%22data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk%2BM9QDwADhgGAWjR9awAAAABJRU5ErkJggg%3D%3D%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22}]}"/>
 <meta name="apple-mobile-web-app-title" content="Niva Dental"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
@@ -608,11 +607,8 @@ tr:hover td{background:#f9fbfc}
   #income-trend-panel,#patient-graph-panel{min-height:unset !important}
 }
 @media(min-width:769px){
-  #dash-graphs-row{align-items:stretch !important}
-  #income-trend-panel,#patient-graph-panel{
-    min-height:420px !important;
-    height:100% !important;
-  }
+  #dash-graphs-row{align-items:stretch}
+  #income-trend-panel,#patient-graph-panel{height:100%}
 }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@200;400;700;900&family=Space+Mono&display=swap" rel="stylesheet"/>
@@ -1005,7 +1001,7 @@ function showLockAfterSplash(){
   <div id="dash-graphs-row" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;align-items:stretch;">
 
     <!-- 📈 12-MONTH INCOME TREND -->
-    <div id="income-trend-panel" style="background:#fff;border-radius:10px;border:1px solid #e0e8ee;overflow:hidden;display:flex;flex-direction:column;min-width:0;min-height:420px;height:100%;">
+    <div id="income-trend-panel" style="background:#fff;border-radius:10px;border:1px solid #e0e8ee;overflow:hidden;display:flex;flex-direction:column;min-width:0;min-height:460px;">
       <div style="background:linear-gradient(135deg,#0d6b8a 0%,#0a5570 100%);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;flex-shrink:0;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:16px;">📈</span>
@@ -1031,15 +1027,15 @@ function showLockAfterSplash(){
         </div>
       </div>
       <div style="padding:14px 14px 12px;flex:1;display:flex;flex-direction:column;min-height:0;">
-        <div style="position:relative;width:100%;flex:1;min-height:280px;">
-          <canvas id="dash-income-chart" style="width:100%;display:block;"></canvas>
+        <div style="position:relative;width:100%;flex:1;min-height:200px;">
+          <canvas id="dash-income-chart" style="position:absolute;top:0;left:0;width:100%;height:100%;display:block;"></canvas>
           <div id="dash-income-chart-empty" style="display:none;text-align:center;padding:32px;color:#bbb;font-size:12px;">No data yet</div>
         </div>
       </div>
     </div>
 
     <!-- 👥 NEW VS RETURNING PATIENTS -->
-    <div id="patient-graph-panel" style="background:#fff;border-radius:10px;border:1px solid #e0e8ee;overflow:hidden;display:flex;flex-direction:column;min-width:0;min-height:420px;height:100%;">
+    <div id="patient-graph-panel" style="background:#fff;border-radius:10px;border:1px solid #e0e8ee;overflow:hidden;display:flex;flex-direction:column;min-width:0;min-height:460px;">
       <div style="background:linear-gradient(135deg,#0d6b8a 0%,#0a5570 100%);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0;">
         <div style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;" onclick="togglePatientGraphPanel()">
           <span style="font-size:16px;">👥</span>
@@ -1069,8 +1065,8 @@ function showLockAfterSplash(){
           <div id="pg-summary" style="margin-left:auto;font-size:11px;color:#888;font-weight:700;"></div>
         </div>
         <!-- Canvas fills remaining height -->
-        <div style="position:relative;width:100%;flex:1;min-height:200px;">
-          <canvas id="patient-graph-canvas" style="width:100%;display:block;"></canvas>
+        <div style="position:relative;width:100%;height:260px;flex-shrink:0;">
+          <canvas id="patient-graph-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;display:block;"></canvas>
           <div id="patient-graph-empty" style="display:none;text-align:center;padding:32px;color:#bbb;font-size:12px;">No patient data for this period</div>
         </div>
       </div>
@@ -2735,13 +2731,14 @@ function showLockAfterSplash(){
         <div class="set-group">
           <label>&#128274; Security Secret Key</label>
           <div style="display:flex;gap:6px;align-items:center">
-            <input id="sb-secret" type="password" placeholder="nivadental" oninput="sbSaveConfig()" style="flex:1"/>
+            <input id="sb-secret" type="password" placeholder="Enter strong secret key" oninput="sbSaveConfig();var b=document.getElementById('sb-update-secret-btn');if(b){b.style.background='#c0392b';b.textContent='⚠️ Secret Changed — Update in Supabase';}" style="flex:1"/>
             <button type="button" onclick="(function(){var i=document.getElementById('sb-secret');i.type=i.type==='password'?'text':'password';})()" class="btn bo sm" style="flex-shrink:0;padding:7px 10px">&#128065;</button>
           </div>
-          <div class="hint">&#9888; Supabase SQL ma <code>niva_check_key()</code> function ma set karela password saathe match karvano. Default: <b>nivadental</b></div>
+          <div class="hint">⚠️ When you change the secret key, click <b>🔑 Update Secret in Supabase</b> below — SQL will be generated automatically.</div>
         </div>
         <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:4px">
           <button class="btn bp" onclick="sbTestConnection()">&#128268; Test Connection</button>
+          <button class="btn brec sm" onclick="sbUpdateSecretKey()" id="sb-update-secret-btn">&#128273; Update Secret in Supabase</button>
           <button class="btn bg sm" onclick="if(typeof sbPollNow==='function'){sbPollNow();var m=document.getElementById('sb-test-msg');if(m){m.style.display='block';m.style.color='#0d6b8a';m.textContent='🔄 Polling Supabase for new data…';setTimeout(function(){m.textContent='✅ Poll complete — UI updated';},2500);}}">&#128260; Sync Now</button>
         </div>
         <div id="sb-test-msg" style="font-size:12px;margin-top:10px;display:none"></div>
@@ -2796,23 +2793,23 @@ function showLockAfterSplash(){
         <!-- SETTINGS EXPORT / IMPORT -->
         <div style="margin-top:20px">
           <div class="sec" style="margin-bottom:10px">&#9881; Settings Backup — Export / Import</div>
-          <div style="font-size:12px;color:#666;margin-bottom:12px">Clinic info, billing options, theme, Firebase &amp; Supabase config — saghvu ek file ma save karo ya restore karo.</div>
+          <div style="font-size:12px;color:#666;margin-bottom:12px">Clinic info, billing options, theme, Firebase &amp; Supabase config — save everything in one file or restore from backup.</div>
           <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:10px;padding:14px;margin-bottom:10px">
             <div style="font-size:13px;font-weight:700;color:#0d6b8a;margin-bottom:4px">&#11014; Export Settings</div>
-            <div style="font-size:11px;color:#666;margin-bottom:10px">Tamari badhij settings ek <b>.json</b> file ma download karo.</div>
+            <div style="font-size:11px;color:#666;margin-bottom:10px">Download all your settings as a <b>.json</b> file.</div>
             <button class="btn bp" style="width:100%" onclick="nivaExportSettings()">&#11014; Download Settings Backup</button>
             <div id="sb-export-msg" style="font-size:12px;margin-top:8px;display:none"></div>
           </div>
           <div style="background:#f0fff4;border:1px solid #a9dfbf;border-radius:10px;padding:14px">
             <div style="font-size:13px;font-weight:700;color:#1b6e35;margin-bottom:4px">&#11015; Import Settings</div>
-            <div style="font-size:11px;color:#666;margin-bottom:10px">Pahela export kareli <b>.json</b> file select karo.</div>
+            <div style="font-size:11px;color:#666;margin-bottom:10px">Select a previously exported <b>.json</b> settings file to restore.</div>
             <label style="display:block;background:#1b6e35;color:#fff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:6px;cursor:pointer;text-align:center;width:100%;box-sizing:border-box">
               &#11015; Select Settings File
               <input type="file" accept=".json" style="display:none" onchange="nivaImportSettings(this)">
             </label>
             <div id="sb-import-msg" style="font-size:12px;margin-top:8px;display:none"></div>
             <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:8px;margin-top:10px;font-size:11px;color:#7a5c00">
-              &#9888; Import karva thi tamari existing settings replace thashhe. Bills/Patients data affect nahi thashhe.
+              ⚠️ Importing will replace your existing settings. Bills &amp; patient data will not be affected.
             </div>
           </div>
         </div>
@@ -3694,13 +3691,13 @@ function showLockAfterSplash(){
     </div>
     <div style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-        <label style="font-size:11px;font-weight:700;color:#666">MESSAGE <span style="font-weight:400;color:#aaa">(edit kari shakaay)</span></label>
+        <label style="font-size:11px;font-weight:700;color:#666">MESSAGE <span style="font-weight:400;color:#aaa">(editable)</span></label>
         <button class="btn bo sm" onclick="resetReviewMsg()" style="font-size:10px;padding:3px 8px">↺ Reset</button>
       </div>
       <textarea id="rev-msg" style="width:100%;min-height:220px;padding:10px;border:1px solid #cdd5dd;border-radius:8px;font-size:12px;font-family:'Courier New',monospace;background:#f8fafc;color:#222;resize:vertical;line-height:1.6;outline:none"></textarea>
     </div>
     <div style="padding:8px 12px;background:#fffde7;border:1px solid #ffe082;border-radius:6px;font-size:11px;color:#7a5800;margin-bottom:12px">
-      💡 <strong>Tip:</strong> Message edit karo, pachi WhatsApp App (mobile) ya WhatsApp Web (desktop) thi moko.
+      💡 <strong>Tip:</strong> Edit the message, then send via WhatsApp App (mobile) or WhatsApp Web (desktop).
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
       <button class="btn bo" onclick="closeM('review-modal')">Cancel</button>
@@ -4140,7 +4137,7 @@ updateTopbar();
 // Firebase SSE + sync functions remain 100% unchanged.
 // ══════════════════════════════════════════════════════════════════════════════
 const _IDB_NAME    = 'niva_dental_db';
-const _IDB_VER     = 1;
+const _IDB_VER     = 3; // bumped: fixes patientFiles→patient_files store name mismatch
 const _IDB_STORES  = ['bills','appointments','expenses','patient_files','prescriptions','med_directory','kv'];
 // 'kv' store = key-value (settings, logo, config, templates, etc.)
 
@@ -7214,7 +7211,7 @@ function renderIncomeGraph(){
   const isMobile=W<480;
   const FSIZE=isMobile?9:10;
   const FSIZE_VAL=isMobile?9:10;
-  const H=isMobile?260:340;        // taller to fit rotated labels
+  const H=canvas.parentElement?(canvas.parentElement.offsetHeight||260):260; // fill container
   const dpr=window.devicePixelRatio||1;
   canvas.width=W*dpr;
   canvas.height=H*dpr;
@@ -7224,7 +7221,7 @@ function renderIncomeGraph(){
   ctx.scale(dpr,dpr);
   ctx.clearRect(0,0,W,H);
 
-  const PAD={top:20,right:16,bottom:isMobile?56:58,left:isMobile?44:52};
+  const PAD={top:36,right:20,bottom:isMobile?54:52,left:isMobile?48:56};
   const cW=W-PAD.left-PAD.right;
   const cH=H-PAD.top-PAD.bottom;
   const n=months.length;
@@ -7248,7 +7245,7 @@ function renderIncomeGraph(){
     ctx.strokeStyle='#edf2f5';
     ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(PAD.left,y);ctx.lineTo(W-PAD.right,y);ctx.stroke();
-    ctx.fillStyle='#aaa';
+    ctx.fillStyle='#333';
     ctx.font=FSIZE+'px Arial';
     const lv=v>=100000?(v/100000).toFixed(1)+'L':v>=1000?(v/1000).toFixed(v%1000===0?0:1)+'k':Math.round(v).toString();
     ctx.fillText(lv,PAD.left-5,y+3.5);
@@ -7310,7 +7307,7 @@ function renderIncomeGraph(){
           ctx.textBaseline='alphabetic';
           ctx.font=(isSel?'bold ':'')+9+'px Arial';
           ctx.fillStyle=EXPENSE_COLOR;
-          var ly=Math.max(13,y-9);
+          var ly=Math.max(PAD.top+2,y-9);
           var lx2=Math.max(PAD.left+18,Math.min(W-PAD.right-18,x));
           ctx.fillText(cur+lv,lx2,ly);
           ctx.restore();
@@ -7333,7 +7330,7 @@ function renderIncomeGraph(){
     var val=m[SK];
     if(val<=0) return;
     var x=xPos(i);
-    var y=Math.max(14,yPos(val)-9);
+    var y=Math.max(PAD.top+2,yPos(val)-9);
     var lv=val>=100000?(val/100000).toFixed(1)+'L':val>=1000?(val/1000).toFixed(val%1000===0?0:1)+'k':Math.round(val).toString();
     var isCurrent=m.key===tod.slice(0,7);
     var isSel=m.key===selMonth;
@@ -7371,7 +7368,7 @@ function renderIncomeGraph(){
     ctx.translate(x,axisY+6);
     ctx.rotate(ANGLE);
     ctx.font=(bold?'bold ':'')+FSIZE+'px Arial';
-    ctx.fillStyle=isCurrent?sColor:(isSel?'#222':'#999');
+    ctx.fillStyle=isCurrent?sColor:(isSel?'#222':'#333');
     ctx.fillText(lbl,0,0);
     ctx.restore();
   });
@@ -7382,8 +7379,8 @@ function renderIncomeGraph(){
     ctx.textAlign='center';
     ctx.textBaseline='alphabetic';
     ctx.font=(lb.isSel?'bold ':'')+(lb.isSel?FSIZE_VAL+1:FSIZE_VAL-1)+'px Arial';
-    ctx.fillStyle=lb.isSel?sColor:(lb.isCurrent?sColor:'#aaa');
-    var cy=Math.max(13,lb.y);
+    ctx.fillStyle=lb.isSel?sColor:(lb.isCurrent?sColor:'#333');
+    var cy=Math.max(PAD.top+2,lb.y);
     var cx=Math.max(PAD.left+18,Math.min(W-PAD.right-18,lb.x));
     ctx.fillText(lb.lv,cx,cy);
     ctx.restore();
@@ -7777,7 +7774,7 @@ function renderDashAppts(){
     <tr style="${highlight?'background:#fef9e7;':''}">
       <td>${fmtDate(a.date)}</td>
       <td>${fmtTime(a.time)}</td>
-      <td><strong>${a.patient}</strong>${a.isFollowUp?` <span class="badge" style="background:#fff3e0;color:#e67e22;font-size:9px">🔔 Follow-Up</span>`:''}<br><span style="font-size:10px;color:#888">${a.phone?'📱 '+a.phone:''}</span></td>
+      <td><div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;"><strong>${a.patient}</strong>${a.isFollowUp?` <span class="badge" style="background:#fff3e0;color:#e67e22;font-size:9px;display:inline-flex;align-items:center;vertical-align:middle">🔔 Follow-Up</span>`:''}</div><span style="font-size:10px;color:#888">${a.phone?'📱 '+a.phone:''}</span></td>
       <td style="font-size:11px;color:#555">${a.purpose||'—'}</td>
       <td style="font-size:11px;color:#555">${a.doctor||'—'}</td>
       <td style="font-size:11px;color:#777">${a.notes||'—'}</td>
@@ -9983,7 +9980,7 @@ function renderPatientGraph(){
   ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, W, H);
 
-  var PAD = {top: 18, right: 12, bottom: isMobile ? 46 : 42, left: 28};
+  var PAD = {top: 18, right: 16, bottom: isMobile ? 46 : 46, left: isMobile ? 28 : 36};
   var cW = W - PAD.left - PAD.right;
   var cH = H - PAD.top - PAD.bottom;
   var n = data.length;
@@ -10073,7 +10070,7 @@ function renderPatientGraph(){
       if(rangeVal === '7'){
         ctx.font = (isMobile ? '7' : '8') + 'px Arial';
         ctx.fillStyle = '#bbb';
-        ctx.fillText(d.lbl, lx, ly + 10);
+        ctx.fillText(d.dayLabel || d.lbl, lx, ly + 11);
       }
     }
 
@@ -10099,11 +10096,7 @@ function renderPatientGraph(){
   ctx.stroke();
 }
 
-// Redraw patient graph on resize
-window.addEventListener('resize', function(){
-  var dash = document.getElementById('tab-dashboard');
-  if(dash && dash.classList.contains('act')) renderPatientGraph();
-});
+// Patient graph resize handled by combined debounced handler below
 
 function initRxTab(){
   showRxTab('write');
@@ -10247,7 +10240,7 @@ const DEF_FB={
   senderid:'',
   appid:'',
   measurementid:'',
-  synckey:'nivadental',
+  synckey:'',  // Firebase sync key — set in Settings > Firebase
   email:'',
   password:'',
   autosync:true,pull:true,realtime:true
@@ -10381,7 +10374,7 @@ function fbUrl(path){
   if(raw.includes('.firebaseapp.com')||raw.includes('.web.app'))
     throw new Error('Wrong URL: "'+raw+'" looks like the Auth Domain, not the Database URL. Your Database URL should end in .firebaseio.com');
   const base=raw.replace(/\/$/, '');
-  const key=F.synckey||'nivadental';
+  const key=F.synckey||'';
   const qs = _fbAuthToken ? `?auth=${encodeURIComponent(_fbAuthToken)}` : '';
   // User-scoped: data stored under /{synckey}/{uid}/... so Firebase Rules
   // can enforce auth.uid == $uid (each user only accesses their own data).
@@ -10535,7 +10528,7 @@ function loadFBForm(){
   document.getElementById('fb-senderid').value=F.senderid||'';
   document.getElementById('fb-appid').value=F.appid||'';
   document.getElementById('fb-measurementid').value=F.measurementid||'';
-  document.getElementById('fb-synckey').value=F.synckey||'nivadental';
+  document.getElementById('fb-synckey').value=F.synckey||'';
   document.getElementById('fb-email').value=F.email||'';
   document.getElementById('fb-password').value=F.password||'';
   const _t=(CFG.firebase&&CFG.firebase.syncToggles)||{};
@@ -10596,7 +10589,7 @@ function restoreFBConfig(input) {
       document.getElementById('fb-senderid').value = F.senderid || '';
       document.getElementById('fb-appid').value = F.appid || '';
       document.getElementById('fb-measurementid').value = F.measurementid || '';
-      document.getElementById('fb-synckey').value = F.synckey || 'nivadental';
+      document.getElementById('fb-synckey').value = F.synckey || '';
       document.getElementById('fb-email').value = F.email || '';
       document.getElementById('fb-password').value = F.password || '';
       const autoEl = document.getElementById('tog-fbautosync');
@@ -10633,7 +10626,7 @@ function saveFBConfig(){
   CFG.firebase.senderid=document.getElementById('fb-senderid').value.trim();
   CFG.firebase.appid=document.getElementById('fb-appid').value.trim();
   CFG.firebase.measurementid=document.getElementById('fb-measurementid').value.trim();
-  CFG.firebase.synckey=document.getElementById('fb-synckey').value.trim()||'nivadental';
+  CFG.firebase.synckey=document.getElementById('fb-synckey').value.trim()||'';
   CFG.firebase.email=document.getElementById('fb-email').value.trim();
   CFG.firebase.password=document.getElementById('fb-password').value;
   const _asEl=document.getElementById('tog-fbautosync');
@@ -11486,7 +11479,7 @@ function startFBListener(){
     if(_sseRetryTimer){clearTimeout(_sseRetryTimer);_sseRetryTimer=null;}
     const F2={...DEF_FB,...(CFG.firebase||{})};
     const base=(F2.dburl||'').replace(/\/$/,'');
-    const key=F2.synckey||'nivadental';
+    const key=F2.synckey||'';
     const uid=_fbAuthUid||'shared';
     const authQ=token?`&auth=${encodeURIComponent(token)}`:'';
     // Listen to entire user node — one SSE stream covers bills + appts + clinic_info
@@ -15665,7 +15658,7 @@ window.showSetSection=function(id,btn){
     window.fbDELETE = async function(path){
       const F = {...DEF_FB, ...(CFG.firebase||{})};
       const base = (F.dburl||'').replace(/\/$/, '');
-      const syncKey = (F.synckey||'nivadental').replace(/[^a-zA-Z0-9_-]/g,'_');
+      const syncKey = (F.synckey||'').replace(/[^a-zA-Z0-9_-]/g,'_');
       const token = (typeof _fbAuthToken !== 'undefined' && _fbAuthToken) ? _fbAuthToken : null;
       const url = base + '/' + syncKey + '/' + path + '.json' + (token ? '?auth=' + token : '');
       const r = await fetch(url, { method: 'DELETE' });
@@ -16193,6 +16186,7 @@ window.addEventListener('load', function(){
   var UPDATE_CHECK_URL = 'https://drive.google.com/uc?export=download&id=16TYfnI6UoTS_zhHJ4ba4G0y1jZhpfLyW';
 
   if(!UPDATE_CHECK_URL) return; // No URL configured — skip silently
+  if(location.protocol === 'file:') return; // Skip on file:// — CORS would fail
 
   // Only check once per day (avoid spamming on every open)
   var LS_KEY = '_niva_update_checked';
@@ -16524,12 +16518,20 @@ window._nivaShowActivation=function(){
     init();
   }
 })();
-// Redraw income graph on resize
-window.addEventListener('resize',function(){
-  var dash=document.getElementById('tab-dashboard');
-  if(dash&&dash.classList.contains('act')) renderIncomeGraph();
-  renderPatientGraph();
-});
+// Redraw graphs on resize — debounced to prevent repeated redraws
+(function(){
+  var _resizeTimer = null;
+  window.addEventListener('resize', function(){
+    if(_resizeTimer) clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(function(){
+      var dash = document.getElementById('tab-dashboard');
+      if(dash && dash.classList.contains('act')){
+        renderIncomeGraph();
+        renderPatientGraph();
+      }
+    }, 200);
+  });
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // PATIENT FILE
@@ -17483,10 +17485,13 @@ function sendDoctorReminderSMSById(id){
 </script>
 
 <script>
-if('serviceWorker' in navigator){
+if('serviceWorker' in navigator && location.protocol !== 'file:'){
+  var _swCode = 'self.addEventListener("install",e=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(clients.claim()));self.addEventListener("fetch",e=>{});';
+  var _swBlob = new Blob([_swCode],{type:'text/javascript'});
+  var _swUrl  = URL.createObjectURL(_swBlob);
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js')
-      .then(function(reg){ console.log('[PWA] SW registered:', reg.scope); })
+    navigator.serviceWorker.register(_swUrl)
+      .then(function(reg){ console.log('[PWA] SW registered'); })
       .catch(function(e){ console.warn('[PWA] SW failed:', e); });
   });
 }
@@ -17497,24 +17502,17 @@ if('serviceWorker' in navigator){
 (function applyMobileLayout(){
   function fix(){
     var w = window.innerWidth;
-    var graphsRow    = document.getElementById('dash-graphs-row');
-    var todayRow     = document.getElementById('dash-today-row');
-    var pgStats      = document.getElementById('pg-stats');
-    var incomePanel  = document.getElementById('income-trend-panel');
-    var patientPanel = document.getElementById('patient-graph-panel');
+    var graphsRow = document.getElementById('dash-graphs-row');
+    var todayRow  = document.getElementById('dash-today-row');
+    var pgStats   = document.getElementById('pg-stats');
     if(w <= 768){
-      if(graphsRow) { graphsRow.style.gridTemplateColumns='1fr'; graphsRow.style.alignItems='normal'; }
-      if(todayRow)  todayRow.style.gridTemplateColumns = '1fr';
-      if(pgStats)   pgStats.style.gridTemplateColumns  = 'repeat(2,1fr)';
-      if(incomePanel)  { incomePanel.style.height=''; }
-      if(patientPanel) { patientPanel.style.height=''; }
+      if(graphsRow) graphsRow.style.gridTemplateColumns = '1fr';
+      if(todayRow)  todayRow.style.gridTemplateColumns  = '1fr';
+      if(pgStats)   pgStats.style.gridTemplateColumns   = 'repeat(2,1fr)';
     } else {
-      if(graphsRow) { graphsRow.style.gridTemplateColumns='1fr 1fr'; graphsRow.style.alignItems='stretch'; }
-      if(todayRow)  todayRow.style.gridTemplateColumns = '1fr 1fr';
-      if(pgStats)   pgStats.style.gridTemplateColumns  = 'repeat(4,1fr)';
-      // Let both panels stretch to fill the tallest panel — no blank space
-      if(incomePanel)  { incomePanel.style.height='100%'; }
-      if(patientPanel) { patientPanel.style.height='100%'; }
+      if(graphsRow) graphsRow.style.gridTemplateColumns = '1fr 1fr';
+      if(todayRow)  todayRow.style.gridTemplateColumns  = '1fr 1fr';
+      if(pgStats)   pgStats.style.gridTemplateColumns   = 'repeat(4,1fr)';
     }
   }
   fix();
@@ -17547,10 +17545,66 @@ function sbSaveConfig(){
   var cfg = sbGetConfig();
   cfg.url    = url.trim().replace(/\/$/,'');
   cfg.key    = key.trim();
-  cfg.secret = secret.trim() || 'nivadental';  // default 'nivadental'
+  cfg.secret = secret.trim();
   localStorage.setItem(_SB_CFG_KEY, JSON.stringify(cfg));
   sbSetStatus(cfg.url && cfg.key ? 'configured' : 'empty');
 }
+// ── Update secret key in Supabase function automatically ──────
+function sbUpdateSecretKey(){
+  var cfg = sbGetConfig();
+  if(!cfg.url || !cfg.key){
+    alert('Please enter Supabase URL and Anon Key first.');
+    return;
+  }
+  var secret = cfg.secret || '';
+  if(!secret){
+    alert('Please enter a Security Secret Key first.');
+    return;
+  }
+  var msg = document.getElementById('sb-test-msg');
+  var btn = document.getElementById('sb-update-secret-btn');
+  if(msg){ msg.style.display='block'; msg.style.color='#0d6b8a'; msg.textContent='🔄 Updating secret key in Supabase…'; }
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Updating…'; }
+
+  // Use Supabase RPC to update the function with new secret
+  // We call a special SQL via the management endpoint isn't available on anon key
+  // Instead we use pg_function update via rpc if available, else show SQL to copy
+  var escapedSecret = secret.replace(/'/g, "''"); // escape single quotes
+  var sql = "create or replace function niva_check_key(req_key text) returns boolean language sql security definer as $$ select req_key = '" + escapedSecret + "' $$;";
+
+  // Try via Supabase REST rpc (needs service_role) — fallback to show SQL
+  fetch(cfg.url + '/rest/v1/rpc/niva_update_secret', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': cfg.key,
+      'Authorization': 'Bearer ' + cfg.key,
+      'x-niva-key': secret
+    },
+    body: JSON.stringify({ new_secret: secret })
+  })
+  .then(function(r){
+    if(r.ok || r.status===200 || r.status===204){
+      if(msg){ msg.style.color='#1b6e35'; msg.textContent='✅ Secret key updated in Supabase! Click Test Connection to verify.'; }
+    } else {
+      throw new Error('rpc_not_found');
+    }
+  })
+  .catch(function(){
+    // Fallback: show SQL to copy-paste
+    if(msg){
+      msg.style.color='#7a5c00';
+      msg.innerHTML = '📋 Copy this SQL and run it in Supabase SQL Editor:'
+        + '<br><textarea style="width:100%;margin-top:6px;font-size:11px;font-family:monospace;background:#f8fafc;border:1px solid #e0e8ee;border-radius:6px;padding:8px;resize:vertical;min-height:60px" onclick="this.select()" readonly>'
+        + sql
+        + '</textarea>';
+    }
+  })
+  .finally(function(){
+    if(btn){ btn.disabled=false; btn.textContent='🔑 Update Secret in Supabase'; }
+  });
+}
+
 function sbLoadConfigToUI(){
   var cfg = sbGetConfig();
   var u = document.getElementById('sb-url');
@@ -17558,7 +17612,7 @@ function sbLoadConfigToUI(){
   var s = document.getElementById('sb-secret');
   if(u) u.value = cfg.url||'';
   if(k) k.value = cfg.key||'';
-  if(s) s.value = cfg.secret||'nivadental';
+  if(s) s.value = cfg.secret||'';
   sbSetStatus(cfg.url && cfg.key ? 'configured' : 'empty');
 }
 function sbSetStatus(state, msg){
@@ -17587,7 +17641,7 @@ function sbSetStatus(state, msg){
 function sbFetch(path, method, body){
   var cfg = sbGetConfig();
   if(!cfg.url||!cfg.key) return Promise.reject(new Error('Supabase not configured'));
-  var secret = cfg.secret || 'nivadental';  // Security secret key
+  var secret = cfg.secret || '';
   var opts = {
     method: method||'GET',
     headers: {
@@ -17699,20 +17753,52 @@ window.sbTestConnection = function(){
 };
 
 function sbCreateTableSQL(){
-  return [
-    'create table if not exists niva_bills (id text primary key, data jsonb, updated_at timestamptz default now());',
-    'create table if not exists niva_appointments (id text primary key, data jsonb, updated_at timestamptz default now());',
-    'create table if not exists niva_expenses (id text primary key, data jsonb, updated_at timestamptz default now());',
-    'create table if not exists niva_patient_files (id text primary key, data jsonb, updated_at timestamptz default now());',
-    'alter table niva_bills enable row level security;',
-    'alter table niva_appointments enable row level security;',
-    'alter table niva_expenses enable row level security;',
-    'alter table niva_patient_files enable row level security;',
-    'create policy "anon_all" on niva_bills for all using (true) with check (true);',
-    'create policy "anon_all" on niva_appointments for all using (true) with check (true);',
-    'create policy "anon_all" on niva_expenses for all using (true) with check (true);',
-    'create policy "anon_all" on niva_patient_files for all using (true) with check (true);'
-  ].join('\n');
+  var secret = (sbGetConfig().secret||'').trim() || 'CHANGE_ME_STRONG_SECRET';
+  var tables = ['niva_bills','niva_appointments','niva_expenses','niva_patient_files'];
+  var L = [];
+  L.push('-- ════════════════════════════════════════════');
+  L.push('-- NIVA DENTAL — Supabase Setup SQL (auto-generated)');
+  L.push('-- Run ONCE in Supabase Dashboard → SQL Editor');
+  L.push('-- ════════════════════════════════════════════');
+  L.push('');
+  L.push('-- Step 1: Store secret key in DB (not in code)');
+  L.push("alter database postgres set app.niva_secret_key = '" + secret + "';");
+  L.push('');
+  L.push('-- Step 2: Key-check function');
+  L.push('create or replace function niva_check_key(req_key text)');
+  L.push('returns boolean language sql security definer as $$');
+  L.push("  select req_key = current_setting('app.niva_secret_key', true)");
+  L.push('$$;');
+  L.push('');
+  L.push('-- Step 3: Create tables');
+  tables.forEach(function(t){
+    L.push('create table if not exists ' + t + ' (id text primary key, data jsonb, updated_at timestamptz default now());');
+  });
+  L.push('');
+  L.push('-- Step 4: Enable Row Level Security');
+  tables.forEach(function(t){ L.push('alter table ' + t + ' enable row level security;'); });
+  L.push('');
+  L.push('-- Step 5: Secure policies (only x-niva-key header passes)');
+  tables.forEach(function(t){
+    ['anon_all','secure_read','secure_write','secure_update','secure_delete'].forEach(function(p){
+      L.push('drop policy if exists "' + p + '" on ' + t + ';');
+    });
+    var hdr = "current_setting('request.headers',true)::json->>'x-niva-key'";
+    L.push('create policy "secure_read"   on '+t+' for select using      (niva_check_key('+hdr+'));');
+    L.push('create policy "secure_write"  on '+t+' for insert with check (niva_check_key('+hdr+'));');
+    L.push('create policy "secure_update" on '+t+' for update using      (niva_check_key('+hdr+'));');
+    L.push('create policy "secure_delete" on '+t+' for delete using      (niva_check_key('+hdr+'));');
+    L.push('');
+  });
+  L.push('-- Optional: Helper RPC for auto key update from app');
+  L.push('create or replace function niva_update_secret(new_secret text)');
+  L.push('returns void language sql security definer as $$');
+  L.push("  select pg_catalog.set_config('app.niva_secret_key', new_secret, false)");
+  L.push('$$;');
+  L.push('');
+  L.push('-- Verify');
+  L.push("select tablename, policyname, cmd from pg_policies where tablename like 'niva_%' order by tablename, cmd;");
+  return L.join('\n');
 }
 
 // ── Full sync all local data → Supabase ───────────────────────
@@ -17830,12 +17916,8 @@ console.log('[NivaSB] Supabase dual sync loaded');
     var s = document.getElementById('sb-secret');
     if(u && cfg.url) u.value = cfg.url;
     if(k && cfg.key) k.value = cfg.key;
-    if(s) s.value = cfg.secret || 'nivadental';
-    // Ensure default secret is saved if not set
-    if(!cfg.secret){
-      cfg.secret = 'nivadental';
-      try{ localStorage.setItem('niva_supabase_cfg', JSON.stringify(cfg)); }catch(e){}
-    }
+    if(s) s.value = cfg.secret || '';
+    // No default secret — user must set their own
     // Set status indicator
     sbSetStatus(cfg.url && cfg.key ? 'configured' : 'empty');
   }
@@ -17922,7 +18004,8 @@ console.log('[NivaSB] Supabase dual sync loaded');
         // Save to localStorage + IDB
         var lsKey = localKey==='bills' ? 'niva_dental_v3' : localKey==='appointments' ? 'niva_appointments' : localKey==='expenses' ? 'niva_expenses' : 'niva_patient_files';
         try{ localStorage.setItem(lsKey, JSON.stringify(merged)); }catch(e){}
-        try{ if(typeof idbSaveAll==='function') idbSaveAll(localKey, merged); }catch(e){}
+        var idbKey = localKey==='patientFiles' ? 'patient_files' : localKey;
+        try{ if(typeof idbSaveAll==='function') idbSaveAll(idbKey, merged); }catch(e){}
 
         console.log('[NivaSB] Realtime poll: '+remote.length+' new/updated in '+table);
 
@@ -18058,7 +18141,7 @@ window.sbPullTable = function(table, localKey){
     } else if(localKey==='patientFiles'){
       window.patientFiles = merged;
       try{ localStorage.setItem('niva_patient_files', JSON.stringify(merged)); }catch(e){}
-      try{ if(typeof idbSaveAll==='function') idbSaveAll('patientFiles', merged); }catch(e){}
+      try{ if(typeof idbSaveAll==='function') idbSaveAll('patient_files', merged); }catch(e){}
     }
 
     // Re-render if function exists
