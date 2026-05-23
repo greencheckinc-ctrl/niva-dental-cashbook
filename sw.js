@@ -1,6 +1,6 @@
 // ── Niva Dental – Service Worker ──────────────────────────────────────────
 // Version: bump this string to force cache refresh
-const CACHE_NAME = 'niva-dental-v1';
+const CACHE_NAME = 'niva-dental-v2';
 
 // Files to cache on install (add your icon paths if hosting separately)
 const PRECACHE_URLS = [
