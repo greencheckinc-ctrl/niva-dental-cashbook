@@ -1,0 +1,25 @@
+{
+  "name": "Niva Dental",
+  "short_name": "Niva",
+  "description": "Dental Clinic \u2013 Billing, Appointments & Cash Book",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d6b8a",
+  "theme_color": "#0d6b8a",
+  "icons": [
+    {
+      "src": "icon192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
