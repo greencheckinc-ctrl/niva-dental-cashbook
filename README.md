@@ -1,2 +1,2 @@
-# niva-dental-cashbook
+#dental-cashbook
 Clinical Management Software
