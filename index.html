@@ -16601,18 +16601,23 @@ window.addEventListener('load', function(){
   var SESSION_TIME_KEY = 'niva_auth_session_time';
   var SESSION_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
 
-  // Session helpers — use localStorage so refresh doesn't clear session
+  // Session helpers — use sessionStorage so browser/tab close clears session
   function _setSession(){
-    localStorage.setItem(SESSION_KEY,'1');
-    localStorage.setItem(SESSION_TIME_KEY, Date.now().toString());
+    sessionStorage.setItem(SESSION_KEY,'1');
+    sessionStorage.setItem(SESSION_TIME_KEY, Date.now().toString());
+    // Clear any old localStorage session
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(SESSION_TIME_KEY);
   }
   function _clearSession(){
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_TIME_KEY);
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(SESSION_TIME_KEY);
   }
   function _isSessionValid(){
-    if(localStorage.getItem(SESSION_KEY)!=='1') return false;
-    var t=parseInt(localStorage.getItem(SESSION_TIME_KEY)||'0');
+    if(sessionStorage.getItem(SESSION_KEY)!=='1') return false;
+    var t=parseInt(sessionStorage.getItem(SESSION_TIME_KEY)||'0');
     if(t && (Date.now()-t) > SESSION_DURATION_MS){ _clearSession(); return false; }
     return true;
   }
