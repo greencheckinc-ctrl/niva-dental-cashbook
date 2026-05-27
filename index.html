@@ -6,10 +6,10 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="var(--pri)"/>
 <link rel="manifest" href="manifest.json"/>
-<meta name="apple-mobile-web-app-title" content="My Clinic"/>
+<meta name="apple-mobile-web-app-title" content=""/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>My Clinic – Cash Book, Billing & Appointments v88</title>
+<title>– Cash Book, Billing & Appointments v88</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:#f0f4f7;color:#222;font-size:13px}
@@ -692,7 +692,7 @@ tr:hover td{background:#f9fbfc}
       letter-spacing:.3px;line-height:1.15;
       text-shadow:0 2px 12px rgba(0,0,0,.3);
       margin-bottom:6px;
-    ">My Clinic</div>
+    "></div>
 
     <!-- Tagline -->
     <div style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:26px;font-weight:400;letter-spacing:.3px">
@@ -847,7 +847,7 @@ function showLockAfterSplash(){
       <img id="lock-logo-img" src="" alt="" style="height:72px;width:72px;object-fit:contain;border-radius:12px;display:none;margin:0 auto"/>
       <div id="lock-logo-tooth" style="font-size:46px;line-height:1">🦷</div>
     </div>
-    <h2 id="lock-clinic-name" style="font-size:19px;font-weight:700;color:var(--pri);margin-bottom:2px">My Clinic</h2>
+    <h2 id="lock-clinic-name" style="font-size:19px;font-weight:700;color:var(--pri);margin-bottom:2px"></h2>
     <p style="font-size:11px;color:#aaa;margin-bottom:4px"></p>
     <p style="font-size:10px;color:#bbb;margin-bottom:2px;letter-spacing:.3px">Clinic Management Software &nbsp;|&nbsp; <strong style="color:#2ecc71">GreenCheck inc.</strong></p>
     <!-- PIN mode -->
@@ -897,7 +897,7 @@ function showLockAfterSplash(){
 <div class="auth-overlay" id="loginModal">
   <div class="auth-box">
     <div class="auth-logo">🦷</div>
-    <div class="auth-title" id="login-clinic-title">My Clinic</div>
+    <div class="auth-title" id="login-clinic-title"></div>
     <div class="auth-sub" id="login-sub">Sign in with your Firebase account</div>
     <div style="position:relative;width:100%;margin-bottom:0">
       <input class="auth-inp" id="login-user" type="email" placeholder="Email" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()" oninput="nivaLoginEmailInput()" onfocus="nivaShowSavedEmails()" style="margin-bottom:0;padding-right:36px"/>
@@ -956,8 +956,8 @@ function showLockAfterSplash(){
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:10px">
     <button class="mob-menu-btn" onclick="openMobDrawer()" title="Menu">&#9776;</button>
-    <img id="tb-logo" src="" alt="My Clinic" style="height:70px;width:auto;object-fit:contain;display:none;filter:brightness(1)"/>
-    <div><h1 id="tb-name" style="display:none">&#9670; My Clinic</h1><p id="tb-addr" style="line-height:1.5">Daily Cash Book &amp; Billing</p></div>
+    <img id="tb-logo" src="" alt="" style="height:70px;width:auto;object-fit:contain;display:none;filter:brightness(1)"/>
+    <div><h1 id="tb-name" style="display:none"></h1><p id="tb-addr" style="line-height:1.5">Daily Cash Book &amp; Billing</p></div>
   </div>
   <div class="topbar-r" id="tdate">
     <span id="tdate-affirmation" style="font-size:11px;font-style:italic;color:rgba(255,255,255,0.82);display:block;text-align:right;max-width:260px;line-height:1.4;margin-bottom:3px;letter-spacing:0.2px;animation:affirmFadeIn 1.2s ease"></span>
@@ -984,7 +984,7 @@ function showLockAfterSplash(){
 <!-- MOBILE DRAWER -->
 <div class="mob-drawer" id="mob-drawer">
   <div class="mob-drawer-header">
-    <h2 id="mob-drawer-name">&#9670; My Clinic</h2>
+    <h2 id="mob-drawer-name"></h2>
     <p>Daily Cash Book &amp; Billing</p>
     <p style="font-size:9px;opacity:.6;margin-top:4px">by <strong>GreenCheck inc.</strong></p>
     <button class="mob-drawer-close" onclick="closeMobDrawer()">&#10005;</button>
@@ -3209,7 +3209,7 @@ function showLockAfterSplash(){
 
         <div class="about-box">
           <div class="logo"></div>
-          <h2 id="about-clinic-name">My Clinic</h2>
+          <h2 id="about-clinic-name"></h2>
           <p id="about-addr" style="color:var(--pri);margin-bottom:10px"></p>
           <p>Daily Cash Book &amp; Billing Software<br>Version 2.0 &nbsp;|&nbsp; Built for dental clinics</p>
           <hr style="margin:14px 0;border:none;border-top:1px solid #eee"/>
@@ -4305,11 +4305,17 @@ function updateTopbar(){
     el.style.lineHeight='1.6';
   }
 })();
-  document.title=CFG.clinic.name+' – Cash Book & Billing';
+  document.title=(CFG.clinic.name?CFG.clinic.name+' – ':'')+' Cash Book & Billing';
   const aboutName=document.getElementById('about-clinic-name');
   const aboutAddr=document.getElementById('about-addr');
-  if(aboutName)aboutName.textContent=CFG.clinic.name;
-  if(aboutAddr)aboutAddr.textContent=CFG.clinic.addr;
+  if(aboutName)aboutName.textContent=CFG.clinic.name||'';
+  if(aboutAddr)aboutAddr.textContent=CFG.clinic.addr||'';
+  // Update topbar name and mobile drawer name dynamically
+  if(tbName)tbName.innerHTML=CFG.clinic.name?('&#9670; '+CFG.clinic.name):'';
+  const mobDrawer=document.getElementById('mob-drawer-name');
+  if(mobDrawer)mobDrawer.innerHTML=CFG.clinic.name?('&#9670; '+CFG.clinic.name):'';
+  const loginTitle=document.getElementById('login-clinic-title');
+  if(loginTitle)loginTitle.textContent=CFG.clinic.name||'';
 }
 (function(){
   function updateClock(){
