@@ -17111,7 +17111,24 @@ window.addEventListener('load', function(){
 (function(){
   window.handleVBAction = function handleVBAction(id, action){
     if(!id||!action) return;
-    if(action==='viewbill'){ var _vid=(id||'').trim(); var b=bills.find(function(x){return (x.id||'').trim()===_vid;}); if(b) openBill(b); else{ var b2=bills.find(function(x){return (x.id||'').trim().toLowerCase()===_vid.toLowerCase();}); if(b2) openBill(b2); else alert('Bill not found: '+_vid); } }
+    if(action==='viewbill'){
+      try{
+        var _vid=(id||'').trim();
+        var b=bills.find(function(x){return (x.id||'').trim()===_vid;});
+        if(!b) b=bills.find(function(x){return (x.id||'').trim().toLowerCase()===_vid.toLowerCase();});
+        if(!b){
+          // Try pulling from Supabase/Firebase if not found locally
+          if(typeof window.sbPullTable==='function'){
+            window.sbPullTable('niva_bills','bills').then(function(){
+              var b2=bills.find(function(x){return (x.id||'').trim().toLowerCase()===_vid.toLowerCase();});
+              if(b2) openBill(b2); else alert('Bill not found: '+_vid);
+            }).catch(function(){ alert('Bill not found: '+_vid); });
+          } else { alert('Bill not found: '+_vid); }
+          return;
+        }
+        openBill(b);
+      }catch(e){ console.error('[viewbill] Error:',e); alert('Error opening bill: '+e.message); }
+    }
     else if(action==='editbill'){ var _eid=(id||'').trim(); var _eb=bills.find(function(x){return (x.id||'').trim()===_eid;}); if(_eb) openEditBill(_eb.id); else openEditBill(_eid); }
     else if(action==='printbill'){ printIndividualBill(id); }
     else if(action==='receipt'){ printIndividualReceipt(id); }
@@ -18738,39 +18755,9 @@ function qFlush(){
 }
 
 // Intercept Firebase sync functions — wrap with offline queue
-function _wrapWithQueue(){
-  if(window._nivaQueueHooked) return;
-  if(typeof window.fbSyncBill !== 'function') return;
-  window._nivaQueueHooked = true;
-
-  var _origFbSyncBill = window.fbSyncBill;
-  window.fbSyncBill = function(b){
-    if(!navigator.onLine){ qAdd('bill', b); return; }
-    try{ _origFbSyncBill(b); } catch(e){ qAdd('bill', b); }
-  };
-  var _origFbSyncAppt = window.fbSyncAppt;
-  window.fbSyncAppt = function(a){
-    if(!navigator.onLine){ qAdd('appt', a); return; }
-    try{ _origFbSyncAppt(a); } catch(e){ qAdd('appt', a); }
-  };
-  var _origFbSyncExp = window.fbSyncExp;
-  window.fbSyncExp = function(e){
-    if(!navigator.onLine){ qAdd('expense', e); return; }
-    try{ _origFbSyncExp(e); } catch(e2){ qAdd('expense', e); }
-  };
-  var _origFbSyncPF = window.fbSyncPF;
-  window.fbSyncPF = function(p){
-    if(!navigator.onLine){ qAdd('pf', p); return; }
-    try{ _origFbSyncPF(p); } catch(e){ qAdd('pf', p); }
-  };
-  var _origFbSyncClinic = window.fbSyncClinic;
-  window.fbSyncClinic = function(){
-    if(!navigator.onLine){ qAdd('clinic', {id:'clinic',ts:Date.now()}); return; }
-    try{ _origFbSyncClinic(); } catch(e){ qAdd('clinic', {id:'clinic',ts:Date.now()}); }
-  };
-
-  console.log('[NivaQ] Offline queue hooks installed.');
-}
+// NO function wrapping — avoids triple-wrap corruption with Supabase hooks
+// Offline queue is used only by qFlush on reconnect
+// Sync functions call qAdd directly when offline (handled in sv/svAppt etc.)
 
 // Flush on reconnect
 window.addEventListener('online', function(){
@@ -18788,12 +18775,7 @@ document.addEventListener('visibilitychange', function(){
 // Show pending count in status bar if any
 window._nivaQueueCount = function(){ return qLoad().length; };
 window._nivaQueueFlush = qFlush;
-
-// Try to hook immediately, retry until ready
-(function _tryQ(){
-  _wrapWithQueue();
-  if(!window._nivaQueueHooked) setTimeout(_tryQ, 400);
-})();
+console.log('[NivaQ] Offline queue ready.');
 
 
 // ── 2. Logo auto-sync to Firebase + Supabase when logo changes ───────────────
