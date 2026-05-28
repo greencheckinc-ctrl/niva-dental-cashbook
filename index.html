@@ -5081,7 +5081,7 @@ function buildBill(b, forPrint){
   if(_liveBalance<=0&&b.status!=='Paid'){b.status='Paid';}
   if(_liveBalance>0&&b.status==='Paid'&&!b.manualPaid){b.status='Pending';}
   const logo=CFG.logo||{};
-  const rows=b.items.map(it=>`<div class="bitem"><span>${it.n} &times; ${it.q}</span><span>${cur}${it.a.toLocaleString('en-IN')}</span></div>`).join('');
+  const rows=(b.items||[]).map(it=>`<div class="bitem"><span>${(it&&it.n)||''} &times; ${(it&&it.q)||1}</span><span>${cur}${((it&&it.a)||0).toLocaleString('en-IN')}</span></div>`).join('');
   const gstLine=BO.showGst&&C.gst?`<p style="font-size:10px;color:#aaa;margin-top:1px">GST: ${C.gst}</p>`:'';
   const regLine=C.reg?`<p style="font-size:10px;color:#aaa;margin-top:1px">Reg: ${C.reg}</p>`:'';
   const diagLine=BO.showDiag?`<div class="bdiag"><strong>Diagnosis:</strong> ${b.diag||'—'}</div>`:'';
@@ -5181,7 +5181,7 @@ function buildReceipt(b){
   const _rPaid=(b.paidNow||0)+(b.payHistory||[]).reduce(function(s,p){return s+(p.amt||0);},0);
   const _liveBalance=Math.max(0,(b.total||0)-_rPaid);
   b.balance=_liveBalance;
-  const items=b.items.map(it=>`<div class="ri"><span>${it.n} x${it.q}</span><span>${cur}${it.a.toLocaleString('en-IN')}</span></div>`).join('');
+  const items=(b.items||[]).map(it=>`<div class="ri"><span>${(it&&it.n)||''} x${(it&&it.q)||1}</span><span>${cur}${((it&&it.a)||0).toLocaleString('en-IN')}</span></div>`).join('');
   const logoHtml=logo.data?`<img src="${logo.data}" style="height:${Math.min(logo.size||80,60)}px;object-fit:contain;margin-bottom:6px;display:block;margin-left:auto;margin-right:auto"/>`:'';
   const showName=!logo.data||(logo.pos!=='only');
   return `<div class="rcpt">
@@ -5228,7 +5228,7 @@ let waShareType='bill';
 
 function buildBillWAMsg(b){
   const C=CFG.clinic,cur=CFG.billing.currency||'₹';
-  const items=b.items.map(it=>`  • ${it.n} x${it.q} = ${cur}${it.a.toLocaleString('en-IN')}`).join('\n');
+  const items=(b.items||[]).map(it=>`  • ${(it&&it.n)||''} x${(it&&it.q)||1} = ${cur}${((it&&it.a)||0).toLocaleString('en-IN')}`).join('\n');
   return `*${C.name}*
 📍 ${C.addr}
 📞 ${C.phone}
@@ -5261,7 +5261,7 @@ _${C.tag||'Thank you for your visit!'}_`;
 
 function buildReceiptWAMsg(b){
   const C=CFG.clinic,cur=CFG.billing.currency||'₹';
-  const items=b.items.map(it=>`${it.n} x${it.q} ......... ${cur}${it.a.toLocaleString('en-IN')}`).join('\n');
+  const items=(b.items||[]).map(it=>`${(it&&it.n)||''} x${(it&&it.q)||1} ......... ${cur}${((it&&it.a)||0).toLocaleString('en-IN')}`).join('\n');
   return `🦷 *${C.name}* – Receipt
 📍 ${C.addr} | ☎ ${C.phone}
 
@@ -5732,7 +5732,7 @@ function buildBillPageA4Pro(b,PF){
   const _hideLgo=PF.hidelogo||false;
   const _hideFtr=PF.hidefooter||false;
   const logoHtml=(!_hideLgo&&logo.data)?`<img src="${logo.data}" style="height:64px;object-fit:contain"/>`:(!_hideLgo?'<div style="width:64px;height:64px;border-radius:50%;background:'+col+';display:flex;align-items:center;justify-content:center;color:#fff;font-size:22pt;font-weight:900">🦷</div>':'');
-  const items=b.items.map((it,i)=>`<tr style="background:${i%2?'#f9fbfc':'#fff'}">
+  const items=(b.items||[]).map((it,i)=>`<tr style="background:${i%2?'#f9fbfc':'#fff'}">
     <td style="padding:6px 8px">${it.n}</td>
     <td style="padding:6px 8px;text-align:center">${it.q}</td>
     <td style="padding:6px 8px;text-align:right">${cur}${(it.a/it.q).toLocaleString('en-IN')}</td>
@@ -5866,7 +5866,7 @@ function buildBillPageA5Compact(b,PF){
   const logoHtml=logo.data?`<img src="${logo.data}" style="height:48px;object-fit:contain;display:block;margin:0 auto 6px"/>`:'';
   const sz=PF.size||'A5';
   const pageSize=sz==='A4'?'A4':(sz==='Letter'?'letter':'A5');
-  const items=b.items.map(it=>`
+  const items=(b.items||[]).map(it=>`
     <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:${fs}pt">
       <div style="flex:1">${it.n} <span style="color:#999;font-size:${fs-1}pt">× ${it.q}</span></div>
       <div style="font-weight:700;white-space:nowrap">${cur}${it.a.toLocaleString('en-IN')}</div>
@@ -5980,7 +5980,7 @@ function buildReceiptPageA4Pro(b,PF){
   const logoHtml=logo.data?`<img src="${logo.data}" style="height:60px;object-fit:contain"/>`:'';
   const sz=PF.size||'A4';
   const pageSize=sz==='A5'?'A5':(sz==='Letter'?'letter':'A4');
-  const items=b.items.map(it=>`<tr><td style="padding:5px 10px">${it.n}</td><td style="padding:5px 10px;text-align:center">${it.q}</td><td style="padding:5px 10px;text-align:right">${cur}${it.a.toLocaleString('en-IN')}</td></tr>`).join('');
+  const items=(b.items||[]).map(it=>`<tr><td style="padding:5px 10px">${(it&&it.n)||''}</td><td style="padding:5px 10px;text-align:center">${(it&&it.q)||1}</td><td style="padding:5px 10px;text-align:right">${cur}${((it&&it.a)||0).toLocaleString('en-IN')}</td></tr>`).join('');
   const ts=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${b.patient} – Receipt ${b.id}</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -6074,7 +6074,7 @@ function buildReceiptPageA5Compact(b,PF){
   const logoHtml=logo.data?`<img src="${logo.data}" style="height:44px;object-fit:contain;display:block;margin:0 auto 4px"/>`:'';
   const sz=PF.size||'A5';
   const pageSize=sz==='A4'?'A4':(sz==='Letter'?'letter':'A5');
-  const items=b.items.map(it=>`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:${fs}pt;border-bottom:1px solid #f5f5f5"><span style="flex:1">${it.n} <span style="color:#bbb">×${it.q}</span></span><strong>${cur}${it.a.toLocaleString('en-IN')}</strong></div>`).join('');
+  const items=(b.items||[]).map(it=>`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:${fs}pt;border-bottom:1px solid #f5f5f5"><span style="flex:1">${it.n} <span style="color:#bbb">×${it.q}</span></span><strong>${cur}${it.a.toLocaleString('en-IN')}</strong></div>`).join('');
   const ts=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${b.patient} – Receipt ${b.id}</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -7027,7 +7027,7 @@ function exportPDF(){
       `<div style="font-size:9px;color:#1b6e35;margin-top:2px">1st: ${cur}${(b.paidNow||0).toLocaleString('en-IN')}`+
       (b.payHistory||[]).map((p,j)=>`&nbsp;|&nbsp;${j+2}${j===0?'nd':j===1?'rd':'th'}: ${cur}${(p.amt||0).toLocaleString('en-IN')}`).join('')+
       `&nbsp;|&nbsp;<span style="color:#c0392b">Bal: ${cur}${_epBal.toLocaleString('en-IN')}</span></div>`:'';
-    const treatments=b.items.map(it=>`${it.n}×${it.q}`).join(', ');
+    const treatments=(b.items||[]).map(it=>`${it.n}×${it.q}`).join(', ');
     return `<tr style="background:${i%2===0?'#fff':'#f9fbfc'}">
       <td style="color:var(--pri);font-weight:700">${b.id}</td>
       <td>${new Date(b.date).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
@@ -9964,7 +9964,7 @@ function renderVB(){
   document.getElementById('vbtable').innerHTML=`<table><thead><tr><th>Bill No.</th><th>Date</th><th>Patient</th><th>Doctor</th><th>Consultation</th><th>Treatment</th><th>Amount</th><th>Mode</th><th>Status</th><th style="min-width:210px">Actions</th></tr></thead>
   <tbody>${f.map(b=>{
     const treatmentList=(b.items&&b.items.length)
-      ?b.items.map(it=>`<span style="display:block">${it.n}${it.q&&it.q!='1'?' &times;'+it.q:''}</span>`).join('')
+      ?(b.items||[]).map(it=>`<span style="display:block">${it.n}${it.q&&it.q!='1'?' &times;'+it.q:''}</span>`).join('')
       :'<span style="color:#aaa">—</span>';
     const consultCell=(b.consult&&b.consult>0)
       ?`<span style="color:var(--pri);font-weight:700">${cur}${b.consult.toLocaleString('en-IN')}</span>`
@@ -13137,7 +13137,7 @@ function printAllReceipts(){
   .rf{text-align:center;margin-top:8px;padding-top:6px;border-top:1px dashed #aaa;font-size:10px;color:#666}
   @media print{@page{margin:.4cm;size:80mm auto}}`;
   const pages=f.map(b=>{
-    const items=b.items.map(it=>`<div class="ri"><span>${it.n} x${it.q}</span><span>${cur}${it.a.toLocaleString('en-IN')}</span></div>`).join('');
+    const items=(b.items||[]).map(it=>`<div class="ri"><span>${(it&&it.n)||''} x${(it&&it.q)||1}</span><span>${cur}${((it&&it.a)||0).toLocaleString('en-IN')}</span></div>`).join('');
     return `<div class="page">
     <div class="rh"><div class="rname">${C.name.toUpperCase()}</div><div class="rsub">${C.addr}</div><div class="rsub">Tel: ${C.phone}</div><div style="margin-top:4px;font-size:11px;font-weight:900;letter-spacing:2px">** RECEIPT **</div></div>
     <div style="font-size:11px;margin-bottom:7px">
@@ -13183,7 +13183,7 @@ function printAllBills(){
   .bfooter{text-align:center;margin-top:12px;font-size:11px;color:#aaa;padding-top:8px;border-top:1px dashed #ddd}
   strong{font-weight:700}@media print{@page{margin:.8cm;size:A4}body{padding:0}.page{margin-bottom:0;border:none;padding:18px}}`;
   const pages=f.map(b=>{
-    const rows=b.items.map(it=>`<div class="bitem"><span>${it.n} &times; ${it.q}</span><span>${cur}${it.a.toLocaleString('en-IN')}</span></div>`).join('');
+    const rows=(b.items||[]).map(it=>`<div class="bitem"><span>${(it&&it.n)||''} &times; ${(it&&it.q)||1}</span><span>${cur}${((it&&it.a)||0).toLocaleString('en-IN')}</span></div>`).join('');
     return `<div class="page">
     <div class="bh"><h2>${C.name}</h2><p>${C.addr}</p><p>Tel: ${C.phone}${C.email?' | '+C.email:''}</p><div class="btit">Patient Bill / Receipt</div></div>
     <div class="bmeta">
@@ -13586,7 +13586,7 @@ function openEditBill(id){
   if(!b){alert('Bill not found.');return;}
   editingId=id;
   _eEditIdx=-1;
-  editItems=b.items.map(it=>({...it}));
+  editItems=(b.items||[]).map(it=>({...it}));
   document.getElementById('emodal-title').textContent='Edit Bill – '+b.id;
   document.getElementById('eb-nm').value=b.patient||'';
   document.getElementById('eb-ag').value=b.age||'';
