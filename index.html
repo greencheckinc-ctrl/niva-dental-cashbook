@@ -8410,8 +8410,8 @@ function renderDashAppts(){
       <td style="font-size:11px;color:#555">${a.purpose||'—'}</td>
       <td style="font-size:11px;color:#555">${a.doctor||'—'}</td>
       <td style="font-size:11px;color:#777">${a.notes||'—'}</td>
-      <td>
-        <div style="display:grid;grid-template-columns:repeat(4,44px);gap:3px;">
+      <td style="text-align:center;vertical-align:middle;padding:6px 4px">
+        <div style="display:grid;grid-template-columns:repeat(4,44px);gap:3px;justify-content:center">
           <!-- Row 1: Show, WA, SMS, Del -->
           <button class="btn bg sm vb-action" data-action="dashdone" data-id="${a.id}" style="width:44px;height:44px;padding:0;font-size:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.2">&#10003;<span>Show</span></button>
           <button class="btn bwa sm vb-action" data-action="dashresendwa" data-id="${a.id}" style="width:44px;height:44px;padding:0;font-size:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.2">&#128242;<span>WA</span></button>
@@ -8427,7 +8427,7 @@ function renderDashAppts(){
     </tr>`;
 
   const tableHeader=`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%"><table style="min-width:560px"><thead><tr>
-    <th>Date</th><th>Time</th><th>Patient</th><th>Purpose</th><th>Doctor</th><th>Notes</th><th>Actions</th>
+    <th>Date</th><th>Time</th><th>Patient</th><th>Purpose</th><th>Doctor</th><th>Notes</th><th style="width:195px;min-width:195px;text-align:center">Actions</th>
   </tr></thead><tbody>`;
   const tableFooter=`</tbody></table></div>`;
 
@@ -17109,7 +17109,7 @@ window.addEventListener('load', function(){
 <script>
 // ── MOBILE BUTTON EVENT DELEGATION (Android content:// compat fix) ──
 (function(){
-  function handleVBAction(id, action){
+  window.handleVBAction = function handleVBAction(id, action){
     if(!id||!action) return;
     if(action==='viewbill'){ var _vid=(id||'').trim(); var b=bills.find(function(x){return (x.id||'').trim()===_vid;}); if(b) openBill(b); else{ var b2=bills.find(function(x){return (x.id||'').trim().toLowerCase()===_vid.toLowerCase();}); if(b2) openBill(b2); else alert('Bill not found: '+_vid); } }
     else if(action==='editbill'){ var _eid=(id||'').trim(); var _eb=bills.find(function(x){return (x.id||'').trim()===_eid;}); if(_eb) openEditBill(_eb.id); else openEditBill(_eid); }
@@ -17200,35 +17200,44 @@ window.addEventListener('load', function(){
     else if(action==='docremindwa'){ sendDoctorReminderWAById(id); }
     else if(action==='docremindwasms'){ sendDoctorReminderSMSById(id); }
   }
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('.vb-action');
-    if(!btn) return;
-    e.preventDefault();
-    e.stopPropagation();
-    handleVBAction(btn.getAttribute('data-id'), btn.getAttribute('data-action'));
-  }, true);
+  // ── Install listeners only ONCE ever, even if script runs again ──
+  if(!window._vbListenerInstalled){
+    window._vbListenerInstalled = true;
 
-  // Track touch start position to distinguish tap from scroll
-  var _touchStartX=0, _touchStartY=0;
-  document.addEventListener('touchstart', function(e){
-    if(e.touches.length===1){
-      _touchStartX=e.touches[0].clientX;
-      _touchStartY=e.touches[0].clientY;
-    }
-  }, {passive:true});
+    // Use a flag to suppress the click that follows a touchend
+    var _suppressNextClick = false;
+    var _touchStartX=0, _touchStartY=0;
 
-  document.addEventListener('touchend', function(e){
-    var btn = e.target.closest('.vb-action');
-    if(!btn) return;
-    // If finger moved more than 10px in any direction → it was a scroll, not a tap
-    var dx=Math.abs((e.changedTouches[0]||{clientX:_touchStartX}).clientX - _touchStartX);
-    var dy=Math.abs((e.changedTouches[0]||{clientY:_touchStartY}).clientY - _touchStartY);
-    if(dx>10||dy>10) return;
-    e.preventDefault();
-    var id = btn.getAttribute('data-id');
-    var action = btn.getAttribute('data-action');
-    setTimeout(function(){ handleVBAction(id, action); }, 50);
-  }, {passive: false});
+    document.addEventListener('touchstart', function(e){
+      if(e.touches.length===1){
+        _touchStartX=e.touches[0].clientX;
+        _touchStartY=e.touches[0].clientY;
+      }
+    }, {passive:true});
+
+    document.addEventListener('touchend', function(e){
+      var btn = e.target.closest('.vb-action');
+      if(!btn) return;
+      var dx=Math.abs((e.changedTouches[0]||{clientX:_touchStartX}).clientX - _touchStartX);
+      var dy=Math.abs((e.changedTouches[0]||{clientY:_touchStartY}).clientY - _touchStartY);
+      if(dx>10||dy>10) return; // scroll, not tap
+      e.preventDefault();
+      _suppressNextClick = true;
+      setTimeout(function(){ _suppressNextClick = false; }, 600);
+      var id = btn.getAttribute('data-id');
+      var action = btn.getAttribute('data-action');
+      setTimeout(function(){ handleVBAction(id, action); }, 30);
+    }, {passive: false});
+
+    document.addEventListener('click', function(e){
+      var btn = e.target.closest('.vb-action');
+      if(!btn) return;
+      if(_suppressNextClick){ e.preventDefault(); e.stopPropagation(); return; }
+      e.preventDefault();
+      e.stopPropagation();
+      handleVBAction(btn.getAttribute('data-id'), btn.getAttribute('data-action'));
+    }, true);
+  }
 })();
 </script>
 
@@ -18686,6 +18695,165 @@ if('serviceWorker' in navigator && location.protocol === 'https:'){
   setTimeout(fix, 1500);
 })();
 </script>
+
+<script>
+// ── OFFLINE WRITE QUEUE + LOGO AUTO-SYNC ─────────────────────────────────────
+(function(){
+
+// ── 1. Offline queue ─────────────────────────────────────────────────────────
+var QUEUE_KEY = 'niva_offline_queue';
+
+function qLoad(){ try{ return JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]'); }catch(e){ return []; } }
+function qSave(q){ try{ localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); }catch(e){} }
+
+function qAdd(type, payload){
+  var q = qLoad();
+  // Deduplicate: replace same type+id if already queued
+  var idx = q.findIndex(function(x){ return x.type===type && x.id===(payload.id||payload.billId||''); });
+  var entry = { type: type, payload: payload, ts: Date.now(), id: payload.id||payload.billId||'' };
+  if(idx >= 0) q[idx] = entry; else q.push(entry);
+  qSave(q);
+}
+
+function qFlush(){
+  var q = qLoad();
+  if(!q.length) return;
+  if(!navigator.onLine) return;
+  var remaining = [];
+  q.forEach(function(entry){
+    var ok = false;
+    try {
+      if(entry.type==='bill'    && typeof window.fbSyncBill==='function'){ window.fbSyncBill(entry.payload);    ok=true; }
+      if(entry.type==='appt'    && typeof window.fbSyncAppt==='function'){ window.fbSyncAppt(entry.payload);    ok=true; }
+      if(entry.type==='expense' && typeof window.fbSyncExp==='function') { window.fbSyncExp(entry.payload);     ok=true; }
+      if(entry.type==='pf'      && typeof window.fbSyncPF==='function')  { window.fbSyncPF(entry.payload);      ok=true; }
+      if(entry.type==='clinic'  && typeof window.fbSyncClinic==='function'){ window.fbSyncClinic();             ok=true; }
+    } catch(e){ ok=false; }
+    if(!ok) remaining.push(entry);
+  });
+  qSave(remaining);
+  if(remaining.length < q.length){
+    console.log('[NivaQ] Flushed '+(q.length-remaining.length)+' queued writes.');
+  }
+}
+
+// Intercept Firebase sync functions — wrap with offline queue
+function _wrapWithQueue(){
+  if(window._nivaQueueHooked) return;
+  if(typeof window.fbSyncBill !== 'function') return;
+  window._nivaQueueHooked = true;
+
+  var _origFbSyncBill = window.fbSyncBill;
+  window.fbSyncBill = function(b){
+    if(!navigator.onLine){ qAdd('bill', b); return; }
+    try{ _origFbSyncBill(b); } catch(e){ qAdd('bill', b); }
+  };
+  var _origFbSyncAppt = window.fbSyncAppt;
+  window.fbSyncAppt = function(a){
+    if(!navigator.onLine){ qAdd('appt', a); return; }
+    try{ _origFbSyncAppt(a); } catch(e){ qAdd('appt', a); }
+  };
+  var _origFbSyncExp = window.fbSyncExp;
+  window.fbSyncExp = function(e){
+    if(!navigator.onLine){ qAdd('expense', e); return; }
+    try{ _origFbSyncExp(e); } catch(e2){ qAdd('expense', e); }
+  };
+  var _origFbSyncPF = window.fbSyncPF;
+  window.fbSyncPF = function(p){
+    if(!navigator.onLine){ qAdd('pf', p); return; }
+    try{ _origFbSyncPF(p); } catch(e){ qAdd('pf', p); }
+  };
+  var _origFbSyncClinic = window.fbSyncClinic;
+  window.fbSyncClinic = function(){
+    if(!navigator.onLine){ qAdd('clinic', {id:'clinic',ts:Date.now()}); return; }
+    try{ _origFbSyncClinic(); } catch(e){ qAdd('clinic', {id:'clinic',ts:Date.now()}); }
+  };
+
+  console.log('[NivaQ] Offline queue hooks installed.');
+}
+
+// Flush on reconnect
+window.addEventListener('online', function(){
+  console.log('[NivaQ] Back online — flushing queue...');
+  setTimeout(qFlush, 500);
+});
+
+// Flush on visibility restore too
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState==='visible' && navigator.onLine){
+    setTimeout(qFlush, 800);
+  }
+});
+
+// Show pending count in status bar if any
+window._nivaQueueCount = function(){ return qLoad().length; };
+window._nivaQueueFlush = qFlush;
+
+// Try to hook immediately, retry until ready
+(function _tryQ(){
+  _wrapWithQueue();
+  if(!window._nivaQueueHooked) setTimeout(_tryQ, 400);
+})();
+
+
+// ── 2. Logo auto-sync to Firebase + Supabase when logo changes ───────────────
+var _origSaveSettings = window.saveSettings;
+window.saveSettings = function(s){
+  if(typeof _origSaveSettings==='function') _origSaveSettings(s);
+
+  // Check if logo changed
+  var _newLogo = s && s.logo && s.logo.data ? s.logo.data : '';
+  var _prevLogo = window._lastSyncedLogoData || '';
+  if(_newLogo && _newLogo !== _prevLogo){
+    window._lastSyncedLogoData = _newLogo;
+    // Sync to Firebase (fbSyncClinic handles logo)
+    setTimeout(function(){
+      if(typeof window.fbSyncClinic==='function'){
+        try{ window.fbSyncClinic(); }catch(e){}
+      }
+      // Sync logo to Supabase
+      if(typeof window.sbPushLogo==='function'){
+        try{ window.sbPushLogo(null); }catch(e){}
+      }
+    }, 200);
+  }
+};
+
+// ── 3. Logo settings (pos, size, etc.) auto-sync ─────────────────────────────
+// When logo settings change (not just data), also push clinic
+var _logoSettingsFields = ['pos','size','tbSize','radius','printSize'];
+window._syncLogoSettings = function(){
+  setTimeout(function(){
+    if(typeof window.fbSyncClinic==='function') try{ window.fbSyncClinic(); }catch(e){}
+    if(typeof window.sbSyncClinic==='function') try{ window.sbSyncClinic(); }catch(e){}
+  }, 300);
+};
+
+// ── 4. Offline indicator in topbar ───────────────────────────────────────────
+function _updateOfflineIndicator(){
+  var el = document.getElementById('niva-offline-badge');
+  if(!el){
+    el = document.createElement('span');
+    el.id = 'niva-offline-badge';
+    el.style.cssText = 'display:none;background:#e74c3c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle;';
+    el.textContent = '⚡ Offline';
+    var tb = document.querySelector('.topbar-right') || document.querySelector('#topbar') || document.body;
+    if(tb) tb.appendChild(el);
+  }
+  var isOffline = !navigator.onLine;
+  var qCount = qLoad().length;
+  el.style.display = (isOffline || qCount>0) ? 'inline-block' : 'none';
+  el.textContent = isOffline ? '⚡ Offline' : ('🔄 '+qCount+' pending');
+}
+
+window.addEventListener('online',  function(){ setTimeout(_updateOfflineIndicator, 300); });
+window.addEventListener('offline', function(){ _updateOfflineIndicator(); });
+setInterval(_updateOfflineIndicator, 5000);
+setTimeout(_updateOfflineIndicator, 2000);
+
+})();
+</script>
+
 </body>
 </html>
 
@@ -18840,7 +19008,7 @@ function sbEnsureTables(){
     .then(function(){ return sbFetch('niva_appointments?limit=1','GET'); })
     .then(function(){ return sbFetch('niva_expenses?limit=1','GET'); })
     .then(function(){ return sbFetch('niva_patient_files?limit=1','GET'); })
-    .then(function(){ return sbFetch('niva_clinic_settings?limit=1','GET'); });
+    .then(function(){ return sbFetch('niva_settings?limit=1','GET'); });
 }
 
 // ── Upsert single record ───────────────────────────────────────
@@ -18907,7 +19075,7 @@ window.sbSyncClinic = function(){
     updatedAt: Date.now()
   };
   var row = { id:'main', data: JSON.stringify(payload), updated_at: new Date().toISOString() };
-  return sbFetch('niva_clinic_settings?on_conflict=id','POST',[row])
+  return sbFetch('niva_settings?on_conflict=id','POST',[row])
     .then(function(){ console.log('[SB] clinic settings synced'); })
     .catch(function(e){ console.warn('[SB] sbSyncClinic:', e.message); });
 };
@@ -18935,7 +19103,7 @@ window.sbPushLogo = function(msgEl){
     updatedAt: Date.now()
   };
   var row = { id:'logo', data: JSON.stringify(logoPayload), updated_at: new Date().toISOString() };
-  sbFetch('niva_clinic_settings?on_conflict=id','POST',[row])
+  sbFetch('niva_settings?on_conflict=id','POST',[row])
     .then(function(){
       if(msgEl){ msgEl.style.color='#1b6e35'; msgEl.textContent='✅ Logo pushed to Supabase!'; }
     })
@@ -18952,7 +19120,7 @@ window.sbPullLogo = function(msgEl){
     return;
   }
   if(msgEl){ msgEl.style.display='block'; msgEl.style.color=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()||'#0d6b8a'; msgEl.textContent='🔄 Pulling logo…'; }
-  sbFetch('niva_clinic_settings?id=eq.logo','GET')
+  sbFetch('niva_settings?id=eq.logo','GET')
     .then(function(rows){
       if(!rows||!rows.length){ throw new Error('No logo found in Supabase'); }
       var payload = typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : rows[0].data;
@@ -18983,7 +19151,7 @@ window.sbPullClinic = function(msgEl){
     return;
   }
   if(msgEl){ msgEl.style.display='block'; msgEl.style.color=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()||'#0d6b8a'; msgEl.textContent='🔄 Pulling clinic info…'; }
-  sbFetch('niva_clinic_settings?id=eq.main','GET')
+  sbFetch('niva_settings?id=eq.main','GET')
     .then(function(rows){
       if(!rows||!rows.length){ throw new Error('No clinic info found in Supabase'); }
       var payload = typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : rows[0].data;
@@ -19041,7 +19209,7 @@ window.sbTestConnection = function(){
 
 function sbCreateTableSQL(){
   var secret = (sbGetConfig().secret||'').trim() || 'CHANGE_ME_STRONG_SECRET';
-  var tables = ['niva_bills','niva_appointments','niva_expenses','niva_patient_files','niva_clinic_settings'];
+  var tables = ['niva_bills','niva_appointments','niva_expenses','niva_patient_files','niva_settings'];
   var L = [];
   L.push('-- ════════════════════════════════════════════');
   L.push('-- NIVA DENTAL — Supabase Setup SQL (auto-generated)');
