@@ -12311,26 +12311,42 @@ function fbPullAll(silent){
 
       // ── Patient File Images (separate folder) ──
       if(pfImgData&&typeof pfImgData==='object'){
-        var imgAdded=0;
-        Object.entries(pfImgData).forEach(function([patientKey, imgs]){
-          if(!imgs||typeof imgs!=='object') return;
-          var p=patientFiles.find(function(x){return fbSafeKey(x.id)===patientKey||x.id===patientKey;});
-          if(!p) return;
+        var imgChanged=0;
+        patientFiles.forEach(function(p){
+          // Build the authoritative set from Firebase for this patient
+          var patKey=fbSafeKey(p.id);
+          var remoteBucket=pfImgData[patKey]||pfImgData[p.id]||null;
           if(!p.images) p.images=[];
-          Object.values(imgs).forEach(function(remoteImg){
-            if(!remoteImg||!remoteImg.id) return;
-            var existsIdx=p.images.findIndex(function(x){return x.id===remoteImg.id||fbSafeKey(x.id)===fbSafeKey(remoteImg.id);});
-            if(existsIdx===-1){
-              // New image from Firebase — add it with full data including dataUrl
-              p.images.push({...remoteImg,synced:true}); imgAdded++;
-            } else if(remoteImg.dataUrl && !p.images[existsIdx].dataUrl){
-              // Image exists locally but dataUrl is stripped — restore from Firebase
-              p.images[existsIdx]={...p.images[existsIdx], dataUrl:remoteImg.dataUrl, synced:true};
-              imgAdded++;
-            }
-          });
+
+          if(remoteBucket&&typeof remoteBucket==='object'){
+            // Reconcile: add/update from remote, but also remove images deleted on remote
+            var remoteIds=new Set(Object.keys(remoteBucket).map(function(k){return k;}));
+            // Remove local images whose fbSafeKey is NOT in remote (deleted remotely)
+            var before=p.images.length;
+            p.images=p.images.filter(function(x){
+              return remoteIds.has(fbSafeKey(x.id))||remoteIds.has(x.id);
+            });
+            if(p.images.length!==before) imgChanged++;
+            // Add/update from remote
+            Object.values(remoteBucket).forEach(function(remoteImg){
+              if(!remoteImg||!remoteImg.id) return;
+              var existsIdx=p.images.findIndex(function(x){return x.id===remoteImg.id||fbSafeKey(x.id)===fbSafeKey(remoteImg.id);});
+              if(existsIdx===-1){
+                p.images.push({...remoteImg,synced:true}); imgChanged++;
+              } else {
+                var localImg=p.images[existsIdx];
+                var merged={...remoteImg,synced:true};
+                if(!merged.dataUrl&&localImg.dataUrl) merged.dataUrl=localImg.dataUrl;
+                if(merged.dataUrl!==localImg.dataUrl||merged.note!==localImg.note||merged.date!==localImg.date){
+                  p.images[existsIdx]=merged; imgChanged++;
+                }
+              }
+            });
+          }
+          // If no remoteBucket for this patient but they have local images,
+          // those images were never pushed — keep them (don't delete local-only images on pull)
         });
-        if(imgAdded){
+        if(imgChanged){
           svPF();
           // Re-render images if patient detail panel is currently open
           if(pfCurrentPatientId){
@@ -12524,10 +12540,17 @@ function startFBListener(){
         if(existsIdx===-1){
           p.images.push({...remoteImg, synced:true});
           pfChanged=true;
-        } else if(remoteImg.dataUrl && !p.images[existsIdx].dataUrl){
-          // Remote has dataUrl (from patient_file_images), local is stripped — restore it
-          p.images[existsIdx]={...p.images[existsIdx], dataUrl:remoteImg.dataUrl, synced:true};
-          pfChanged=true;
+        } else {
+          // Update existing image — prefer remote dataUrl if local is missing, always update metadata
+          var localImg=p.images[existsIdx];
+          var mergedImg={...remoteImg, synced:true};
+          // Keep local dataUrl if remote doesn't have one (shouldn't happen, but be safe)
+          if(!mergedImg.dataUrl && localImg.dataUrl) mergedImg.dataUrl=localImg.dataUrl;
+          // Only update if something actually changed
+          if(mergedImg.dataUrl!==localImg.dataUrl||mergedImg.note!==localImg.note||mergedImg.date!==localImg.date){
+            p.images[existsIdx]=mergedImg;
+            pfChanged=true;
+          }
         }
       });
     });
@@ -12766,6 +12789,26 @@ function startFBListener(){
                 svPF();if(typeof renderPF==='function')renderPF();
                 idbDelete('patient_files',remoteKey).catch(()=>{});
               }
+            } else if(nodeType==='patient_file_images'){
+              // path = /patient_file_images/patientId  OR  /patient_file_images/patientId/imgId
+              const imgKey=parts[2]||null;
+              if(imgKey){
+                // Delete single image
+                var _dp=patientFiles.find(function(x){return fbSafeKey(x.id)===remoteKey||x.id===remoteKey;});
+                if(_dp&&_dp.images){
+                  var _before=_dp.images.length;
+                  _dp.images=_dp.images.filter(function(x){return fbSafeKey(x.id)!==imgKey&&x.id!==imgKey;});
+                  if(_dp.images.length!==_before){
+                    _dp.updatedAt=Date.now();
+                    svPF();
+                    if(pfCurrentPatientId===_dp.id&&typeof pfRenderImages==='function') pfRenderImages(_dp);
+                  }
+                }
+              } else {
+                // Delete all images for this patient
+                var _dp2=patientFiles.find(function(x){return fbSafeKey(x.id)===remoteKey||x.id===remoteKey;});
+                if(_dp2){_dp2.images=[];_dp2.updatedAt=Date.now();svPF();if(pfCurrentPatientId===_dp2.id&&typeof pfRenderImages==='function')pfRenderImages(_dp2);}
+              }
             }
           }
           return;
@@ -12820,6 +12863,32 @@ function startFBListener(){
         const payload=JSON.parse(e.data);
         const path=payload.path||'/';
         const d=payload.data;
+
+        // ── Handle top-level null (delete of an entire node) ──
+        // e.g. path='/patient_file_images/patientId/imgId', d=null  ← image delete
+        if(d===null){
+          const parts=path.replace(/^\//,'').split('/');
+          if(parts[0]==='patient_file_images'&&parts.length>=3){
+            // Delete a single image: parts = ['patient_file_images', patientId, imgId]
+            const patKey=parts[1]; const imgKey=parts[2];
+            var _p2=patientFiles.find(function(x){return fbSafeKey(x.id)===patKey||x.id===patKey;});
+            if(_p2&&_p2.images){
+              var _before=_p2.images.length;
+              _p2.images=_p2.images.filter(function(x){return fbSafeKey(x.id)!==imgKey&&x.id!==imgKey;});
+              if(_p2.images.length!==_before){
+                _p2.updatedAt=Date.now();
+                svPF();
+                if(pfCurrentPatientId===_p2.id&&typeof pfRenderImages==='function') pfRenderImages(_p2);
+              }
+            }
+          } else if(parts[0]==='patient_file_images'&&parts.length===2){
+            // Delete all images for a patient
+            var _p3=patientFiles.find(function(x){return fbSafeKey(x.id)===parts[1]||x.id===parts[1];});
+            if(_p3){_p3.images=[];_p3.updatedAt=Date.now();svPF();if(pfCurrentPatientId===_p3.id&&typeof pfRenderImages==='function')pfRenderImages(_p3);}
+          }
+          return;
+        }
+
         if(!d) return;
         // Firebase patch events have a 'path' showing which node changed.
         // e.g. path='/appointments' means d = { apptKey: {...} }
