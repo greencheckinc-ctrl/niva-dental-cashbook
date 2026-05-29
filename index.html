@@ -6633,7 +6633,7 @@ function showSetSection(name,btn){
   if(name==='data'){updateDataStats();initAutoSaveUI();}
   if(name==='apptmsg'){loadApptMsgForm();}
   if(name==='affirmation'){loadAffirmationSettings();}
-  if(name==='dashboard'){setTimeout(renderPatientGraph,100);setTimeout(function(){ if(window.applyMobAffirmCard) window.applyMobAffirmCard(); },100);}
+  if(name==='dashboard'){renderPatientGraph();setTimeout(function(){ if(window.applyMobAffirmCard) window.applyMobAffirmCard(); },100);}
   if(name==='email'||name==='firebase'){
     var body=document.getElementById('adv-sync-body');
     var arrow=document.getElementById('adv-sync-arrow');
@@ -7868,9 +7868,12 @@ function onMonthSelectChange(val){
 // ═══════════════════════════════════════════════════════════════
 var _graphSeries='collected'; // 'collected' | 'billed' | 'pending'
 
+// Helper: read --pri at draw time so canvas gets a real hex value (CSS vars are not valid canvas colors)
+function _getPriColor(){ return getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()||'#0d6b8a'; }
+
 var _graphSeriesCfg={
   collected:{color:'#1b6e35',label:'Collected'},
-  billed:   {color:getComputedStyle(document.documentElement).getPropertyValue('--pri').trim(),label:'Billed'},
+  billed:   {color:'#0d6b8a',label:'Billed'},
   pending:  {color:'#e67e22',label:'Pending'},
   expense:  {color:'#e74c3c',label:'Expense'}
 };
@@ -7893,7 +7896,16 @@ function setGraphSeries(s){
   renderIncomeGraph();
 }
 
+var _incomeGraphRafId=null;
 function renderIncomeGraph(){
+  // Debounce: cancel any pending rAF so rapid calls collapse into one draw
+  if(_incomeGraphRafId) cancelAnimationFrame(_incomeGraphRafId);
+  _incomeGraphRafId = requestAnimationFrame(function(){
+    _incomeGraphRafId = null;
+    _renderIncomeGraphNow();
+  });
+}
+function _renderIncomeGraphNow(){
   const canvas=document.getElementById('dash-income-chart');
   const emptyEl=document.getElementById('dash-income-chart-empty');
   if(!canvas) return;
@@ -7972,7 +7984,9 @@ function renderIncomeGraph(){
   const cW=W-PAD.left-PAD.right;
   const cH=H-PAD.top-PAD.bottom;
   const n=months.length;
-  const TEAL='var(--pri)';
+  const TEAL=_getPriColor();
+  // Keep billed color in sync with current theme at draw time
+  _graphSeriesCfg.billed.color=TEAL;
   const GREEN='#1b6e35';
   const ORANGE='#e67e22';
 
@@ -10802,7 +10816,7 @@ function recalcAllBalances(){
   });
   sv();
 }
-function renderAll(){recalcAllBalances();renderDash();renderCB();renderVB();setTimeout(renderPatientGraph,80);}
+function renderAll(){recalcAllBalances();renderDash();renderCB();renderVB();renderPatientGraph();}
 
 // ── PATIENT GRAPH (New vs Returning) ──────────────────────────────────────
 function togglePatientGraphPanel(){
@@ -10815,7 +10829,15 @@ function togglePatientGraphPanel(){
   if(!isOpen) setTimeout(renderPatientGraph, 30);
 }
 
+var _patientGraphRafId=null;
 function renderPatientGraph(){
+  if(_patientGraphRafId) cancelAnimationFrame(_patientGraphRafId);
+  _patientGraphRafId = requestAnimationFrame(function(){
+    _patientGraphRafId = null;
+    _renderPatientGraphNow();
+  });
+}
+function _renderPatientGraphNow(){
   var canvas = document.getElementById('patient-graph-canvas');
   var emptyEl = document.getElementById('patient-graph-empty');
   var statsEl = document.getElementById('pg-stats');
@@ -16304,17 +16326,18 @@ window.doLogout=async function(){
     ctx.fillRect(0, 0, s, s);
 
     // Outer border
-    ctx.strokeStyle = 'var(--pri)';
+    var _priHex=_getPriColor();
+    ctx.strokeStyle = _priHex;
     ctx.lineWidth = 3;
     ctx.strokeRect(2, 2, s-4, s-4);
 
     // Corner finder squares
     function drawFinder(x, y){
-      ctx.fillStyle = 'var(--pri)';
+      ctx.fillStyle = _priHex;
       ctx.fillRect(x, y, 22, 22);
       ctx.fillStyle = '#fff';
       ctx.fillRect(x+3, y+3, 16, 16);
-      ctx.fillStyle = 'var(--pri)';
+      ctx.fillStyle = _priHex;
       ctx.fillRect(x+7, y+7, 8, 8);
     }
     drawFinder(10, 10);
@@ -16324,7 +16347,7 @@ window.doLogout=async function(){
     // Center UPI badge
     ctx.fillStyle = '#e8f4f8';
     roundRect(ctx, s/2-26, s/2-20, 52, 40, 8);
-    ctx.fillStyle = 'var(--pri)';
+    ctx.fillStyle = _priHex;
     ctx.font = 'bold 18px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('UPI', s/2, s/2+6);
@@ -16363,7 +16386,7 @@ window.doLogout=async function(){
     var ctx = canvas.getContext('2d');
     ctx.fillStyle='#f0f4f7';
     ctx.fillRect(0,0,150,150);
-    ctx.fillStyle='var(--pri)';
+    ctx.fillStyle=_getPriColor();
     ctx.font='bold 13px Arial';
     ctx.textAlign='center';
     ctx.fillText('UPI QR', 75, 65);
@@ -19820,11 +19843,12 @@ console.log('[NivaSB] Supabase dual sync loaded');
     if(!cfg.url || !cfg.key) return; // Not configured, skip
     console.log('[NivaSB] Auto-pulling latest data from Supabase on startup…');
     sbSetStatus('syncing');
+    // Pass skipRender=true — render once after all 4 tables complete
     Promise.all([
-      window.sbPullTable ? window.sbPullTable('niva_bills','bills') : Promise.resolve(),
-      window.sbPullTable ? window.sbPullTable('niva_appointments','appointments') : Promise.resolve(),
-      window.sbPullTable ? window.sbPullTable('niva_expenses','expenses') : Promise.resolve(),
-      window.sbPullTable ? window.sbPullTable('niva_patient_files','patientFiles') : Promise.resolve()
+      window.sbPullTable ? window.sbPullTable('niva_bills','bills',true) : Promise.resolve(),
+      window.sbPullTable ? window.sbPullTable('niva_appointments','appointments',true) : Promise.resolve(),
+      window.sbPullTable ? window.sbPullTable('niva_expenses','expenses',true) : Promise.resolve(),
+      window.sbPullTable ? window.sbPullTable('niva_patient_files','patientFiles',true) : Promise.resolve()
     ]).then(function(){
       sbSetStatus('ok');
       console.log('[NivaSB] Startup pull complete');
@@ -19847,13 +19871,18 @@ console.log('[NivaSB] Supabase dual sync loaded');
 (function(){
   var _lastPollTime = {};  // table -> ISO timestamp of last poll
   var _POLL_INTERVAL = 30000; // 30 seconds
+  // Capture page-load time; used as the baseline for the first poll so it
+  // does not overlap with the startup auto-pull that runs at t+3s.
+  var _sbPageLoadTime = Date.now();
 
   function _sbPollTable(table, localKey, globalKey){
     var cfg = sbGetConfig();
     if(!cfg.url || !cfg.key) return Promise.resolve();
 
-    // Only fetch records updated after our last poll
-    var since = _lastPollTime[table] || new Date(Date.now() - 60000).toISOString(); // 1 min ago on first poll
+    // Only fetch records updated after our last poll.
+    // On first poll use the page-load timestamp so we don't re-fetch
+    // data that the startup auto-pull (which runs at t+3s) already pulled.
+    var since = _lastPollTime[table] || new Date(_sbPageLoadTime).toISOString();
     var path = table + '?select=id,data,updated_at&updated_at=gt.' + encodeURIComponent(since) + '&order=updated_at.asc&limit=500';
     _lastPollTime[table] = new Date().toISOString();
 
@@ -19974,13 +20003,14 @@ window.sbPushTable = function(table, localKey){
 };
 
 // ── PULL single table Supabase → local ────────────────────────
-window.sbPullTable = function(table, localKey){
+// skipRender=true when called from sbPullAll — renders once after all tables complete
+window.sbPullTable = function(table, localKey, skipRender){
   var cfg = sbGetConfig();
-  if(!cfg.url||!cfg.key){ alert('Supabase config missing.'); return; }
+  if(!cfg.url||!cfg.key){ alert('Supabase config missing.'); return Promise.resolve(); }
   var msg = document.getElementById('sb-pull-msg');
   if(msg){ msg.style.display='block'; msg.style.color=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim(); msg.textContent='🔄 Pulling '+table+'…'; }
 
-  sbFetch(table+'?select=id,data,updated_at&limit=10000','GET')
+  return sbFetch(table+'?select=id,data,updated_at&limit=10000','GET')
   .then(function(rows){
     if(!Array.isArray(rows)||!rows.length){
       if(msg){ msg.style.color='#888'; msg.textContent='ℹ️ No data in Supabase for '+table; }
@@ -20029,9 +20059,11 @@ window.sbPullTable = function(table, localKey){
       try{ if(typeof idbSaveAll==='function') idbSaveAll('patient_files', merged); }catch(e){}
     }
 
-    // Re-render if function exists
-    if(typeof renderAll==='function') renderAll();
-    if(typeof renderDash==='function') renderDash();
+    // Re-render only when called standalone (not from sbPullAll which renders once after all tables)
+    if(!skipRender){
+      if(typeof renderAll==='function') renderAll();
+      if(typeof renderDash==='function') renderDash();
+    }
 
     if(msg){ msg.style.color='#1b6e35'; msg.textContent='✅ Pulled '+remote.length+' records from '+table+' (merged with local)'; }
   })
@@ -20044,12 +20076,17 @@ window.sbPullTable = function(table, localKey){
 window.sbPullAll = function(){
   var msg = document.getElementById('sb-pull-msg');
   if(msg){ msg.style.display='block'; msg.style.color=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim(); msg.textContent='🔄 Pulling all tables…'; }
+  // Pass skipRender=true so each table doesn't trigger its own render;
+  // we do a single render pass after all 4 tables have merged.
   Promise.all([
-    window.sbPullTable('niva_bills','bills'),
-    window.sbPullTable('niva_appointments','appointments'),
-    window.sbPullTable('niva_expenses','expenses'),
-    window.sbPullTable('niva_patient_files','patientFiles')
+    window.sbPullTable('niva_bills','bills',true),
+    window.sbPullTable('niva_appointments','appointments',true),
+    window.sbPullTable('niva_expenses','expenses',true),
+    window.sbPullTable('niva_patient_files','patientFiles',true)
   ]).then(function(){
+    // Single render after all tables merged
+    try{ if(typeof renderAll==='function') renderAll(); }catch(e){}
+    try{ if(typeof renderDash==='function') renderDash(); }catch(e){}
     if(msg){ msg.style.color='#1b6e35'; msg.textContent='✅ Pull All complete — page reload થાય છે…'; }
     setTimeout(function(){ location.reload(); }, 1500);
   });
@@ -20106,8 +20143,8 @@ function appRefresh(){
   if(icon){icon.style.transition='transform 0.7s ease';icon.style.transform='rotate(360deg)';setTimeout(function(){icon.style.transition='none';icon.style.transform='rotate(0deg)';},750);}
   if(btn){btn.disabled=true;setTimeout(function(){if(btn)btn.disabled=false;},3000);}
 
-  var fbConfigured=!!(window._fbDB_URL||(typeof CFG!=='undefined'&&CFG.billing&&CFG.billing.fbUrl));
-  var sbConfigured=!!(window._sbURL&&window._sbKey);
+  var fbConfigured=!!(typeof CFG!=='undefined'&&CFG.firebase&&CFG.firebase.dburl);
+  var sbConfigured=(function(){try{var c=JSON.parse(localStorage.getItem('niva_supabase_cfg')||'{}');return !!(c.url&&c.key);}catch(e){return false;}})();
 
   var pulled=false;
   if(fbConfigured&&typeof fbPullAll==='function'){try{fbPullAll(false);pulled=true;}catch(e){}}
