@@ -2100,6 +2100,7 @@ function showLockAfterSplash(){
       <button class="btn bo sm" onclick="pfRemoveDupThisPatient()" title="Remove duplicate treatments for this patient" style="background:#fff3e0;color:#d35400;border-color:#f0c080">🧹 Remove Duplicates</button>
       <button class="btn bo sm" onclick="pfRemoveDupAllPatients()" title="Remove duplicate treatments for ALL patients" style="background:#fdecea;color:#c0392b;border-color:#f0b8b3">🧹 Remove All Duplicates</button>
       <button class="btn bo sm" onclick="pfOpenAddImage()" style="background:#e8f4f8;color:var(--pri);border-color:var(--pri-text)">📷 Add Image</button>
+      <button class="btn bo sm" onclick="pfSyncImagesFromCloud()" id="pf-sync-img-btn" title="Firebase thi images fetch karo" style="background:#f0f4f7;color:#555;border-color:#cdd5dd">☁️ Sync Images</button>
     </div>
     <div id="pf-img-gallery" style="display:none;margin-bottom:14px"></div>
     <div id="pf-det-info" style="background:#f7fafd;border:1px solid #e0e8ee;border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:13px;display:flex;gap:24px;flex-wrap:wrap"></div>
@@ -5831,7 +5832,27 @@ body{font-family:Arial,sans-serif;padding:0;color:#000;font-size:${fs}pt}
 .bfooter{text-align:center;margin-top:10px;font-size:${fs-1}pt;color:#aaa;padding-top:7px;border-top:1px dashed #ddd}
 strong{font-weight:700}
 @media print{@page{size:${pageSize} ${orient};margin:0}body{padding:0}}
-</style></head><body>${c}<script>window.onload=()=>window.print();<\/script></body></html>`;
+</style></head><body>${c}<script>window.onload=()=>window.print();<\/script>
+<!-- ── PF Smart Merge Modal ── -->
+<div id="pf-smart-merge-modal" class="ov" style="align-items:flex-start !important;padding:16px 0 0 0 !important;overflow-y:auto">
+  <div style="background:#fff;border-radius:14px;padding:0;width:98%;max-width:560px;box-shadow:0 8px 40px rgba(0,0,0,.18);margin:0 auto 16px;overflow:hidden">
+    <div style="background:var(--pri);padding:16px 18px 12px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="color:#fff;font-size:15px;font-weight:700">🔀 Duplicate Patient Records Found</div>
+          <div style="color:rgba(255,255,255,.75);font-size:11px;margin-top:3px">Pull baad duplicate entries mili — merge karvi?</div>
+        </div>
+        <button onclick="pfCloseMergeModal()" style="background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">✕ Skip</button>
+      </div>
+    </div>
+    <div id="pf-merge-modal-body" style="padding:14px 16px;max-height:70vh;overflow-y:auto"></div>
+    <div style="padding:12px 16px;border-top:1px solid #e8edf0;display:flex;gap:8px;justify-content:flex-end;background:#fafbfc">
+      <button onclick="pfCloseMergeModal()" class="btn bo">Skip All</button>
+      <button onclick="pfApplyMergeDecisions()" class="btn bp" id="pf-merge-apply-btn">✓ Apply Merges</button>
+    </div>
+  </div>
+</div>
+</body></html>`;
 }
 
 // ── TEMPLATE: A4 PROFESSIONAL ─────────────────────────────────────────────────
@@ -12202,12 +12223,29 @@ function fbPullAll(silent){
           var idx=patientFiles.findIndex(function(x){return x.id===rp.id||fbSafeKey(x.id)===fbSafeKey(rp.id);});
           if(idx===-1){patientFiles.push(rp);pfAdded++;}
           else if((rp.updatedAt||0)>(patientFiles[idx].updatedAt||0)){
-            // Preserve local dataUrl for images — remote strips dataUrl (stored in patient_file_images)
+            // Preserve local dataUrl for images — remote patient_files strips dataUrl (stored in patient_file_images)
+            // Also merge any images from pfImgData that are available at this point
             var localImgs=patientFiles[idx].images||[];
             var mergedImgs=(rp.images||[]).map(function(ri){
               var localImg=localImgs.find(function(li){return li.id===ri.id||fbSafeKey(li.id)===fbSafeKey(ri.id);});
-              return localImg&&localImg.dataUrl ? {...ri, dataUrl:localImg.dataUrl, synced:true} : ri;
+              // Prefer local dataUrl (already fetched), else try pfImgData
+              var dataUrl=(localImg&&localImg.dataUrl)||'';
+              if(!dataUrl&&pfImgData){
+                var imgBucket=pfImgData[fbSafeKey(rp.id)]||pfImgData[rp.id]||{};
+                var remoteFullImg=imgBucket[fbSafeKey(ri.id)]||imgBucket[ri.id];
+                if(remoteFullImg&&remoteFullImg.dataUrl) dataUrl=remoteFullImg.dataUrl;
+              }
+              return dataUrl ? {...ri, dataUrl:dataUrl, synced:true} : ri;
             });
+            // Also add any images that exist in pfImgData but not in rp.images (not yet synced in patient_files record)
+            if(pfImgData){
+              var imgBucket2=pfImgData[fbSafeKey(rp.id)]||pfImgData[rp.id]||{};
+              Object.values(imgBucket2).forEach(function(remoteImg){
+                if(!remoteImg||!remoteImg.id) return;
+                var alreadyIn=mergedImgs.find(function(x){return x.id===remoteImg.id||fbSafeKey(x.id)===fbSafeKey(remoteImg.id);});
+                if(!alreadyIn) mergedImgs.push({...remoteImg,synced:true});
+              });
+            }
             patientFiles[idx]={...rp, images:mergedImgs};
             pfUpdated++;
           }
@@ -12233,11 +12271,25 @@ function fbPullAll(silent){
           if(!p.images) p.images=[];
           Object.values(imgs).forEach(function(remoteImg){
             if(!remoteImg||!remoteImg.id) return;
-            var exists=p.images.find(function(x){return x.id===remoteImg.id||fbSafeKey(x.id)===fbSafeKey(remoteImg.id);});
-            if(!exists){ p.images.push({...remoteImg,synced:true}); imgAdded++; }
+            var existsIdx=p.images.findIndex(function(x){return x.id===remoteImg.id||fbSafeKey(x.id)===fbSafeKey(remoteImg.id);});
+            if(existsIdx===-1){
+              // New image from Firebase — add it with full data including dataUrl
+              p.images.push({...remoteImg,synced:true}); imgAdded++;
+            } else if(remoteImg.dataUrl && !p.images[existsIdx].dataUrl){
+              // Image exists locally but dataUrl is stripped — restore from Firebase
+              p.images[existsIdx]={...p.images[existsIdx], dataUrl:remoteImg.dataUrl, synced:true};
+              imgAdded++;
+            }
           });
         });
-        if(imgAdded){ svPF(); }
+        if(imgAdded){
+          svPF();
+          // Re-render images if patient detail panel is currently open
+          if(pfCurrentPatientId){
+            var _curP=patientFiles.find(function(x){return x.id===pfCurrentPatientId;});
+            if(_curP && typeof pfRenderImages==='function') pfRenderImages(_curP);
+          }
+        }
       }
 
       renderAll();renderExp();
@@ -18026,12 +18078,8 @@ function pfNormPhone(s){const d=(s||'').replace(/\D/g,'');return d.length>=10?d.
 function pfAreDuplicates(a,b){
   const nA=pfNormName(a.name), nB=pfNormName(b.name);
   if(!nA||!nB) return false;
-  if(nA===nB) return true; // exact name match
-  // One name contains all words of the other (handles "Ravi Shah" vs "Ravi")
-  const wA=nA.split(' ').filter(w=>w.length>1);
-  const wB=nB.split(' ').filter(w=>w.length>1);
-  if(wA.length&&wB.length&&wA.every(w=>nB.includes(w))) return true;
-  if(wA.length&&wB.length&&wB.every(w=>nA.includes(w))) return true;
+  // STRICT: only exact normalized name match (fuzzy matching caused data loss)
+  if(nA===nB) return true;
   return false;
 }
 
@@ -18216,18 +18264,244 @@ function pfRemoveDupAllPatients(){
   }
 }
 
-function pfRunMergeDuplicates(){
-  const count=pfDeduplicateAll();
-  if(count>0){
-    pfRenderList((document.getElementById('pf-search').value||'').toLowerCase());
-    if(pfCurrentPatientId){
-      const p=patientFiles.find(x=>x.id===pfCurrentPatientId);
-      if(p) pfRenderTreatments(p); else {pfCurrentPatientId=null;document.getElementById('pf-detail').style.display='none';}
+
+// ══════════════════════════════════════════════════════════════════
+// PF SMART MERGE — Pull baad same bill ID / same patient detect karo
+// ══════════════════════════════════════════════════════════════════
+
+window._pfPendingMergeGroups = []; // [{keep, drops:[], reason:'auto'|'select'}]
+window._pfMergeDecisions = {};     // groupIdx → 'merge'|'skip' | 'select:<id>'
+
+// Main entry point — call this after any pull (Firebase or Supabase)
+function pfSmartMergeAfterPull(){
+  // Step 1: Deduplicate treatments inside each patient
+  pfDeduplicateTreatments();
+
+  // Step 2: Find duplicate PATIENT records
+  var groups = pfFindDuplicateGroups();
+  if(!groups.length) return;
+
+  window._pfPendingMergeGroups = groups;
+  window._pfMergeDecisions = {};
+  groups.forEach(function(g, i){
+    // Always default to skip — user must explicitly choose to merge
+    window._pfMergeDecisions[i] = 'skip';
+  });
+
+  pfShowMergeModal();
+}
+
+// Group duplicate patients:
+//  - 'auto' reason: same normalized name → auto-merge silently eligible
+//  - 'select' reason: different names but same bill IDs → show user choice
+function pfFindDuplicateGroups(){
+  var groups = [];
+  var visited = new Set();
+
+  // SAFE: Only detect EXACT same-name duplicates (same normalized name)
+  // Bill-ID based cross-patient matching removed — it caused false positives and data loss
+  patientFiles.forEach(function(p, i){
+    if(visited.has(p.id)) return;
+    var drops = [];
+
+    patientFiles.forEach(function(q, j){
+      if(i===j || visited.has(q.id)) return;
+      // Strict exact name match only
+      if(pfNormName(p.name) === pfNormName(q.name) && pfNormName(p.name).length > 0){
+        drops.push(q);
+      }
+    });
+
+    if(drops.length){
+      var all = [p].concat(drops);
+      // Keep the one with more treatments, or earlier created
+      all.sort(function(a,b){
+        return ((b.treatments||[]).length - (a.treatments||[]).length) ||
+               ((a.createdAt||0) - (b.createdAt||0));
+      });
+      var keep = all[0];
+      var dropList = all.slice(1);
+      all.forEach(function(x){ visited.add(x.id); });
+      groups.push({ keep: keep, drops: dropList, reason: 'auto' });
     }
-    typeof showToast!=='undefined'&&showToast('✅ Merged '+count+' duplicate patient record'+(count>1?'s':'')+'.');
-  } else {
-    typeof showToast!=='undefined'&&showToast('No duplicates found — all patient records are unique.');
+  });
+
+  return groups;
+}
+
+// Render and open the merge modal
+function pfShowMergeModal(){
+  var groups = window._pfPendingMergeGroups;
+  if(!groups.length){ pfCloseMergeModal(); return; }
+
+  var html = '';
+  var autoCount = groups.filter(function(g){return g.reason==='auto';}).length;
+  var selectCount = groups.filter(function(g){return g.reason==='select';}).length;
+
+  if(autoCount){
+    html += '<div style="background:#e8f5ee;border:1px solid #a8d5b8;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1b6e35">'
+      +'✅ <strong>'+autoCount+' same-name</strong> duplicate'+(autoCount>1?'s':'')+' auto-merge ready. '
+      +(selectCount?'<strong>'+selectCount+'</strong> need your input below.':'')
+      +'</div>';
   }
+
+  groups.forEach(function(g, gi){
+    var dec = window._pfMergeDecisions[gi];
+    var all = [g.keep].concat(g.drops);
+
+    // Find shared bill IDs for context
+    var sharedBillIds = [];
+    var billCount = {};
+    all.forEach(function(p){
+      (p.treatments||[]).forEach(function(tx){
+        var bid = tx._billId||(tx.notes&&tx.notes.startsWith('Bill: ')?tx.notes.slice(6).trim():null);
+        if(bid){ billCount[bid]=(billCount[bid]||0)+1; }
+      });
+    });
+    Object.keys(billCount).forEach(function(bid){ if(billCount[bid]>1) sharedBillIds.push(bid); });
+
+    html += '<div id="pf-merge-group-'+gi+'" style="background:#fff;border:1.5px solid '+(g.reason==='auto'?'#a8d5b8':'#f0c080')+';border-radius:10px;padding:14px;margin-bottom:14px">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
+    html += '<div>';
+    html += '<span style="font-size:10px;font-weight:700;color:'+(g.reason==='auto'?'#1b6e35':'#d35400')+';text-transform:uppercase;letter-spacing:.5px">'+(g.reason==='auto'?'🔀 Same Name — Auto Merge':'⚠️ Same Bills, Different Names — Select')+' (Group '+(gi+1)+')</span>';
+    if(sharedBillIds.length){
+      html += '<div style="font-size:10px;color:#888;margin-top:2px">Shared bills: '+sharedBillIds.slice(0,4).join(', ')+(sharedBillIds.length>4?' …':'')+'</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+
+    // Show each patient card
+    html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">';
+    all.forEach(function(p){
+      var txCount = (p.treatments||[]).length;
+      var isSelected = (dec === ('select:'+p.id)) || (g.reason==='auto' && p.id===g.keep.id);
+      html += '<div onclick="pfMergeSelectKeep('+gi+',\''+p.id+'\')" style="cursor:pointer;padding:10px 12px;border-radius:8px;border:2px solid '+(isSelected?'var(--pri)':'#e0e8ee')+';background:'+(isSelected?'#e8f4f8':'#f9fbfc')+';transition:.15s">';
+      html += '<div style="display:flex;align-items:center;gap:8px">';
+      html += '<div style="width:22px;height:22px;border-radius:50%;border:2.5px solid '+(isSelected?'var(--pri)':'#cdd5dd')+';background:'+(isSelected?'var(--pri)':'#fff')+';flex-shrink:0;display:flex;align-items:center;justify-content:center">'+(isSelected?'<svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':'')+'</div>';
+      html += '<div style="flex:1;min-width:0">';
+      html += '<div style="font-weight:700;font-size:13px;color:#1a2433">'+p.name+'</div>';
+      html += '<div style="font-size:11px;color:#888">'+[p.phone,p.age?(p.age+' yrs'):'',p.gender].filter(Boolean).join(' · ')+'</div>';
+      html += '<div style="font-size:10px;color:var(--pri);margin-top:2px">'+txCount+' treatment'+(txCount!==1?'s':'')+' · ID: '+p.id+'</div>';
+      html += '</div>';
+      if(isSelected) html += '<div style="font-size:10px;font-weight:700;color:var(--pri);background:#d0eaf4;border-radius:5px;padding:3px 7px">KEEP</div>';
+      html += '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    // Action buttons
+    if(g.reason==='select'){
+      html += '<div style="font-size:11px;color:#888;margin-bottom:8px">👆 Tap karo to keep karvo hoy te patient (bijo merge thai jashe)</div>';
+    }
+    html += '<div style="display:flex;gap:6px">';
+    var isMerge = (dec==='merge'||dec&&dec.startsWith('select:'));
+    var isSkip = (dec==='skip');
+    html += '<button onclick="pfMergeSetDecision('+gi+',\'merge\')" style="flex:1;padding:7px;border-radius:7px;border:2px solid '+(isMerge?'#1b6e35':'#e0e8ee')+';background:'+(isMerge?'#1b6e35':'#fff')+';color:'+(isMerge?'#fff':'#555')+';font-size:11px;font-weight:700;cursor:pointer">✓ Merge</button>';
+    html += '<button onclick="pfMergeSetDecision('+gi+',\'skip\')" style="flex:1;padding:7px;border-radius:7px;border:2px solid '+(isSkip?'#c0392b':'#e0e8ee')+';background:'+(isSkip?'#fdecea':'#fff')+';color:'+(isSkip?'#c0392b':'#555')+';font-size:11px;font-weight:700;cursor:pointer">✕ Skip</button>';
+    html += '</div>';
+    html += '</div>';
+  });
+
+  document.getElementById('pf-merge-modal-body').innerHTML = html;
+  document.getElementById('pf-smart-merge-modal').classList.add('open');
+}
+
+function pfMergeSelectKeep(gi, pid){
+  window._pfMergeDecisions[gi] = 'select:' + pid;
+  pfShowMergeModal(); // re-render
+}
+
+function pfMergeSetDecision(gi, dec){
+  var g = window._pfPendingMergeGroups[gi];
+  if(dec === 'merge'){
+    // For select-type, keep current selection or default to keep
+    if(window._pfMergeDecisions[gi] === 'skip'){
+      window._pfMergeDecisions[gi] = 'select:' + g.keep.id;
+    } else if(!window._pfMergeDecisions[gi]){
+      window._pfMergeDecisions[gi] = 'select:' + g.keep.id;
+    }
+    // if already 'select:...' keep it
+  } else {
+    window._pfMergeDecisions[gi] = dec;
+  }
+  pfShowMergeModal();
+}
+
+function pfApplyMergeDecisions(){
+  var groups = window._pfPendingMergeGroups;
+  var mergeCount = 0;
+  var skipCount = 0;
+
+  groups.forEach(function(g, gi){
+    var dec = window._pfMergeDecisions[gi];
+    if(!dec || dec === 'skip'){ skipCount++; return; }
+
+    // Determine who to keep
+    var keepId = g.keep.id;
+    if(dec.startsWith('select:')){
+      keepId = dec.slice(7);
+    }
+    var keepPat = patientFiles.find(function(x){return x.id===keepId;});
+    if(!keepPat) return;
+
+    var dropPats = [g.keep].concat(g.drops).filter(function(x){return x.id!==keepId;});
+    dropPats.forEach(function(drop){
+      pfMergeInto(keepPat, drop);
+      // Remove drop from patientFiles
+      var idx = patientFiles.findIndex(function(x){return x.id===drop.id;});
+      if(idx !== -1) patientFiles.splice(idx, 1);
+      // Delete from Firebase
+      try{ if(typeof fbDeletePF==='function') fbDeletePF(drop.id); }catch(e){}
+    });
+
+    // Deduplicate treatments inside the kept patient
+    pfDeduplicateOneTreatments(keepPat);
+    keepPat.updatedAt = Date.now();
+    mergeCount++;
+  });
+
+  if(mergeCount > 0){
+    pfDeduplicateTreatments();
+    svPF();
+    // Sync all changed patients to Firebase
+    patientFiles.forEach(function(p){ try{ fbSyncPF(p); }catch(e){} });
+    try{ if(typeof sbPushTable==='function') sbPushTable('niva_patient_files','patientFiles'); }catch(e){}
+    pfRenderList((document.getElementById('pf-search')?.value||'').toLowerCase());
+    if(pfCurrentPatientId){
+      var cp = patientFiles.find(function(x){return x.id===pfCurrentPatientId;});
+      if(cp) pfRenderTreatments(cp);
+      else { pfCurrentPatientId=null; document.getElementById('pf-detail').style.display='none'; document.getElementById('pf-sbar').style.display='flex'; document.getElementById('pf-list').style.display='block'; }
+    }
+    typeof showToast!=='undefined' && showToast('✅ Merged '+mergeCount+' duplicate group'+(mergeCount>1?'s':'')+'. Treatments deduplicated.');
+  }
+
+  pfCloseMergeModal();
+  window._pfPendingMergeGroups = [];
+  window._pfMergeDecisions = {};
+}
+
+function pfCloseMergeModal(){
+  var m = document.getElementById('pf-smart-merge-modal');
+  if(m) m.classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════════════════════
+
+function pfRunMergeDuplicates(){
+  // Use new smart merge modal (shows auto + select groups)
+  pfDeduplicateTreatments(); // first clean up duplicate treatments
+  var groups = pfFindDuplicateGroups();
+  if(!groups.length){
+    typeof showToast!=='undefined'&&showToast('No duplicates found — all patient records are unique.');
+    return;
+  }
+  window._pfPendingMergeGroups = groups;
+  window._pfMergeDecisions = {};
+  groups.forEach(function(g, i){
+    // Default skip — user must confirm each merge
+    window._pfMergeDecisions[i] = 'skip';
+  });
+  pfShowMergeModal();
 }
 
 function pfRenderList(q){
@@ -18274,6 +18548,32 @@ function pfOpenDetail(pid){
      ${p.notes?`<span>📝 ${p.notes}</span>`:''}`;
   pfRenderImages(p);
   pfRenderTreatments(p);
+
+  // Auto-fetch images from Firebase if any are missing dataUrl (bija device thi add thayelaa)
+  var _missingDataUrl=(p.images||[]).some(function(img){return !img.dataUrl;});
+  if(_missingDataUrl){
+    var _F={};try{_F={...DEF_FB,...(CFG.firebase||{})};}catch(e){}
+    if(_F.dburl){
+      fbGET('patient_file_images/'+fbSafeKey(p.id))
+        .then(function(imgData){
+          if(!imgData||typeof imgData!=='object') return;
+          var changed=false;
+          if(!p.images) p.images=[];
+          Object.values(imgData).forEach(function(remoteImg){
+            if(!remoteImg||!remoteImg.id) return;
+            var existsIdx=p.images.findIndex(function(x){return x.id===remoteImg.id||fbSafeKey(x.id)===fbSafeKey(remoteImg.id);});
+            if(existsIdx===-1){
+              p.images.push({...remoteImg,synced:true}); changed=true;
+            } else if(remoteImg.dataUrl && !p.images[existsIdx].dataUrl){
+              p.images[existsIdx]={...p.images[existsIdx],dataUrl:remoteImg.dataUrl,synced:true};
+              changed=true;
+            }
+          });
+          if(changed){ svPF(); pfRenderImages(p); }
+        })
+        .catch(function(){});
+    }
+  }
 }
 
 function pfCloseDetail(){
@@ -18485,6 +18785,53 @@ function pfRenderImages(p){
   el.innerHTML=html;
 }
 
+// ── Manually sync images for current patient from Firebase ──
+function pfSyncImagesFromCloud(){
+  var p=patientFiles.find(function(x){return x.id===pfCurrentPatientId;});
+  if(!p){alert('No patient selected.'); return;}
+  var F={};try{F={...DEF_FB,...(CFG.firebase||{})};}catch(e){}
+  if(!F.dburl){
+    typeof showToast!=='undefined'&&showToast('Firebase configured nathi — images sync nahi thai shaki.');
+    return;
+  }
+  var btn=document.getElementById('pf-sync-img-btn');
+  if(btn){btn.textContent='⏳ Syncing…';btn.disabled=true;}
+
+  fbGET('patient_file_images/'+fbSafeKey(p.id))
+    .then(function(imgData){
+      if(!imgData||typeof imgData!=='object'){
+        typeof showToast!=='undefined'&&showToast('Firebase maa koi images nathi mili.');
+        if(btn){btn.textContent='☁️ Sync Images';btn.disabled=false;}
+        return;
+      }
+      if(!p.images) p.images=[];
+      var added=0, updated=0;
+      Object.values(imgData).forEach(function(remoteImg){
+        if(!remoteImg||!remoteImg.id) return;
+        var existsIdx=p.images.findIndex(function(x){return x.id===remoteImg.id||fbSafeKey(x.id)===fbSafeKey(remoteImg.id);});
+        if(existsIdx===-1){
+          p.images.push({...remoteImg, synced:true}); added++;
+        } else if(remoteImg.dataUrl && !p.images[existsIdx].dataUrl){
+          p.images[existsIdx]={...p.images[existsIdx], dataUrl:remoteImg.dataUrl, synced:true};
+          updated++;
+        }
+      });
+      if(added||updated){
+        p.updatedAt=Date.now();
+        svPF();
+        pfRenderImages(p);
+        typeof showToast!=='undefined'&&showToast('✅ '+(added+updated)+' image(s) synced from Firebase.');
+      } else {
+        typeof showToast!=='undefined'&&showToast('✅ Images already up to date.');
+      }
+      if(btn){btn.textContent='☁️ Sync Images';btn.disabled=false;}
+    })
+    .catch(function(e){
+      typeof showToast!=='undefined'&&showToast('❌ Image sync failed: '+e.message);
+      if(btn){btn.textContent='☁️ Sync Images';btn.disabled=false;}
+    });
+}
+
 function pfOpenAddImage(){
   var p=patientFiles.find(function(x){return x.id===pfCurrentPatientId;});if(!p)return;
   document.getElementById('pf-img-input').value='';
@@ -18577,9 +18924,10 @@ function pfSaveImage(){
   p.updatedAt=Date.now();
   svPF();
   // Save image to separate Firebase folder: patient_file_images/<patientId>/<imgId>
+  // NOTE: Always push image when Firebase dburl is configured (independent of autosync toggle)
+  // so that images are always available on other devices via pull.
   var _F2={};try{_F2={...DEF_FB,...(CFG.firebase||{})};}catch(e){}
-  var _syncT2=(CFG.firebase&&CFG.firebase.syncToggles)||{};
-  if(_F2.dburl && _syncT2.autosync!==false){
+  if(_F2.dburl){
     var _fbImgPath='patient_file_images/'+fbSafeKey(p.id)+'/'+fbSafeKey(imgId);
     var _fbImgData={id:imgId,patientId:p.id,date:imgObj.date,note:note,dataUrl:_pfImgCompressed,sizeKb:kb,savedAt:Date.now()};
     fbPUT(_fbImgPath, _fbImgData)
