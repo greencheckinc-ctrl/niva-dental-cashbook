@@ -2093,10 +2093,12 @@ function showLockAfterSplash(){
 
   <!-- Patient detail view -->
   <div id="pf-detail" style="display:none">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
       <button class="btn bo sm" onclick="pfCloseDetail()">&#8592; Back</button>
       <div id="pf-det-name" style="font-size:16px;font-weight:700;color:#1a2433"></div>
       <button class="btn bg sm" onclick="pfOpenAddTreatment()" style="margin-left:auto">&#43; Add Treatment</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
       <button class="btn bo sm" onclick="pfRemoveDupThisPatient()" title="Remove duplicate treatments for this patient" style="background:#fff3e0;color:#d35400;border-color:#f0c080">🧹 Remove Duplicates</button>
       <button class="btn bo sm" onclick="pfRemoveDupAllPatients()" title="Remove duplicate treatments for ALL patients" style="background:#fdecea;color:#c0392b;border-color:#f0b8b3">🧹 Remove All Duplicates</button>
       <button class="btn bo sm" onclick="pfOpenAddImage()" style="background:#e8f4f8;color:var(--pri);border-color:var(--pri-text)">📷 Add Image</button>
