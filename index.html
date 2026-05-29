@@ -12051,7 +12051,7 @@ function fbPullAll(silent){
       }
       return [billData,expData,apptData,clinicInfo,pfData,pfImgData];
     })
-    .then(([billData,expData,apptData,clinicInfo,pfData])=>{
+    .then(([billData,expData,apptData,clinicInfo,pfData,pfImgData])=>{
       var bAdded=0,bUpdated=0,eAdded=0,eUpdated=0,aAdded=0,aUpdated=0,pfAdded=0,pfUpdated=0;
       var conflicts=[];
 
@@ -12179,7 +12179,16 @@ function fbPullAll(silent){
           // Match by id OR fbSafeKey to prevent duplicates
           var idx=patientFiles.findIndex(function(x){return x.id===rp.id||fbSafeKey(x.id)===fbSafeKey(rp.id);});
           if(idx===-1){patientFiles.push(rp);pfAdded++;}
-          else if((rp.updatedAt||0)>(patientFiles[idx].updatedAt||0)){patientFiles[idx]=rp;pfUpdated++;}
+          else if((rp.updatedAt||0)>(patientFiles[idx].updatedAt||0)){
+            // Preserve local dataUrl for images — remote strips dataUrl (stored in patient_file_images)
+            var localImgs=patientFiles[idx].images||[];
+            var mergedImgs=(rp.images||[]).map(function(ri){
+              var localImg=localImgs.find(function(li){return li.id===ri.id||fbSafeKey(li.id)===fbSafeKey(ri.id);});
+              return localImg&&localImg.dataUrl ? {...ri, dataUrl:localImg.dataUrl, synced:true} : ri;
+            });
+            patientFiles[idx]={...rp, images:mergedImgs};
+            pfUpdated++;
+          }
         });
         if(pfAdded||pfUpdated){
           pfDeduplicateTreatments(); // remove duplicate treatments before saving
@@ -12389,9 +12398,13 @@ function startFBListener(){
           return;
         }
         if(!remoteImg||!remoteImg.id) return;
-        var exists=p.images.find(function(x){return x.id===remoteImg.id||fbSafeKey(x.id)===fbSafeKey(remoteImg.id);});
-        if(!exists){
+        var existsIdx=p.images.findIndex(function(x){return x.id===remoteImg.id||fbSafeKey(x.id)===fbSafeKey(remoteImg.id);});
+        if(existsIdx===-1){
           p.images.push({...remoteImg, synced:true});
+          pfChanged=true;
+        } else if(remoteImg.dataUrl && !p.images[existsIdx].dataUrl){
+          // Remote has dataUrl (from patient_file_images), local is stripped — restore it
+          p.images[existsIdx]={...p.images[existsIdx], dataUrl:remoteImg.dataUrl, synced:true};
           pfChanged=true;
         }
       });
