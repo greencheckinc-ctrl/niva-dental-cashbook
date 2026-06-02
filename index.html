@@ -1050,7 +1050,7 @@ function showLockAfterSplash(){
   </div>
 
   <!-- Hidden placeholder for JS (do not remove) -->
-  <div id="dash-appt-section" style="display:none"></div>
+  <div id="dash-appt-section-placeholder" style="display:none"></div>
 
   <!-- MONTHLY INCOME PANEL -->
   <div id="monthly-income-panel" style="background:#fff;border-radius:10px;border:1px solid #e0e8ee;margin-bottom:16px;overflow:hidden;">
@@ -8130,7 +8130,7 @@ function _renderIncomeGraphNow(){
   ctx.scale(dpr,dpr);
   ctx.clearRect(0,0,W,H);
 
-  const PAD={top:36,right:20,bottom:isMobile?54:52,left:isMobile?48:56};
+  const PAD={top:48,right:isMobile?36:44,bottom:isMobile?68:66,left:isMobile?48:56};
   const cW=W-PAD.left-PAD.right;
   const cH=H-PAD.top-PAD.bottom;
   const n=months.length;
@@ -8215,11 +8215,15 @@ function _renderIncomeGraphNow(){
           var lv=val>=100000?(val/100000).toFixed(1)+'L':val>=1000?(val/1000).toFixed(val%1000===0?0:1)+'k':Math.round(val).toString();
           ctx.save();
           ctx.textAlign='center';
-          ctx.textBaseline='alphabetic';
-          ctx.font=(isSel?'bold ':'')+9+'px Arial';
+          ctx.textBaseline='bottom';
+          var efs=isSel?11:10;
+          ctx.font=(isSel?'bold ':'')+efs+'px Arial';
+          var ly=Math.max(PAD.top+efs+4,y-10);
+          var lx2=Math.max(PAD.left+22,Math.min(W-PAD.right-22,x));
+          var tw2=ctx.measureText(cur+lv).width;
+          ctx.fillStyle='rgba(255,255,255,0.85)';
+          ctx.fillRect(lx2-tw2/2-2,ly-efs-2,tw2+4,efs+4);
           ctx.fillStyle=EXPENSE_COLOR;
-          var ly=Math.max(PAD.top+2,y-9);
-          var lx2=Math.max(PAD.left+18,Math.min(W-PAD.right-18,x));
           ctx.fillText(cur+lv,lx2,ly);
           ctx.restore();
         }
@@ -8241,7 +8245,7 @@ function _renderIncomeGraphNow(){
     var val=m[SK];
     if(val<=0) return;
     var x=xPos(i);
-    var y=Math.max(PAD.top+2,yPos(val)-9);
+    var y=Math.max(PAD.top+4,yPos(val)-12);
     var lv=val>=100000?(val/100000).toFixed(1)+'L':val>=1000?(val/1000).toFixed(val%1000===0?0:1)+'k':Math.round(val).toString();
     var isCurrent=m.key===tod.slice(0,7);
     var isSel=m.key===selMonth;
@@ -8276,7 +8280,7 @@ function _renderIncomeGraphNow(){
     var lbl=m.lbl.replace('\n',' ');
     var bold=isCurrent||isSel;
     ctx.save();
-    ctx.translate(x,axisY+6);
+    ctx.translate(x,axisY+8);
     ctx.rotate(ANGLE);
     ctx.font=(bold?'bold ':'')+FSIZE+'px Arial';
     ctx.fillStyle=isCurrent?sColor:(isSel?'#222':'#333');
@@ -8288,11 +8292,16 @@ function _renderIncomeGraphNow(){
   lblItems.forEach(function(lb){
     ctx.save();
     ctx.textAlign='center';
-    ctx.textBaseline='alphabetic';
-    ctx.font=(lb.isSel?'bold ':'')+(lb.isSel?FSIZE_VAL+1:FSIZE_VAL-1)+'px Arial';
-    ctx.fillStyle=lb.isSel?sColor:(lb.isCurrent?sColor:'#333');
-    var cy=Math.max(PAD.top+2,lb.y);
-    var cx=Math.max(PAD.left+18,Math.min(W-PAD.right-18,lb.x));
+    ctx.textBaseline='bottom';
+    var fs=lb.isSel?FSIZE_VAL+2:FSIZE_VAL+1;
+    ctx.font=(lb.isSel?'bold ':'')+fs+'px Arial';
+    var cy=Math.max(PAD.top+fs+4,lb.y);
+    var cx=Math.max(PAD.left+22,Math.min(W-PAD.right-22,lb.x));
+    // White background for readability
+    var tw=ctx.measureText(lb.lv).width;
+    ctx.fillStyle='rgba(255,255,255,0.85)';
+    ctx.fillRect(cx-tw/2-2,cy-fs-2,tw+4,fs+4);
+    ctx.fillStyle=lb.isSel?sColor:(lb.isCurrent?sColor:'#444');
     ctx.fillText(lb.lv,cx,cy);
     ctx.restore();
   });
@@ -9030,7 +9039,7 @@ function importFromDB(){
   alert(added>0?'✅ '+added+' medicine(s) imported to My Directory!':'All matched medicines already in directory.');
 }
 
-function openRxMedDirectory(){showRxTab('directory');}
+// openRxMedDirectory defined below
 
 // ── Patient autocomplete ──
 function rxPatientInput(val){
@@ -13926,9 +13935,9 @@ async function checkPassword(){
 }
 
 // Expose helpers for the rest of the app
-function getAttemptState(){ try{ return JSON.parse(localStorage.getItem('niva_pw_attempts')||'{"count":0,"lockedUntil":0}'); }catch(e){ return {count:0,lockedUntil:0}; } }
-function setAttemptState(obj){ localStorage.setItem('niva_pw_attempts', JSON.stringify(obj)); }
-function resetAttempts(){ setAttemptState({count:0,lockedUntil:0}); }
+// getAttemptState — defined in IIFE above
+//function getAttemptState(){ try{ return JSON.parse(localStorage.getItem(\'niva_pw_attempts\')||'{"count":0,"lockedUntil":0}'); }catch(e){ return {count:0,lockedUntil:0}; } }
+// setAttemptState and resetAttempts defined in IIFE above
 // ── AUTO-SAVE FILE SYSTEM ─────────────────────────────────────────────────────
 let _autoSaveHandle=null; // FileSystemFileHandle stored in memory per session
 
@@ -15071,343 +15080,6 @@ function saveBillWithSync() {
   }
 }
 
-
-
-// ═══════════════════════════════════════════════════════
-// APPOINTMENTS TAB – Full Dedicated Screen
-// ═══════════════════════════════════════════════════════
-
-function renderApptTabFull(){
-  renderApptStats();
-  showApptSub('today', document.getElementById('appt-sub-btn-today'));
-}
-
-function showApptSub(name, btn){
-  ['today','upcoming','all','add'].forEach(s=>{
-    const p=document.getElementById('appt-sub-'+s);
-    const b=document.getElementById('appt-sub-btn-'+s);
-    if(p) p.classList.toggle('act', s===name);
-    if(b) b.classList.toggle('act', s===name);
-  });
-  if(name==='today') renderApptToday();
-  if(name==='upcoming') renderApptTab();
-  if(name==='all') renderApptAll();
-  if(name==='add'){
-    const dEl=document.getElementById('qa-date');
-    if(dEl&&!dEl.value) dEl.value=tod;
-    const drEl=document.getElementById('qa-doctor');
-    if(drEl&&!drEl.value) drEl.value=CFG.clinic.doctor||'';
-    renderApptRecent();
-  }
-  renderApptStats();
-}
-
-function renderApptStats(){
-  const bar=document.getElementById('appt-stats-bar');
-  if(!bar) return;
-  const now=new Date(); const todStr=(function(){var _ld=new Date();return _ld.getFullYear()+'-'+String(_ld.getMonth()+1).padStart(2,'0')+'-'+String(_ld.getDate()).padStart(2,'0');})();
-  const all=appointments;
-  const todayA=all.filter(a=>a.date===todStr&&a.status==='Scheduled');
-  const upcoming=all.filter(a=>a.status==='Scheduled'&&a.date>todStr);
-  const overdue=all.filter(a=>a.status==='Scheduled'&&a.date<todStr);
-  const done=all.filter(a=>a.status==='Done');
-  const cur=CFG.billing.currency||'₹';
-  bar.innerHTML=`
-    <div class="appt-stat" style="border-left:3px solid #7c3aed"><div class="lb">📅 Today</div><div class="vl" style="color:#7c3aed">${todayA.length}</div></div>
-    <div class="appt-stat" style="border-left:3px solid var(--pri)"><div class="lb">📆 Upcoming</div><div class="vl b">${upcoming.length}</div></div>
-    <div class="appt-stat" style="border-left:3px solid #c0392b"><div class="lb">⚠️ Overdue</div><div class="vl r">${overdue.length}</div></div>
-    <div class="appt-stat" style="border-left:3px solid #1b6e35"><div class="lb">✅ Done</div><div class="vl g">${done.length}</div></div>
-    <div class="appt-stat"><div class="lb">📋 Total</div><div class="vl">${all.length}</div></div>`;
-}
-
-function _fmtApptDate(d){
-  if(!d) return '—';
-  return new Date(d).toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
-}
-function _fmtApptTime(t){
-  if(!t) return '';
-  const [h,m]=t.split(':'); const hr=+h;
-  return (hr%12||12)+':'+m+' '+(hr<12?'AM':'PM');
-}
-
-function _apptCardHTML(a, highlight, extraClass){
-  const cls='appt-card'+(highlight?' today':'')+(extraClass?' '+extraClass:'');
-  return `<div class="${cls}">
-    <div class="appt-card-top">
-      <div class="appt-card-info">
-        <div class="name">👤 ${a.patient}</div>
-        ${a.phone?`<div class="phone">📱 ${a.phone}</div>`:''}
-      </div>
-      <div class="appt-card-date">
-        <div class="date">📅 ${_fmtApptDate(a.date)}</div>
-        ${a.time?`<div class="time">🕐 ${_fmtApptTime(a.time)}</div>`:''}
-      </div>
-    </div>
-    <div class="appt-card-meta">
-      ${a.purpose?`<span>🦷 ${a.purpose}</span>`:''}
-      ${a.doctor?`<span>👨‍⚕️ ${a.doctor}</span>`:''}
-      ${a.notes?`<span style="color:#888;font-style:italic">📝 ${a.notes}</span>`:''}
-      <span class="badge ${a.status==='Done'?'bpd':a.status==='Scheduled'?'bm':'bpn'}">${a.status==='Done'?'Show':a.status}</span>
-    </div>
-    <div class="appt-card-actions">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;width:100%">
-        ${a.status!=='Done'?`<button class="btn bg-lt sm vb-action" data-action="dashdone" data-id="${a.id}" style="text-align:center">✓ Show</button>`:`<button class="btn bpd sm" disabled style="text-align:center;opacity:.5">✓ Done</button>`}
-        <button class="btn sm vb-action" data-action="apptcollect" data-id="${a.id}" style="background:#e8f5e9;color:#1b6e35;border:1px solid #a5d6a7;text-align:center">💰 Collect</button>
-        <button class="btn bd-lt sm vb-action" data-action="apptdelete" data-id="${a.id}" style="text-align:center">🗑️ Delete</button>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
-        <button class="btn bwa-lt sm vb-action" data-action="dashresendwa" data-id="${a.id}">📱 WA</button>
-        <button class="btn bsms-lt sm vb-action" data-action="dashresendsms" data-id="${a.id}">💬 SMS</button>
-        <button class="btn bo sm vb-action" data-action="apptedit" data-id="${a.id}">✏️ Edit</button>
-        ${a.doctor?`<button class="btn sm vb-action" data-action="docremindwa" data-id="${a.id}" style="background:#e8f5ee;color:#1b6e35;border:1px solid #a8d5b8">👨‍⚕️ Dr.WA</button>`:''}
-        ${a.doctor?`<button class="btn sm vb-action" data-action="docremindwasms" data-id="${a.id}" style="background:#e8f0f8;color:#0066cc;border:1px solid #a8c4ee">👨‍⚕️ Dr.SMS</button>`:''}
-      </div>
-    </div>
-  </div>`;
-}
-
-function renderApptToday(){
-  const el=document.getElementById('appt-today-list');
-  if(!el) return;
-  const todStr=(function(){var _ld=new Date();return _ld.getFullYear()+'-'+String(_ld.getMonth()+1).padStart(2,'0')+'-'+String(_ld.getDate()).padStart(2,'0');})();
-  const todayA=appointments.filter(a=>a.date===todStr).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
-  const overdueA=appointments.filter(a=>a.status==='Scheduled'&&a.date<todStr).sort((a,b)=>b.date.localeCompare(a.date));
-  let html='';
-  if(todayA.length){
-    html+=`<div class="sec" style="color:#7c3aed;border-bottom-color:#7c3aed">📅 Today's Appointments (${todayA.length})</div>`;
-    html+=todayA.map(a=>_apptCardHTML(a,a.status==='Scheduled','')).join('');
-  } else {
-    html+=`<div class="empty" style="margin-bottom:14px">No appointments scheduled for today. <button class="btn bp sm" style="margin-top:8px" onclick="showApptSub('add',document.getElementById('appt-sub-btn-add'))">➕ Book One</button></div>`;
-  }
-  if(overdueA.length){
-    html+=`<div class="sec" style="margin-top:16px;color:#c0392b;border-bottom-color:#c0392b">⚠️ Missed / Overdue (${overdueA.length})</div>`;
-    html+=overdueA.map(a=>_apptCardHTML(a,false,'overdue')).join('');
-  }
-  el.innerHTML=html||'<div class="empty">No appointments today.</div>';
-}
-
-function renderApptTab(){
-  const el=document.getElementById('appt-upcoming-list');
-  if(!el) return;
-  const q=(document.getElementById('appt-search-up')||{value:''}).value.toLowerCase();
-  const fr=(document.getElementById('appt-from')||{value:''}).value;
-  const to=(document.getElementById('appt-to')||{value:''}).value;
-  const st=(document.getElementById('appt-status-filter')||{value:''}).value;
-  const todStr=(function(){var _ld=new Date();return _ld.getFullYear()+'-'+String(_ld.getMonth()+1).padStart(2,'0')+'-'+String(_ld.getDate()).padStart(2,'0');})();
-  let list=appointments.filter(a=>
-    a.date>=todStr &&
-    (!q||(a.patient||'').toLowerCase().includes(q)||(a.phone||'').includes(q)||(a.purpose||'').toLowerCase().includes(q)) &&
-    (!fr||a.date>=fr) && (!to||a.date<=to) &&
-    (!st||a.status===st)
-  ).sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||''));
-  if(!list.length){el.innerHTML='<div class="empty">No upcoming appointments found.</div>';return;}
-  el.innerHTML=list.map(a=>_apptCardHTML(a,a.date===todStr,'')).join('');
-}
-
-function renderApptAll(){
-  const el=document.getElementById('appt-all-list');
-  if(!el) return;
-  const q=(document.getElementById('appt-search-all')||{value:''}).value.toLowerCase();
-  const st=(document.getElementById('appt-all-status')||{value:''}).value;
-  let list=appointments.filter(a=>
-    (!q||(a.patient||'').toLowerCase().includes(q)||(a.phone||'').includes(q)||(a.purpose||'').toLowerCase().includes(q)) &&
-    (!st||a.status===st)
-  ).sort((a,b)=>b.date.localeCompare(a.date));
-  if(!list.length){el.innerHTML='<div class="empty">No appointments found.</div>';return;}
-  const todStr=(function(){var _ld=new Date();return _ld.getFullYear()+'-'+String(_ld.getMonth()+1).padStart(2,'0')+'-'+String(_ld.getDate()).padStart(2,'0');})();
-  el.innerHTML=list.map(a=>_apptCardHTML(a,a.date===todStr&&a.status==='Scheduled',a.status==='Scheduled'&&a.date<todStr?'overdue':'')).join('');
-}
-
-function renderApptRecent(){
-  const el=document.getElementById('appt-recent-list');
-  if(!el) return;
-  const list=appointments.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
-  if(!list.length){el.innerHTML='<div class="empty">No appointments yet.</div>';return;}
-  const todStr=(function(){var _ld=new Date();return _ld.getFullYear()+'-'+String(_ld.getMonth()+1).padStart(2,'0')+'-'+String(_ld.getDate()).padStart(2,'0');})();
-  el.innerHTML=list.map(a=>_apptCardHTML(a,a.date===todStr&&a.status==='Scheduled','')).join('');
-}
-
-function markApptDoneTab(id){
-  const a=appointments.find(x=>x.id===id);if(!a)return;
-  if(!confirm('Mark appointment for '+a.patient+' as Done?'))return;
-  a.status='Done';a.updatedAt=Date.now();svAppt();fbSyncAppt(a);renderApptTabFull();renderDash();
-  if(typeof renderVB==='function') renderVB();
-}
-
-function deleteApptTab(id){
-  const a=appointments.find(x=>x.id===id);if(!a)return;
-  if(!confirm('Delete appointment for '+a.patient+'?'))return;
-  fbDeleteAppt(id);appointments=appointments.filter(x=>x.id!==id);svAppt();renderApptTabFull();renderDash();
-  if(typeof renderVB==='function') renderVB();
-}
-
-function editApptTab(id){
-  const a=appointments.find(x=>x.id===id);if(!a)return;
-  // Switch to Book New sub-tab and prefill form
-  showApptSub('add', document.getElementById('appt-sub-btn-add'));
-  document.getElementById('qa-patient').value=a.patient||'';
-  document.getElementById('qa-phone').value=a.phone||'';
-  document.getElementById('qa-date').value=a.date||tod;
-  document.getElementById('qa-time').value=a.time||'10:00';
-  document.getElementById('qa-doctor').value=a.doctor||'';
-  document.getElementById('qa-purpose').value=a.purpose||'';
-  document.getElementById('qa-notes').value=a.notes||'';
-  const _qaAddDet=document.getElementById('qa-adddet');if(_qaAddDet)_qaAddDet.value=a.additionalDetail||'';
-  // store id for update
-  document.getElementById('qa-patient').dataset.editId=id;
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-// Patient autocomplete for quick book form
-function apptQuickSearch(val){
-  const box=document.getElementById('qa-suggestions');
-  if(!box) return;
-  if(!val||val.length<2){box.innerHTML='';return;}
-  const q=val.toLowerCase();
-  // Get unique patients from bills
-  const seen=new Set();
-  const matches=bills.filter(b=>(b.patient||'').toLowerCase().includes(q)||((b.phone||'').includes(q))).filter(b=>{
-    if(seen.has(b.patient)) return false; seen.add(b.patient); return true;
-  }).slice(0,6);
-  if(!matches.length){box.innerHTML='';return;}
-  box.innerHTML=`<div style="position:absolute;top:0;left:0;right:0;background:#fff;border:1.5px solid var(--pri);border-top:none;border-radius:0 0 8px 8px;z-index:500;box-shadow:0 6px 16px rgba(13,107,138,.12)">
-    ${matches.map(b=>`<div onclick="apptFillPatient('${b.patient.replace(/'/g,"\\'")}','${(b.phone||'').replace(/'/g,"\\'")}','${(b.doctor||'').replace(/'/g,"\\'")}');document.getElementById('qa-suggestions').innerHTML=''"
-      style="padding:8px 12px;font-size:12px;cursor:pointer;display:flex;justify-content:space-between;border-bottom:1px solid #f0f3f5"
-      onmouseover="this.style.background='#f0f8fc'" onmouseout="this.style.background=''">
-      <span style="font-weight:700">${b.patient}</span>
-      <span style="font-size:11px;color:#aaa">${b.phone||''}</span>
-    </div>`).join('')}
-  </div>`;
-  // position relative on parent
-  box.style.position='relative';
-}
-
-function apptFillPatient(name, phone, doctor){
-  document.getElementById('qa-patient').value=name;
-  if(phone) document.getElementById('qa-phone').value=phone;
-  if(doctor&&!document.getElementById('qa-doctor').value) document.getElementById('qa-doctor').value=doctor;
-  document.getElementById('qa-suggestions').innerHTML='';
-  document.getElementById('qa-date').focus();
-}
-
-function saveQuickAppt(){
-  const patient=(document.getElementById('qa-patient').value||'').trim();
-  const date=document.getElementById('qa-date').value;
-  if(!patient){alert('Enter patient name.');return;}
-  if(!date){alert('Select appointment date.');return;}
-  const editId=document.getElementById('qa-patient').dataset.editId||'';
-  const entry={
-    id: editId||('QA'+Date.now()),
-    billId: '',
-    patient,
-    phone: (document.getElementById('qa-phone').value||'').trim(),
-    date,
-    time: document.getElementById('qa-time').value||'',
-    doctor: (document.getElementById('qa-doctor').value||'').trim()||CFG.clinic.doctor||'',
-    purpose: (document.getElementById('qa-purpose').value||'').trim(),
-    notes: (document.getElementById('qa-notes').value||'').trim(),
-    additionalDetail: (function(){var el=document.getElementById('qa-adddet');return el?el.value.trim():'';})(),
-    status: 'Scheduled',
-    created: Date.now()
-  };
-  if(editId){
-    const idx=appointments.findIndex(x=>x.id===editId);
-    if(idx>=0) appointments[idx]=entry; else appointments.unshift(entry);
-    delete document.getElementById('qa-patient').dataset.editId;
-    alert('✅ Appointment updated for '+patient+'!');
-  } else {
-    appointments.unshift(entry);
-    alert('✅ Appointment saved for '+patient+' on '+_fmtApptDate(date)+'!');
-  }
-  svAppt();
-  fbSyncAppt(entry);
-  clearQuickApptForm();renderApptTabFull();renderDash();
-  if(typeof renderVB==='function') renderVB();
-  showApptSub('today', document.getElementById('appt-sub-btn-today'));
-}
-
-function saveAndSendApptWA(){
-  const patient=(document.getElementById('qa-patient').value||'').trim();
-  const date=document.getElementById('qa-date').value;
-  if(!patient||!date){alert('Enter patient name and date first.');return;}
-  saveQuickAppt();
-  // Find the appointment just saved and send WA
-  const a=appointments[0];
-  if(!a) return;
-  const C=CFG.clinic;
-  const msg=`Dear *${a.patient}*,\n\nYour appointment at *${C.name}*:\n📅 ${_fmtApptDate(a.date)}${a.time?'\n🕐 '+_fmtApptTime(a.time):''}${a.purpose?'\n🦷 '+a.purpose:''}\n\n📍 ${C.addr}\n📞 ${C.phone}\n\nPlease arrive 5 minutes early. Thank you!`;
-  const phone=(a.phone||'').replace(/\D/g,'').replace(/^91/,'').slice(-10);
-  const num=phone?'91'+phone:'';
-  window.open(num?`https://wa.me/${num}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
-}
-
-
-function clearQuickApptForm(){
-  ['qa-patient','qa-phone','qa-time','qa-doctor','qa-purpose','qa-notes','qa-adddet'].forEach(id=>{
-    const el=document.getElementById(id); if(el){el.value='';delete el.dataset.editId;}
-  });
-  document.getElementById('qa-date').value=tod;
-  document.getElementById('qa-doctor').value=CFG.clinic.doctor||'';
-  document.getElementById('qa-suggestions').innerHTML='';
-}
-
-// MOBILE / ANDROID HELPER FUNCTIONS
-// ═══════════════════════════════════════════
-
-/* ── Drawer open/close ── */
-function openMobDrawer(){
-  document.getElementById('mob-drawer').classList.add('open');
-  document.getElementById('mob-nav-overlay').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeMobDrawer(){
-  document.getElementById('mob-drawer').classList.remove('open');
-  document.getElementById('mob-nav-overlay').classList.remove('open');
-  document.body.style.overflow='';
-}
-
-/* ── Settings accordion toggle ── */
-function toggleMobSetMenu(btn){
-  const list=document.getElementById('mob-set-list');
-  const isOpen=list.classList.contains('open');
-  list.classList.toggle('open',!isOpen);
-  btn.classList.toggle('open',!isOpen);
-}
-function closeMobSetMenu(){
-  const list=document.getElementById('mob-set-list');
-  const btn=document.querySelector('.mob-set-accordion-btn');
-  if(list)list.classList.remove('open');
-  if(btn)btn.classList.remove('open');
-}
-
-/* ── Reports accordion toggle ── */
-function toggleMobRepMenu(btn){
-  const list=document.getElementById('mob-rep-list');
-  const isOpen=list.classList.contains('open');
-  list.classList.toggle('open',!isOpen);
-  btn.classList.toggle('open',!isOpen);
-}
-function closeMobRepMenu(){
-  const list=document.getElementById('mob-rep-list');
-  const btn=document.querySelector('.mob-rep-accordion-btn');
-  if(list)list.classList.remove('open');
-  if(btn)btn.classList.remove('open');
-}
-
-/* ── Swipe-to-close drawer ── */
-(function swipeDrawer(){
-  let startX=0,startY=0;
-  document.addEventListener('DOMContentLoaded',function(){
-    const drawer=document.getElementById('mob-drawer');
-    if(!drawer)return;
-    drawer.addEventListener('touchstart',function(e){startX=e.touches[0].clientX;startY=e.touches[0].clientY;},{passive:true});
-    drawer.addEventListener('touchend',function(e){
-      const dx=e.changedTouches[0].clientX-startX;
-      const dy=Math.abs(e.changedTouches[0].clientY-startY);
-      if(dx<-60&&dy<40)closeMobDrawer();
-    },{passive:true});
-  });
-})();
 
 // ═══════════════════════════════════════════
 // APPOINTMENTS TAB – FULL MODULE
