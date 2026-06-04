@@ -184,6 +184,7 @@ tr:hover td{background:#f9fbfc}
 
 /* SETTINGS STYLES */
 .settings-grid{display:grid;grid-template-columns:220px 1fr;gap:0;background:#fff;border-radius:10px;border:1px solid #e0e8ee;overflow:hidden;min-height:500px}
+@media(max-width:768px){.settings-grid{overflow:visible !important}}
 .settings-sidebar{background:#f8fafc;border-right:1px solid #e0e8ee;padding:0}
 .settings-sidebar h3{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.6px;padding:16px 16px 8px}
 .setnav button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;border:none;background:transparent;font-size:14px;font-weight:600;color:#555;cursor:pointer;text-align:left;border-left:3px solid transparent;transition:.15s}
@@ -439,9 +440,9 @@ tr:hover td{background:#f9fbfc}
   .f input,.f select,.f textarea{font-size:14px;padding:10px 12px}
 
   /* Settings grid: sidebar hidden, accordion shown */
-  .settings-grid{grid-template-columns:1fr;min-height:unset}
-  .settings-sidebar{display:none}
-  .settings-content{padding:12px}
+  .settings-grid{display:block !important;overflow:visible !important;min-height:unset;border:none;background:transparent}
+  .settings-sidebar{display:none !important}
+  .settings-content{padding:12px !important;overflow:visible !important;height:auto !important;max-height:none !important;padding-bottom:100px !important}
   .mob-set-accordion{display:block}
 
   /* Reports grid: sidebar hidden, accordion shown */
@@ -510,8 +511,10 @@ tr:hover td{background:#f9fbfc}
   .xb{width:46px;height:46px;font-size:22px;border-radius:10px;position:relative}
   .xb::after{content:'';position:absolute;inset:-8px}
 
-  /* Save bar wraps */
-  .save-bar{flex-wrap:wrap;gap:8px}
+  /* Save bar wraps + clears iOS/Android browser bottom nav */
+  .save-bar{flex-wrap:wrap;gap:8px;padding-bottom:env(safe-area-inset-bottom,12px)}
+  /* Sticky save bar at bottom of screen on mobile */
+  .mob-sticky-save{display:flex !important;position:fixed;bottom:0;left:0;right:0;z-index:950;background:#fff;border-top:2px solid var(--pri);padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 16px rgba(0,0,0,.15)}
 
   /* Toggle rows */
   .toggle-row .tlabel{font-size:12px}
@@ -2399,6 +2402,10 @@ function showLockAfterSplash(){
         <div class="save-bar">
           <button class="btn bg" onclick="saveClinic()">&#10003; Save Clinic Info</button>
           <span class="saved-msg" id="clinic-saved">&#10003; Saved successfully!</span>
+        </div>
+        <!-- Mobile sticky save -->
+        <div style="display:none" id="mob-clinic-save-bar" class="mob-sticky-save">
+          <button class="btn bg" style="flex:1;padding:14px;font-size:15px" onclick="saveClinic()">&#10003; Save Clinic Info</button>
         </div>
       </div>
 
@@ -4815,6 +4822,20 @@ function dedupById(arr){
   });
   return Array.from(map.values());
 }
+// Dedup appointments that share the same billId+date+time (different IDs but same logical appt)
+function dedupApptsByBill(arr){
+  const seen=new Map();
+  const out=[];
+  // Sort newest first so we keep the latest
+  const sorted=[...arr].sort((a,b)=>((b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0)));
+  sorted.forEach(function(a){
+    if(!a||!a.id)return;
+    // Key: billId+date+status (or just id if no billId)
+    const key=a.billId?(a.billId+'|'+a.status):'__'+a.id;
+    if(!seen.has(key)){seen.set(key,true);out.push(a);}
+  });
+  return out;
+}
 
 function sv(){
   bills=dedupById(bills);
@@ -4840,8 +4861,10 @@ function gid(){
 // ── APPOINTMENTS STORAGE ──────────────────────────────────────────────────────
 let appointments=[];
 try{appointments=JSON.parse(localStorage.getItem('niva_appointments')||'[]');}catch(e){}
+// One-time dedup of any duplicates already in storage
+try{if(appointments.length>1){var _dd=dedupApptsByBill(dedupById(appointments));if(_dd.length<appointments.length){appointments=_dd;localStorage.setItem('niva_appointments',JSON.stringify(appointments));console.log('[Niva] Deduped '+(_dd.length)+' appts from '+(appointments.length||_dd.length));}}}catch(e){}
 function svAppt(){
-  appointments=dedupById(appointments);
+  appointments=dedupById(dedupApptsByBill(appointments));
   try{localStorage.setItem('niva_appointments',JSON.stringify(appointments));}catch(e){}
   idbSaveAll('appointments',appointments).catch(e=>console.warn('[NivaIDB] svAppt:',e));
 }
@@ -5883,8 +5906,10 @@ function resetApptMsgTemplate(){
 
 function saveApptToStorage(){
   if(!_apptBill)return;
+  // Reuse existing ID to prevent Firebase sync from creating duplicates
+  const _existingAppt=appointments.find(a=>a.billId===_apptBill.id&&a.status==='Scheduled');
   const appt={
-    id:'APPT-'+Date.now(),
+    id:(_existingAppt&&_existingAppt.id)||'APPT-'+Date.now(),
     billId:_apptBill.id,
     patient:_apptBill.patient,
     phone:(document.getElementById('appt-phone').value||'').trim(),
@@ -5894,7 +5919,8 @@ function saveApptToStorage(){
     purpose:document.getElementById('appt-purpose').value.trim(),
     notes:document.getElementById('appt-notes').value.trim(),
     additionalDetail:(function(){var el=document.getElementById('appt-adddet');return el?el.value.trim():'';})(),
-    createdAt:Date.now(),
+    createdAt:(_existingAppt&&_existingAppt.createdAt)||Date.now(),
+    updatedAt:Date.now(),
     status:'Scheduled'
   };
   // Remove any previous pending appointment for same bill (keep only latest)
@@ -6786,6 +6812,14 @@ function showSetSection(name,btn){
     var arrow=document.getElementById('adv-sync-arrow');
     if(body){body.style.display='block';}
     if(arrow){arrow.textContent='▼';}
+  }
+  // On mobile: scroll to top of settings content so Save button is reachable by scrolling down
+  if(window.innerWidth<=768){
+    setTimeout(function(){
+      var sc=document.querySelector('.settings-content');
+      if(sc){sc.scrollTop=0;}
+      window.scrollTo(0,0);
+    },80);
   }
 }
 function loadClinicForm(){
@@ -10915,6 +10949,20 @@ function printSummaryReport(){
   </body></html>`;
   openPreviewModal('summary',null,html,`Summary Report (${f.length} bills)`);
 }
+function toggleMobSetMenu(btn){
+  var list=document.getElementById('mob-set-list');
+  if(!list)return;
+  var isOpen=list.classList.contains('open');
+  if(isOpen){list.classList.remove('open');btn.classList.remove('open');}
+  else{list.classList.add('open');btn.classList.add('open');}
+}
+function closeMobSetMenu(){
+  var list=document.getElementById('mob-set-list');
+  var btn=document.querySelector('.mob-set-accordion-btn');
+  if(list)list.classList.remove('open');
+  if(btn)btn.classList.remove('open');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 function openMobDrawer(){
   document.getElementById('mob-drawer').classList.add('open');
   document.getElementById('mob-nav-overlay').classList.add('open');
@@ -10933,6 +10981,12 @@ function showTab(name,btn){
   // sync mobile drawer highlight
   const mobBtn=document.getElementById('mob-nav-'+name);
   if(mobBtn)mobBtn.classList.add('act');
+  // Hide FABs on settings/reports/prescription/expenses — show only on billing-related tabs
+  const _fabNewbill=document.getElementById('mob-fab-newbill');
+  const _fabAppt=document.getElementById('mob-fab-appt');
+  const _fabHide=['settings','reports','prescription','expenses','patientfile'];
+  if(_fabNewbill) _fabNewbill.style.display=_fabHide.includes(name)?'none':'';
+  if(_fabAppt) _fabAppt.style.display=_fabHide.includes(name)?'none':'';
   if(name==='settings'){loadClinicForm();renderThemeGrid();loadBillingForm();loadEmailForm();loadFBForm();loadPFForm();loadApptMsgForm();setTimeout(refreshSetActivationCard,50);showSetSection('clinic',document.querySelector('.setnav button:first-child'));}
   if(name==='expenses')renderExp();
   if(name==='reports'){setTimeout(()=>{
@@ -11782,8 +11836,10 @@ function saveFBConfig(){
   CFG.firebase.syncToggles.realtime=_rtEl?_rtEl.checked:true;
   CFG.firebase.realtime=CFG.firebase.syncToggles.realtime;
 
-  // Reset cached auth token so next request re-authenticates with new credentials
-  _fbAuthToken=null; _fbAuthExpiry=0; _fbAuthUser=null;
+  // Reset cached auth token + rate-limit so next request re-authenticates with new credentials
+  _fbAuthToken=null; _fbAuthExpiry=0; _fbAuthUser=null; _fbAuthUid=null;
+  _fbSignInRetryAfter=0; _fbSignInPending=null;
+  try{sessionStorage.removeItem('_niva_fb_token');sessionStorage.removeItem('_niva_fb_exp');sessionStorage.removeItem('_niva_fb_uid');sessionStorage.removeItem('_niva_fb_email');}catch(e){}
   saveSettings(CFG);
   const m=document.getElementById('fb-saved');m.classList.add('show');setTimeout(()=>m.classList.remove('show'),2500);
   fbSetAuthStatus('info','🔄 Reconnecting with new settings…');
@@ -11855,6 +11911,10 @@ function fbFlashSynced(){
 function testFBConnection(){
   const _F={...DEF_FB,...(CFG.firebase||{})};
   if(!_F.dburl||!_F.apikey){setFBStatus('idle','Enter Firebase config above','#aaa');return;}
+  // Clear any rate-limit block so test can actually attempt a fresh auth
+  _fbSignInRetryAfter=0; _fbSignInPending=null;
+  _fbAuthToken=null; _fbAuthExpiry=0;
+  try{sessionStorage.removeItem('_niva_fb_token');sessionStorage.removeItem('_niva_fb_exp');}catch(e){}
   setFBStatus('loading','Testing connection…','#f39c12');
   fbGET('_ping')
     .then(()=>setFBStatus('connected','Connected to Niva Dental Firebase','#1b6e35'))
@@ -12302,7 +12362,7 @@ function fbPullAll(silent){
           if(idx===-1){appointments.unshift(ra);aAdded++;}
           else if((ra.createdAt||ra.updatedAt||0)>(appointments[idx].createdAt||appointments[idx].updatedAt||0)){appointments[idx]=ra;aUpdated++;}
         });
-        appointments=dedupById(appointments);
+        appointments=dedupById(dedupApptsByBill(appointments));
         svAppt();
         // Push any local appointments not yet in Firebase (e.g. saved offline or on another device)
         fbSyncMissingAppts(apptData);
@@ -12738,7 +12798,7 @@ function startFBListener(){
       // Only merge remote data in; null-keyed deletions handled above.
       // appointments = appointments.filter(a => remoteIds.has(a.id)); // ← REMOVED
       if(aChanged){
-        appointments=dedupById(appointments);svAppt();
+        appointments=dedupById(dedupApptsByBill(appointments));svAppt();
         renderDashAppts();
         if(typeof renderApptTabFull==='function')renderApptTabFull();
       }
