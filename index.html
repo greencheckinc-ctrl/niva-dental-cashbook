@@ -943,7 +943,7 @@ function showLockAfterSplash(){
     </div>
 
     <hr class="auth-divider"/>
-    <div style="font-size:10px;color:#bbb;text-align:center">Niva Dental &nbsp;|&nbsp; <strong style="color:#2ecc71">GreenCheck inc.</strong></div>
+    <div style="font-size:10px;color:#bbb;text-align:center" id="login-footer-clinic">Niva Dental &nbsp;|&nbsp; <strong style="color:#2ecc71">GreenCheck inc.</strong></div>
   </div>
 </div>
 
@@ -4478,6 +4478,14 @@ function updateTopbar(){
   if(mobDrawer)mobDrawer.innerHTML=CFG.clinic.name?('&#9670; '+CFG.clinic.name):'';
   const loginTitle=document.getElementById('login-clinic-title');
   if(loginTitle)loginTitle.textContent=CFG.clinic.name||'';
+  // Dynamic clinic name — update all branded UI elements
+  var _cn=CFG.clinic.name||'Niva Dental';
+  var _loginFooter=document.getElementById('login-footer-clinic');
+  if(_loginFooter)_loginFooter.innerHTML=_cn+'&nbsp;|&nbsp; <strong style="color:#2ecc71">GreenCheck inc.</strong>';
+  var _trialName=document.getElementById('trial-clinic-name');
+  if(_trialName)_trialName.textContent=_cn;
+  var _trialFooter=document.getElementById('trial-footer-clinic');
+  if(_trialFooter)_trialFooter.textContent=_cn;
 }
 (function(){
   function updateClock(){
@@ -11993,10 +12001,10 @@ function testFBConnection(){
   try{sessionStorage.removeItem('_niva_fb_token');sessionStorage.removeItem('_niva_fb_exp');}catch(e){}
   setFBStatus('loading','Testing connection…','#f39c12');
   fbGET('_ping')
-    .then(()=>setFBStatus('connected','Connected to Niva Dental Firebase','#1b6e35'))
+    .then(()=>setFBStatus('connected','Connected to '+(CFG.clinic&&CFG.clinic.name?CFG.clinic.name:'Firebase'),'#1b6e35'))
     .catch(e=>{
       if(e.message.includes('404')||e.message.includes('200')){
-        setFBStatus('connected','Connected to Niva Dental Firebase','#1b6e35');
+        setFBStatus('connected','Connected to '+(CFG.clinic&&CFG.clinic.name?CFG.clinic.name:'Firebase'),'#1b6e35');
       } else if(e.message.includes('401')||e.message.includes('403')||e.message.includes('Unauthorized')){
         setFBStatus('error','Connected – set DB Rules to allow read/write','#c0392b');
       } else {
@@ -13662,7 +13670,7 @@ function initFirebase(){
   // Auto sign-in and connect
   fbSignIn()
     .then(function(){
-      setFBStatus('connected','Connected to Niva Dental Firebase','#1b6e35');
+      setFBStatus('connected','Connected to '+((CFG.clinic&&CFG.clinic.name)?CFG.clinic.name:'Firebase'),'#1b6e35');
       const t=(CFG.firebase&&CFG.firebase.syncToggles)||{};
       if(t.pullonopen!==false){
         setTimeout(()=>fbPullAll(true), 1500);
@@ -14230,7 +14238,7 @@ async function doLogout(){
       :'⚠ Auto-save failed (file handle lost).\n\nLog out anyway?';
     if(!confirm(msg))return;
   } else {
-    if(!confirm('Log out of Niva Dental?\n\nYou will need to enter the password again to access.'))return;
+    if(!confirm('Log out of '+((typeof CFG!=='undefined'&&CFG.clinic&&CFG.clinic.name)?CFG.clinic.name:'Niva Dental')+'?\n\nYou will need to enter the password again to access.'))return;
   }
   localStorage.removeItem('niva_unlocked');
   document.getElementById('lockscreen').style.display='flex';
@@ -15837,7 +15845,7 @@ if (typeof svAppt === 'undefined') {
 
 // ── Override doLogout – lock screen disabled ──
 window.doLogout=async function(){
-  if(!confirm('Log out of Niva Dental?')) return;
+  if(!confirm('Log out of '+((typeof CFG!=='undefined'&&CFG.clinic&&CFG.clinic.name)?CFG.clinic.name:'Niva Dental')+'?')) return;
   location.reload();
 };
 
@@ -17853,7 +17861,7 @@ window.addEventListener('load', function(){
     ov.innerHTML=`
       <div style="background:#fff;border-radius:16px;padding:30px 24px;width:92%;max-width:380px;text-align:center;box-shadow:0 16px 60px rgba(0,0,0,.4)">
         <div style="width:60px;height:60px;border-radius:14px;background:var(--pri);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px">🦷</div>
-        <div style="font-size:18px;font-weight:700;color:var(--pri);margin-bottom:6px">Niva Dental</div>
+        <div style="font-size:18px;font-weight:700;color:var(--pri);margin-bottom:6px" id="trial-clinic-name">Niva Dental</div>
         ${expired
           ?`<div style="font-size:13px;color:#c0392b;font-weight:700;margin-bottom:6px">⛔ Trial Period Expired</div>
              <div style="font-size:12px;color:#666;margin-bottom:18px;line-height:1.6">Your 15-day free trial has ended.<br>Enter activation key to continue.</div>`
@@ -17872,7 +17880,7 @@ window.addEventListener('load', function(){
           <button id="_niva_reset_btn" style="width:100%;padding:8px;background:#f7f7f7;color:var(--pri);border:1px solid #b2dce8;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">📧 Request Key via Email</button>
           <div id="_niva_reset_msg" style="font-size:11px;min-height:16px;margin-top:6px;color:#888"></div>
         </div>
-        <div style="margin-top:12px;font-size:10px;color:#ccc">GreenCheck Inc. | Niva Dental v61</div>
+        <div style="margin-top:12px;font-size:10px;color:#ccc">GreenCheck Inc. | <span id="trial-footer-clinic">Niva Dental</span> v61</div>
       </div>`;
     return ov;
   }
