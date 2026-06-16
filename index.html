@@ -8884,8 +8884,8 @@ function renderDash(){
         +(linkedBill?'<button class="btn bo sm vb-action" data-action="viewbill" data-id="'+linkedBill.id+'" style="font-size:11px;padding:5px 8px;white-space:nowrap">📄 Bill</button>':'')
         +(!linkedBill?'<button class="btn bg sm" onclick="openNewBillForPatient(\''+a.patient.replace(/'/g,"\\'")+'\',\''+(a.phone||'').replace(/'/g,"\\'")+'\',\''+(a.doctor||'').replace(/'/g,"\\'")+'\',\''+(a.purpose||'').replace(/'/g,"\\'")+'\',\''+a.id+'\')" style="font-size:11px;padding:5px 8px;white-space:nowrap">➕ New Bill</button>':'')
         +(linkedBill&&linkedBill.status==='Pending'?'<button class="btn bg sm vb-action" data-action="collect" data-id="'+linkedBill.id+'" style="font-size:11px;padding:5px 8px;white-space:nowrap">✅ Collect</button>':'')
-        +'<button class="btn sm" onclick="deleteAppt(\''+a.id+'\')" style="font-size:11px;padding:5px 8px;white-space:nowrap;background:#fdf0ef;color:#c0392b;border:1px solid #f0b8b3;border-radius:6px;cursor:pointer">🗑️ Del Appt</button>'
         +'<button class="btn sm" onclick="openAddApptForPatient(\''+a.patient.replace(/'/g,"\\'")+'\',' +'\''+( a.phone||'').replace(/'/g,"\\'")+'\');" style="font-size:11px;padding:5px 8px;white-space:nowrap;background:#e8f0f8;color:#0d6b8a;border:1px solid #a8c8dc;border-radius:6px;cursor:pointer">📅 Add Appt</button>'
+        +'<button class="btn bd sm" onclick="deleteAppt(\''+a.id+'\')" style="font-size:11px;padding:5px 8px;white-space:nowrap">🗑️ Del</button>'
         +'</div></td>'
         +'</tr>';
     }).join('');
@@ -8903,12 +8903,11 @@ function renderDash(){
       <td style="font-weight:700;color:#1b6e35">${cur}${collected.toLocaleString('en-IN')}</td>
       <td style="font-weight:700;color:${pendAmt>0?'#e67e22':'#aaa'}">${pendAmt>0?cur+pendAmt.toLocaleString('en-IN'):'—'}</td>
       <td><span class="badge ${b.status==='Paid'?'bpd':'bpn'}">${b.status}</span></td>
-      <td style="min-width:110px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;width:108px">
-          <button class="btn bo sm vb-action" data-action="viewbill" data-id="${(b.id||'').trim()}" style="font-size:10px;padding:4px 2px;text-align:center;width:100%">📄 Bill</button>
-          <button class="btn bp-lt sm vb-action" data-action="editbill" data-id="${(b.id||'').trim()}" style="font-size:10px;padding:4px 2px;text-align:center;width:100%">✏️ Edit</button>
-          ${b.status==='Pending'?`<button class="btn bg sm vb-action" data-action="collect" data-id="${(b.id||'').trim()}" style="font-size:10px;padding:4px 2px;text-align:center;width:100%">✅ Collect</button>`:'<div></div>'}
-          <button class="btn bd sm vb-action" data-action="delete" data-id="${(b.id||'').trim()}" style="font-size:10px;padding:4px 2px;text-align:center;width:100%">🗑️ Del</button>
+      <td style="min-width:220px">
+        <div style="display:flex;gap:4px;flex-wrap:nowrap;align-items:center">
+          <button class="btn bo sm vb-action" data-action="viewbill" data-id="${(b.id||'').trim()}" style="font-size:11px;padding:5px 8px;white-space:nowrap">📄 Bill</button>
+          <button class="btn sm" onclick="openAddApptForPatient('${(b.patient||'').replace(/'/g,"\\'")}','${(b.phone||'').replace(/'/g,"\\'")}');" style="font-size:11px;padding:5px 8px;white-space:nowrap;background:#e8f0f8;color:#0d6b8a;border:1px solid #a8c8dc;border-radius:6px;cursor:pointer">📅 Add Appt</button>
+          <button class="btn bd sm vb-action" data-action="delete" data-id="${(b.id||'').trim()}" style="font-size:11px;padding:5px 8px;white-space:nowrap">🗑️ Del</button>
         </div>
       </td>
     </tr>`;}).join('')}${apptRows}</tbody></table></div>`;
