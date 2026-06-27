@@ -12,11 +12,44 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: nivadental-2026
-          channelId: live
-          force: true
+          node-version: 20
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Write service account key to file
+        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/firebase-key.json
+
+      - name: Deploy to Firebase Hosting (live channel)
+        id: deploy
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-key.json
+        run: |
+          set +e
+          OUTPUT=$(firebase deploy --only hosting --project nivadental-2026 --non-interactive 2>&1)
+          STATUS=$?
+          echo "$OUTPUT"
+
+          if [ $STATUS -eq 0 ]; then
+            echo "✅ Deploy succeeded normally."
+            exit 0
+          fi
+
+          # If firebase already released this version (duplicate/retry race),
+          # treat it as a successful deploy instead of failing the job.
+          if echo "$OUTPUT" | grep -q "is the current active version"; then
+            echo "⚠️ Firebase reported the version is already the active/live version."
+            echo "✅ This means the deploy already succeeded earlier — treating as success."
+            exit 0
+          fi
+
+          echo "❌ Deploy failed for a real reason."
+          exit $STATUS
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f /tmp/firebase-key.json
