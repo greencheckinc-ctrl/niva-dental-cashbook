@@ -2810,11 +2810,11 @@ function showLockAfterSplash(){
       <label style="font-size:12px;font-weight:600;color:#555">Doctor</label>
       <select id="pf-consent-doctor" onchange="handleDoctorDropdown('pf-consent-doctor')" style="padding:8px 10px;border:1px solid #cdd5dd;border-radius:6px;font-size:13px;background:#fff;color:#222;width:100%"></select>
       <label style="font-size:12px;font-weight:600;color:#555">Consent Text (editable)</label>
-      <textarea id="pf-consent-text" rows="8" style="padding:8px 10px;border:1px solid #cdd5dd;border-radius:6px;font-size:12px;resize:vertical;line-height:1.5"></textarea>
+      <textarea id="pf-consent-text" rows="10" style="padding:8px 10px;border:1px solid #cdd5dd;border-radius:6px;font-size:12px;resize:vertical;line-height:1.5;min-height:220px;flex-shrink:0"></textarea>
 
       <label style="font-size:12px;font-weight:600;color:#555">Patient Signature</label>
-      <div style="border:1.5px dashed #cdd5dd;border-radius:8px;background:#fafcfd;overflow:hidden">
-        <canvas id="pf-consent-sigpad" width="440" height="150" style="width:100%;height:150px;display:block;cursor:crosshair;touch-action:none"></canvas>
+      <div style="border:1.5px dashed #cdd5dd;border-radius:8px;background:#fafcfd;overflow:hidden;min-height:170px;flex-shrink:0">
+        <canvas id="pf-consent-sigpad" width="440" height="170" style="width:100%;height:170px;min-height:170px;display:block;cursor:crosshair;touch-action:none"></canvas>
       </div>
       <div style="font-size:10px;color:#999">Sign above with finger / stylus / mouse.</div>
       <button class="btn bo sm" onclick="pfConsentClearSig()">🧹 Clear Signature</button>
@@ -11604,8 +11604,8 @@ function pfPrintConsentById(id){
   .row{display:flex;gap:24px;margin-bottom:10px;flex-wrap:wrap;font-size:12px}
   .row b{color:#333}
   .txt{background:#f7fafd;border:1px solid #e0e8ee;border-radius:8px;padding:14px;margin:14px 0;white-space:pre-wrap}
-  .sigbox{margin-top:26px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px}
-  .sigline{border-top:1px solid #333;padding-top:4px;font-size:11px;text-align:center;width:220px}
+  .sigbox{margin-top:26px;display:flex;justify-content:center;align-items:flex-end}
+  .sigline{border-top:1px solid #333;padding-top:6px;font-size:12px;text-align:center;width:340px;min-height:100px;display:flex;flex-direction:column;justify-content:flex-end}
   @media print{@page{margin:0;size:A4 portrait}body{padding:16mm 14mm}}
   </style></head><body>
   <div class="hdr"><div class="cname">${C.name||''}</div><div class="caddr">${C.addr||''}${C.phone?' | '+C.phone:''}</div></div>
@@ -11614,8 +11614,7 @@ function pfPrintConsentById(id){
   <div class="row"><span><b>${L.procedure}:</b> ${c.procedure}</span>${c.doctor?`<span><b>${L.doctor}:</b> Dr. ${c.doctor}</span>`:''}</div>
   <div class="txt">${(c.text||'').replace(/</g,'&lt;')}</div>
   <div class="sigbox">
-    <div class="sigline">${c.sigData?`<img src="${c.sigData}" style="max-width:200px;max-height:70px;display:block;margin:0 auto 4px"/>`:''}${L.sig}</div>
-    <div class="sigline" style="padding-top:34px">${L.staff}</div>
+    <div class="sigline">${c.sigData?`<img src="${c.sigData}" style="max-width:300px;max-height:110px;display:block;margin:0 auto 4px"/>`:''}${L.sig}</div>
   </div>
   <script>window.onload=()=>window.print();<\/script></body></html>`;
   openPrintWindow(html);
@@ -15382,6 +15381,19 @@ function startFBListener(){
           var bankPanel = document.getElementById('set-banking');
           if(bankPanel && bankPanel.classList.contains('act') && typeof window.loadBankingForm==='function') window.loadBankingForm();
         }
+        // Doctors list -- previously not handled here at all, so live updates
+        // from another device (add/edit/delete doctor) never showed up until
+        // a manual "Pull All" + reload. Fixed to match fbPullAll's handling.
+        if(ciSettings.doctors&&Array.isArray(ciSettings.doctors)){
+          try{
+            doctorsList=ciSettings.doctors;
+            svDoctors();
+            var drPanel=document.getElementById('set-doctors');
+            if(drPanel&&drPanel.classList.contains('act')&&typeof drRender==='function') drRender();
+            if(typeof populateAllDoctorDropdowns==='function') populateAllDoctorDropdowns();
+            if(typeof populateApptDoctorDropdown==='function') populateApptDoctorDropdown();
+          }catch(e){ console.warn('[Doctors] realtime merge failed:', e); }
+        }
         CFG._clinicUpdatedAt=settingsUpdatedAt;
         saveSettings(CFG);updateTopbar();
       }
@@ -17823,7 +17835,15 @@ function showApptSub(name, btn) {
 
 function renderApptTabFull() {
   renderApptStats();
-  renderApptToday();
+  // Refresh whichever sub-tab (Today / Upcoming / All) is currently visible so
+  // realtime (Firebase/Supabase) updates actually show up regardless of which
+  // sub-view the user is looking at -- previously this only refreshed "Today",
+  // so live updates silently didn't appear while viewing Upcoming/All.
+  const cur = _apptSubCurrent || 'today';
+  if (cur === 'upcoming') renderApptTab();
+  else if (cur === 'all') renderApptAll();
+  else if (cur === 'add') { if(typeof renderApptRecent==='function') renderApptRecent(); renderApptToday(); }
+  else renderApptToday();
 }
 
 function renderApptStats() {
@@ -22974,29 +22994,36 @@ function openQuickAddDoctorModal(returnSelectId){
   document.getElementById('qdr-name').value = '';
   document.getElementById('qdr-phone').value = '';
   document.getElementById('qdr-spec').value = '';
-  document.getElementById('quick-add-dr-modal').classList.add('open');
+  openM('quick-add-dr-modal');
   setTimeout(function(){ document.getElementById('qdr-name').focus(); }, 100);
 }
 function closeQuickAddDoctorModal(){
-  document.getElementById('quick-add-dr-modal').classList.remove('open');
+  closeM('quick-add-dr-modal');
 }
 function saveQuickAddDoctor(){
-  const name = document.getElementById('qdr-name').value.trim();
-  const phone = document.getElementById('qdr-phone').value.replace(/\D/g,'').slice(-10);
-  const spec = document.getElementById('qdr-spec').value.trim();
-  if(!name){ alert('Doctor name જરૂરી છે.'); return; }
-  if(!phone){ alert('Mobile number જરૂરી છે.'); return; }
-  const newDr = {id:drGenId(), name:name, phone:phone, spec:spec, days:''};
-  doctorsList.push(newDr);
-  svDoctors();
-  drRender();
-  // Populate all dropdowns and select the new doctor in the originating select
-  populateAllDoctorDropdowns();
-  populateApptDoctorDropdown();
-  if(_quickAddDrReturnSelectId){
-    populateAllDoctorDropdowns(_quickAddDrReturnSelectId, name);
+  try{
+    const name = document.getElementById('qdr-name').value.trim();
+    const phone = document.getElementById('qdr-phone').value.replace(/\D/g,'').slice(-10);
+    const spec = document.getElementById('qdr-spec').value.trim();
+    if(!name){ alert('Doctor name જરૂરી છે.'); return; }
+    if(!phone){ alert('Mobile number જરૂરી છે.'); return; }
+    const newDr = {id:drGenId(), name:name, phone:phone, spec:spec, days:''};
+    doctorsList.push(newDr);
+    svDoctors();
+    try{ drRender(); }catch(e){ console.warn('[QuickAddDr] drRender failed:', e); }
+    // Populate all dropdowns and select the new doctor in the originating select
+    try{ populateAllDoctorDropdowns(); }catch(e){ console.warn('[QuickAddDr] populateAllDoctorDropdowns failed:', e); }
+    try{ populateApptDoctorDropdown(); }catch(e){ console.warn('[QuickAddDr] populateApptDoctorDropdown failed:', e); }
+    if(_quickAddDrReturnSelectId){
+      try{ populateAllDoctorDropdowns(_quickAddDrReturnSelectId, name); }catch(e){ console.warn('[QuickAddDr] target dropdown populate failed:', e); }
+    }
+    try{ if(typeof fbPushDoctors==='function') fbPushDoctors(); }catch(e){ console.warn('[QuickAddDr] fbPushDoctors failed:', e); }
+  }catch(err){
+    console.error('[QuickAddDr] saveQuickAddDoctor error:', err);
+    alert('Doctor save karva ma error aavi. Fari try karo.');
+  }finally{
+    closeQuickAddDoctorModal();
   }
-  closeQuickAddDoctorModal();
 }
 
 //  Populate appointment modal doctor dropdown 
@@ -24430,6 +24457,12 @@ console.log('[NivaSB] Supabase dual sync loaded');
         // Re-render UI
         if(typeof renderAll==='function') renderAll();
         if(typeof renderDash==='function') renderDash();
+        if(localKey==='appointments'){
+          try{ if(typeof renderApptTabFull==='function') renderApptTabFull(); }catch(e){ console.warn('[NivaSB] appt render failed:', e); }
+        }
+        if(localKey==='expenses'){
+          try{ if(typeof renderExp==='function') renderExp(); }catch(e){ console.warn('[NivaSB] expense render failed:', e); }
+        }
         if(localKey==='stock'){
           try{ var stockTab=document.getElementById('tab-stock'); if(stockTab&&stockTab.classList.contains('act')&&typeof renderStock==='function') renderStock(); }catch(e){}
         }
