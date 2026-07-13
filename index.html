@@ -25,7 +25,7 @@ body{font-family:Arial,sans-serif;background:#f0f4f7;color:#222;font-size:13px}
 .topbar p{color:var(--pri-text);font-size:11px;margin-top:2px}
 .topbar-r{color:var(--pri-text);font-size:13px;text-align:right;line-height:1.6}
 .nav{display:flex;background:#f0f4f7;border-bottom:2px solid #e0e8ee;padding:6px 8px;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}
-.nav button{flex:1 1 0;padding:8px 6px;white-space:nowrap;border:none;background:#fff;font-size:11px;font-weight:700;color:#000;cursor:pointer;border-radius:8px;border:1.5px solid #e0e8ee;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.06);text-align:center;overflow:hidden;text-overflow:ellipsis}
+.nav button{flex:1 0 auto;padding:8px 10px;white-space:nowrap;border:none;background:#fff;font-size:11px;font-weight:700;color:#000;cursor:pointer;border-radius:8px;border:1.5px solid #e0e8ee;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .nav button.act{color:#fff !important;background:var(--pri);border-color:var(--pri);box-shadow:0 2px 8px rgba(13,107,138,.25)}
 #nav-dashboard.act{color:#fff !important}
 #nav-settings.act{color:#fff !important}
@@ -887,6 +887,7 @@ function showLockAfterSplash(){
     if(pinMode) pinMode.style.display = 'block';
     if(pwMode)  pwMode.style.display  = 'none';
     if(ls) ls.style.display = 'flex';
+    if(typeof window._nivaShowBioRowIfEnabled === 'function') window._nivaShowBioRowIfEnabled();
     // After PIN success, _checkLoginAfterUnlock will show login if also enabled
 
   } else if(loginEnabled){
@@ -915,16 +916,6 @@ function showLockAfterSplash(){
 .pin-key.del{font-size:16px;color:#888}
 .pin-key.wide{grid-column:span 2}
 @media(max-width:480px){#lockscreen > div{padding:28px 18px}.pin-key{padding:12px 0}}
-@media(min-width:900px){
-  #lockscreen > div{max-width:420px;padding:46px 40px}
-  #lock-logo-img{height:88px;width:88px}
-  #lock-logo-tooth{font-size:58px}
-  #lock-clinic-name{font-size:23px}
-  .pin-dots{gap:16px;margin:22px 0 12px}
-  .pin-dot{width:17px;height:17px}
-  .pin-pad{max-width:300px;gap:14px}
-  .pin-key{font-size:24px;padding:18px 0}
-}
 </style>
 <div id="lockscreen" style="position:fixed;inset:0;background:linear-gradient(135deg,var(--pri) 0%,var(--pri-dark) 100%);z-index:9999;display:none;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:16px;padding:36px 28px;width:94%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center">
@@ -959,6 +950,14 @@ function showLockAfterSplash(){
         <button class="pin-key del" onclick="pinDel()">⌫</button>
       </div>
       <div id="lock-attempts" style="margin-top:8px;font-size:11px;color:#c0392b;display:none"></div>
+
+      <!-- Fingerprint / Face unlock -->
+      <div id="lock-bio-row" style="display:none;margin-top:14px">
+        <div style="display:flex;align-items:center;text-align:left;gap:8px;margin:10px 0"><hr style="flex:1;border:none;border-top:1px solid #eee"/><span style="font-size:10px;color:#bbb">OR</span><hr style="flex:1;border:none;border-top:1px solid #eee"/></div>
+        <button type="button" onclick="tryBiometricUnlock()" style="width:100%;padding:11px;border:1.5px solid var(--pri-text);background:var(--pri-light);color:var(--pri);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:Arial,sans-serif">
+          <span id="lock-bio-icon" style="font-size:18px">&#128272;</span><span id="lock-bio-label">Unlock with Fingerprint / Face</span>
+        </button>
+      </div>
 
     </div>
     <!-- Legacy password mode (fallback if no PIN set) -->
@@ -2971,1486 +2970,81 @@ function showLockAfterSplash(){
 
       <!-- CLINIC INFO -->
       <div id="set-clinic" class="set-section act">
-        <div class="set-title">&#127973; Clinic Information</div>
-        <div class="set-sub">This information appears on all bills and receipts.</div>
-
-        <div class="sec">Clinic logo</div>
-        <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px">
-          <div style="width:100px;height:100px;border:2px dashed #cdd5dd;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f8fafc;overflow:hidden;flex-shrink:0">
-            <img id="logo-preview" src="" alt="" style="max-width:100%;max-height:100%;object-fit:contain;display:none"/>
-            <span id="logo-placeholder" style="font-size:28px;color:#ccc">&#127973;</span>
-          </div>
-          <div style="flex:1;min-width:200px">
-            <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:6px">UPLOAD LOGO IMAGE</label>
-            <label class="btn bo" style="cursor:pointer;display:inline-block;padding:7px 14px;font-size:12px;font-weight:700;margin-bottom:6px">&#128247; Choose Image <input type="file" id="logo-upload" accept="image/*" style="display:none" onchange="handleLogoUpload(this)"/></label>
-            <div style="font-size:11px;color:#aaa;line-height:1.6">Supports JPG, PNG, GIF, SVG<br>Recommended: square image, max 200KB<br>Shown on bills, receipts &amp; topbar</div>
-            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-              <button class="btn bo sm" onclick="removeLogoConfirm()">&#128465; Remove Logo</button>
-              <button class="btn bo sm" onclick="resizeLogo()">&#8621; Resize to fit</button>
-            </div>
-          </div>
-        </div>
-        <div style="margin-bottom:4px">
-          <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:5px">LOGO POSITION ON BILL</label>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="logo-pos" id="lp-center" value="center" checked/> Center</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="logo-pos" id="lp-left" value="left"/> Left</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="logo-pos" id="lp-right" value="right"/> Right</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="logo-pos" id="lp-only" value="only"/> Logo only (no text name)</label>
-          </div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;margin-top:8px">
-          <label style="font-size:11px;font-weight:700;color:#666">LOGO SIZE ON BILL</label>
-          <input type="range" id="logo-size" min="40" max="160" value="80" style="flex:1" oninput="document.getElementById('logo-size-val').textContent=this.value+'px'"/>
-          <span id="logo-size-val" style="font-size:12px;font-weight:700;color:#555;min-width:40px">80px</span>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
-          <label style="font-size:11px;font-weight:700;color:#666;white-space:nowrap">TOPBAR LOGO SIZE</label>
-          <input type="range" id="logo-opacity" min="30" max="120" value="70" style="flex:1" oninput="document.getElementById('logo-opacity-val').textContent=this.value+'px';var l=document.getElementById('tb-logo');if(l){l.style.height=this.value+'px';l.style.width='auto';}"/>
-          <span id="logo-opacity-val" style="font-size:12px;font-weight:700;color:#555;min-width:40px">70px</span>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
-          <label style="font-size:11px;font-weight:700;color:#666;white-space:nowrap">TOPBAR LOGO BG OPACITY</label>
-          <input type="range" id="logo-bg-opacity" min="0" max="100" value="100" style="flex:1" oninput="document.getElementById('logo-bg-opacity-val').textContent=this.value+'%';applyLogoBgOpacity(this.value);"/>
-          <span id="logo-bg-opacity-val" style="font-size:12px;font-weight:700;color:#555;min-width:40px">100%</span>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
-          <label style="font-size:11px;font-weight:700;color:#666;white-space:nowrap">LOGO CORNER RADIUS</label>
-          <input type="range" id="logo-radius" min="0" max="50" value="10" style="flex:1" oninput="document.getElementById('logo-radius-val').textContent=this.value+'px';var l=document.getElementById('tb-logo');if(l)l.style.borderRadius=this.value+'px';"/>
-          <span id="logo-radius-val" style="font-size:12px;font-weight:700;color:#555;min-width:40px">10px</span>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
-          <label style="font-size:11px;font-weight:700;color:#666;white-space:nowrap">PRINT LOGO SIZE</label>
-          <input type="range" id="logo-print-size" min="30" max="120" value="50" style="flex:1" oninput="document.getElementById('logo-print-size-val').textContent=this.value+'px';"/>
-          <span id="logo-print-size-val" style="font-size:12px;font-weight:700;color:#555;min-width:40px">50px</span>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
-          <label style="font-size:11px;font-weight:700;color:#666;white-space:nowrap">LOGO BACKGROUND</label>
-          <label style="font-size:12px;cursor:pointer"><input type="radio" name="logo-bg" value="transparent" checked onchange="applyLogoBg(this.value)"> Transparent</label>
-          <label style="font-size:12px;cursor:pointer"><input type="radio" name="logo-bg" value="white" onchange="applyLogoBg(this.value)"> White</label>
-          <label style="font-size:12px;cursor:pointer"><input type="radio" name="logo-bg" value="custom" onchange="applyLogoBg(this.value)"> Custom</label>
-          <input type="color" id="logo-bg-color" value="#ffffff" style="width:32px;height:28px;border:none;border-radius:6px;cursor:pointer;padding:2px" oninput="if(document.querySelector('input[name=logo-bg]:checked').value==='custom')applyLogoBg('custom')"/>
-        </div>
-
-        <div class="sec">Clinic details</div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>Clinic Name</label><input id="s-name" placeholder="e.g. Niva Dental"/><div class="hint">Shown as heading on all bills</div></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:2"><label>Full Address</label><textarea id="s-addr" placeholder="e.g. Shop 5, Near XYZ Mall, Bhuyangdev, Ahmedabad"></textarea></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>Phone / Mobile</label><input id="s-phone" placeholder="079-XXXXXXXX or 9XXXXXXXXX"/></div>
-          <div class="set-group" style="flex:1"><label>Email (optional)</label><input id="s-email" placeholder="clinic@example.com"/></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>Default Doctor Name</label><input id="s-doctor" placeholder="e.g. Dr. Rakesh N Patel"/></div>
-          <div class="set-group" style="flex:1"><label>Registration / License No.</label><input id="s-reg" placeholder="e.g. MCI-XXXXX"/></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>Bill Footer / Tagline</label><input id="s-tag" placeholder="e.g. Your smile, our care"/></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>GST Number (optional)</label><input id="s-gst" placeholder="e.g. 24AAAAA0000A1Z5"/></div>
-          <div class="set-group" style="flex:1"><label>Website (optional)</label><input id="s-web" placeholder="www.yourdental.com"/></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label> Google Review Link <span style="font-weight:400;color:#aaa">(optional)</span></label><input id="s-reviewurl" placeholder="https://g.page/r/XXXXXX/review"/><div class="hint">Paste your Google Business "Write a Review" link. Patients will get this via WhatsApp after billing.</div></div>
-        </div>
-        <div class="save-bar">
-          <button class="btn bg" onclick="saveClinic()">&#10003; Save Clinic Info</button>
-          <span class="saved-msg" id="clinic-saved">&#10003; Saved successfully!</span>
-        </div>
-        <!-- Mobile sticky save -->
-        <div style="display:none" id="mob-clinic-save-bar" class="mob-sticky-save">
-          <button class="btn bg" style="flex:1;padding:14px;font-size:15px" onclick="saveClinic()">&#10003; Save Clinic Info</button>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- THEME -->
       <div id="set-theme" class="set-section">
-        <div class="set-title">&#127912; Theme &amp; Colors</div>
-        <div class="set-sub">Choose a preset theme or set a custom primary color.</div>
-        <div class="sec">Preset themes</div>
-        <div class="theme-grid" id="theme-grid"></div>
-        <div class="sec" style="margin-top:20px">Custom color</div>
-        <div class="color-row">
-          <input type="color" id="custom-color" value="var(--pri)" oninput="previewCustom(this.value)"/>
-          <span class="clabel">Primary color<br><span style="font-size:11px;color:#aaa;font-weight:400">Used for topbar, buttons, highlights</span></span>
-          <span class="cval" id="custom-hex">var(--pri)</span>
-        </div>
-        <div class="save-bar">
-          <button class="btn bg" style="flex:1" onclick="saveTheme()">&#10003; Apply Theme</button>
-          <button class="btn bo" style="flex:1" onclick="resetTheme()">Reset Default</button>
-          <span class="saved-msg" id="theme-saved">&#10003; Theme applied!</span>
-        </div>
-        <div class="sec" style="margin-top:20px">Auto from Logo</div>
-        <div style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:12px 14px">
-          <div style="font-size:12px;color:#555;margin-bottom:10px">Automatically extract the dominant colour from your clinic logo and set it as theme.</div>
-          <!-- Logo Preview -->
-          <div id="auto-logo-preview-wrap" style="display:none;margin-bottom:10px;text-align:center">
-            <img id="auto-logo-preview-img" src="" alt="Clinic Logo" style="max-height:72px;max-width:100%;object-fit:contain;border-radius:8px;border:1px solid #e0e8ee;background:#fff;padding:4px"/>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <div id="logo-color-preview" style="width:36px;height:36px;border-radius:6px;border:2px solid #e0e8ee;background:#eee;flex-shrink:0"></div>
-            <div>
-              <div id="logo-color-hex" style="font-size:13px;font-weight:700;color:#333">--</div>
-              <div style="font-size:11px;color:#aaa">Extracted colour</div>
-            </div>
-            <button class="btn bo" onclick="extractLogoColor()" style="margin-left:auto">&#127752; Extract from Logo</button>
-            <button class="btn bg" id="apply-logo-color-btn" onclick="applyLogoColor()" style="display:none">&#10003; Apply this colour</button>
-          </div>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- BILLING OPTIONS -->
       <div id="set-billing" class="set-section">
-        <div class="set-title">&#128196; Billing Options</div>
-        <div class="set-sub">Configure how bills and receipts are generated.</div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Show GST on bill</div><div class="tsub">Add GST number to bill header</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-gst"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Show doctor name on bill</div><div class="tsub">Display treating doctor on receipt</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-doctor" checked/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Show diagnosis on bill</div><div class="tsub">Print diagnosis / treatment notes</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-diag" checked/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Auto-print after saving bill</div><div class="tsub">Open print dialog immediately on save</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-autoprint"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Show discount line on bill</div><div class="tsub">Show discount row even if 0</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-disc" checked/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="row" style="margin-top:16px">
-          <div class="set-group" style="flex:1"><label>Bill prefix</label><input id="s-prefix" value="RCP" placeholder="RCP"/><div class="hint">Bills will be numbered RCP-001, RCP-002...</div></div>
-          <div class="set-group" style="flex:1"><label>Next bill starting number</label><input id="s-nextnum" type="number" min="1" placeholder="Auto" title="Leave blank to auto-count from existing bills"/><div class="hint">Next bill will use this number. Leave blank to auto.</div></div>
-          <div class="set-group" style="flex:1"><label>Currency symbol</label><input id="s-currency" value="" placeholder=""/></div>
-        </div>
-
-        <!-- RENUMBER ALL EXISTING BILLS -->
-        <div style="margin-top:16px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:14px">
-          <div style="font-size:13px;font-weight:700;color:#b45309;margin-bottom:4px">&#9998; Rename / Renumber All Existing Bills</div>
-          <div style="font-size:12px;color:#666;margin-bottom:12px;line-height:1.6">Change the prefix and/or starting number for <strong>all</strong> existing bill IDs. Bills will be sorted by date and renumbered in order.<br><span style="color:#c0392b;font-weight:700">! This updates all existing bill IDs -- cannot be undone.</span></div>
-          <div class="row" style="margin-bottom:10px">
-            <div class="set-group" style="flex:1"><label>New prefix for all bills</label><input id="s-renumber-prefix" placeholder="e.g. RCP or BILL"/></div>
-            <div class="set-group" style="flex:1"><label>Starting number</label><input id="s-renumber-start" type="number" min="1" value="1" placeholder="1"/></div>
-            <div class="set-group" style="flex:1"><label>Pad digits (e.g. 3 -> 001)</label>
-              <select id="s-renumber-pad">
-                <option value="3">3 digits -- 001, 002...</option>
-                <option value="4">4 digits -- 0001, 0002...</option>
-                <option value="2">2 digits -- 01, 02...</option>
-                <option value="1">No padding -- 1, 2...</option>
-              </select>
-            </div>
-          </div>
-          <div id="renumber-preview" style="font-size:12px;color:#555;background:#fffbf0;border:1px solid #f0e0a0;border-radius:6px;padding:8px 12px;margin-bottom:10px;display:none"></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn bo" onclick="previewRenumber()">&#128269; Preview</button>
-            <button class="btn bora" onclick="doRenumberBills()">&#9998; Apply to All Bills</button>
-          </div>
-        </div>
-
-        <!-- RENUMBER ALL EXISTING EXPENSES -->
-        <div style="margin-top:16px;background:#f0fff4;border:1px solid #a8d5b8;border-radius:8px;padding:14px">
-          <div style="font-size:13px;font-weight:700;color:#1b6e35;margin-bottom:4px">&#128184; Rename / Renumber All Existing Expenses</div>
-          <div style="font-size:12px;color:#666;margin-bottom:12px;line-height:1.6">Change the prefix and/or starting number for <strong>all</strong> existing expense IDs. Expenses will be sorted by date and renumbered in order.<br><span style="color:#c0392b;font-weight:700">! This updates all existing expense IDs -- cannot be undone.</span></div>
-          <div class="row" style="margin-bottom:10px">
-            <div class="set-group" style="flex:1"><label>New prefix for all expenses</label><input id="s-exp-renum-prefix" placeholder="e.g. EXP or COST"/></div>
-            <div class="set-group" style="flex:1"><label>Starting number</label><input id="s-exp-renum-start" type="number" min="1" value="1" placeholder="1"/></div>
-            <div class="set-group" style="flex:1"><label>Pad digits (e.g. 3 -> 001)</label>
-              <select id="s-exp-renum-pad">
-                <option value="3">3 digits -- 001, 002...</option>
-                <option value="4">4 digits -- 0001, 0002...</option>
-                <option value="2">2 digits -- 01, 02...</option>
-                <option value="1">No padding -- 1, 2...</option>
-              </select>
-            </div>
-          </div>
-          <div id="exp-renumber-preview" style="font-size:12px;color:#555;background:#f0fff4;border:1px solid #a8d5b8;border-radius:6px;padding:8px 12px;margin-bottom:10px;display:none"></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn bo" onclick="previewRenumberExp()">&#128269; Preview</button>
-            <button class="btn bg" onclick="doRenumberExp()">&#9998; Apply to All Expenses</button>
-          </div>
-        </div>
-
-        <div class="save-bar">
-          <button class="btn bg" onclick="saveBillingOpts()">&#10003; Save Options</button>
-          <span class="saved-msg" id="billing-saved">&#10003; Saved!</span>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- DATA & BACKUP -->
       <div id="set-data" class="set-section">
-        <div class="set-title">&#128190; Data &amp; Backup</div>
-        <div class="set-sub">Export your data or restore from a backup file.</div>
-
-        <!-- AUTO-SAVE FILE PATH -->
-        <div class="sec">&#128204; Auto-Save File (Local Storage)</div>
-        <div style="background:#f0f8ff;border:1px solid #b8d8f0;border-radius:8px;padding:14px;margin-bottom:14px">
-          <div style="font-size:13px;font-weight:700;color:var(--pri);margin-bottom:5px">&#128196; Auto-save on Logout</div>
-          <div style="font-size:12px;color:#555;margin-bottom:12px">Choose a file on your device. Every time you log out, all data (bills + expenses + settings) will be automatically saved to that file -- overwriting it each time. No duplicate files.</div>
-          <div class="dir-box" style="margin-bottom:10px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-              <span style="font-size:16px">&#128196;</span>
-              <div style="flex:1">
-                <div class="dir-path" id="autosave-path-display" style="color:var(--pri);font-weight:700;font-size:12px">No file selected</div>
-                <div class="dir-info" id="autosave-path-sub" style="font-size:11px;color:#aaa;margin-top:2px">Click "Choose File" to pick a save location</div>
-              </div>
-              <span id="autosave-status-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;display:inline-block;flex-shrink:0" title="Not configured"></span>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            <button class="btn bp" onclick="chooseAutoSaveFile()">&#128193; Choose File</button>
-            <button class="btn bg" onclick="saveNow()" id="save-now-btn" style="display:none">&#128190; Save Now</button>
-            <button class="btn bo" onclick="clearAutoSavePath()" id="clear-path-btn" style="display:none">&#10005; Remove</button>
-          </div>
-          <div style="margin-top:10px">
-            <div class="toggle-row" style="padding:8px 0;border:none">
-              <div><div class="tlabel" style="font-size:12px">Auto-save on logout</div><div class="tsub">Automatically overwrite the file when you log out</div></div>
-              <label class="toggle"><input type="checkbox" id="tog-autosave-logout" onchange="saveAutoSaveSettings()"/><span class="toggle-slider"></span></label>
-            </div>
-            <div class="toggle-row" style="padding:8px 0;border:none;border-top:1px solid #e8edf0;margin-top:4px">
-              <div><div class="tlabel" style="font-size:12px">&#128204; Auto-save on close / background</div><div class="tsub">Silently save when app is closed, tab hidden, or you navigate away</div></div>
-              <label class="toggle"><input type="checkbox" id="tog-autosave-exit" onchange="saveAutoSaveSettings()"/><span class="toggle-slider"></span></label>
-            </div>
-          </div>
-          <div id="autosave-last-saved" style="font-size:11px;color:#aaa;margin-top:6px;display:none">&#10003; Last saved: <span id="autosave-last-time">--</span></div>
-          <div id="autosave-fs-warning" style="display:none;margin-top:10px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:9px 12px;font-size:11px;color:#7a5c00">
-            &#9888; Your browser does not support the File System Access API. Use <strong>Chrome</strong> or <strong>Edge</strong> for this feature. You can still use manual export below.
-          </div>
-        </div>
-
-        <!-- MANUAL EXPORT -->
-        <div class="sec">Save / Export</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px">
-          <button class="btn bp" onclick="exportJSON()">&#128229; Export All Data (JSON)</button>
-          <button class="btn bg" onclick="exportCSV()">&#128229; Export Bills (CSV)</button>
-          <button class="btn bora" onclick="exportHTMLReport()">&#128229; Save Full Report (HTML)</button>
-        </div>
-
-        <!-- IMPORT -->
-        <div class="sec">Import / Restore</div>
-        <div style="margin-bottom:14px">
-          <label class="btn bo" style="cursor:pointer;display:inline-block;padding:7px 14px;font-size:12px;font-weight:700">&#128229; Import Backup (JSON) <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(this)"/></label>
-          <span style="font-size:11px;color:#aaa;margin-left:10px">Select a previously exported .json file</span>
-        </div>
-
-        <!-- DANGER -->
-        <div class="sec">Danger zone</div>
-        <div style="background:#fff8f8;border:1px solid #fcc;border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:12px">
-
-          <!-- Option 1: Clear Data Only -->
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:12px;border-bottom:1px solid #fdd">
-            <div>
-              <div style="font-size:13px;font-weight:700;color:#c0392b">&#128203; Clear All Data Only</div>
-              <div style="font-size:11px;color:#aaa;margin-top:2px">Deletes bills, expenses, appointments and patient files. Keeps clinic settings, Firebase &amp; server config intact.</div>
-            </div>
-            <button class="btn bd sm" onclick="clearDataOnly()">&#128465; Clear Data</button>
-          </div>
-
-          <!-- Option 2: Clear Data + Firebase -->
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:12px;border-bottom:1px solid #fdd">
-            <div>
-              <div style="font-size:13px;font-weight:700;color:#c0392b">&#9889; Clear Data + Firebase Config</div>
-              <div style="font-size:11px;color:#aaa;margin-top:2px">Deletes bills, expenses, appointments, patient files and removes saved Firebase / Live Sync settings. Local Server config kept.</div>
-            </div>
-            <button class="btn bd sm" onclick="clearDataAndFirebase()">&#128465; Clear + Firebase</button>
-          </div>
-
-          <!-- Option 3: Clear Data + Local Server -->
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:12px;border-bottom:1px solid #fdd">
-            <div>
-              <div style="font-size:13px;font-weight:700;color:#c0392b">&#128257; Clear Data + Local Server Config</div>
-              <div style="font-size:11px;color:#aaa;margin-top:2px">Deletes bills, expenses, appointments and patient files. Firebase config kept.</div>
-            </div>
-            <button class="btn bd sm" onclick="clearDataAndLocalServer()">&#128465; Clear Bills &amp; Expenses</button>
-          </div>
-
-          <!-- Option 4: Clear Everything -->
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-            <div>
-              <div style="font-size:13px;font-weight:700;color:#7b0000">&#128465; Clear Everything</div>
-              <div style="font-size:11px;color:#aaa;margin-top:2px">Permanently deletes all bills, expenses, appointments, patient files, Firebase config, Local Server config and all settings. Cannot be undone.</div>
-            </div>
-            <button class="btn bd sm" style="background:#7b0000" onclick="clearAllData()">&#128465; Clear Everything</button>
-          </div>
-
-        </div>
-        <div class="save-bar" style="margin-top:12px">
-          <span style="font-size:12px;color:#888">Total bills stored: <strong id="total-bills-count">0</strong> &nbsp;|&nbsp; Storage used: <strong id="storage-used">--</strong></span>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- EMAIL SYNC -->
       <div id="set-email" class="set-section">
-        <div style="margin-bottom:14px">
-          <button class="btn bo sm" onclick="showSetSection('clinic',null)" style="font-size:12px;padding:6px 14px">&#8592; Back to Settings</button>
-        </div>
-        <div class="set-title">&#128140; Email Sync &amp; Backup</div>
-        <div class="set-sub">Send your daily cash book and backup directly to your email. Uses your device's default mail app (no password stored).</div>
-
-        <div class="sec">Your email account</div>
-        <div class="row">
-          <div class="set-group" style="flex:2"><label>Your Email Address</label><input id="s-myemail" placeholder="yourname@gmail.com or yourname@outlook.com"/><div class="hint">Backup files will be sent to this address</div></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>CC Email (optional)</label><input id="s-ccemail" placeholder="accountant@example.com"/></div>
-          <div class="set-group" style="flex:1"><label>Your Name / Clinic</label><input id="s-sendername" placeholder="Niva Dental"/></div>
-        </div>
-        <div class="save-bar" style="margin-bottom:18px">
-          <button class="btn bg" onclick="saveEmailConfig()">&#10003; Save Email Settings</button>
-          <span class="saved-msg" id="email-cfg-saved">&#10003; Saved!</span>
-        </div>
-
-        <div class="sec">Send daily report</div>
-        <div style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:14px;margin-bottom:14px">
-          <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:6px">&#128197; Today's Cash Book Report</div>
-          <div style="font-size:12px;color:#888;margin-bottom:12px">Sends today's bill summary as an HTML report attached to an email.</div>
-          <div style="display:flex;gap:9px;flex-wrap:wrap">
-            <button class="btn bp" onclick="emailTodayReport()">&#128140; Send Today's Report</button>
-            <button class="btn bg" onclick="emailAllData()">&#128140; Send Full Backup (JSON)</button>
-          </div>
-        </div>
-
-        <div class="sec">Auto-sync schedule</div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Auto-email daily report</div><div class="tsub">Remind to send report each day when app is opened</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-autoemail"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Send backup on every export</div><div class="tsub">Also email a copy whenever you export data</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-exportemail"/><span class="toggle-slider"></span></label>
-        </div>
-
-        <div class="sec" style="margin-top:16px">WhatsApp / SMS share</div>
-        <div style="background:#f0faf4;border:1px solid #b8e6c8;border-radius:8px;padding:14px;margin-bottom:10px">
-          <div style="font-size:12px;color:#555;margin-bottom:10px">Share today's collection summary via WhatsApp or SMS instantly.</div>
-          <div style="display:flex;gap:9px;flex-wrap:wrap">
-            <button class="btn bg" onclick="shareWhatsApp()">&#128242; Share on WhatsApp</button>
-            <button class="btn bo" onclick="shareSMS()">&#128172; Share via SMS</button>
-          </div>
-        </div>
-
-        <div class="sec">Sync history</div>
-        <div id="sync-history" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:12px;font-size:12px;color:#aaa;text-align:center">No sync history yet. Send a report above to get started.</div>
-        <div class="save-bar" style="margin-top:10px">
-          <button class="btn bo sm" onclick="clearSyncHistory()">Clear history</button>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- FIREBASE LIVE SYNC -->
       <div id="set-firebase" class="set-section">
-        <div style="margin-bottom:14px">
-          <button class="btn bo sm" onclick="showSetSection('clinic',null)" style="font-size:12px;padding:6px 14px">&#8592; Back to Settings</button>
-        </div>
-        <div class="set-title">&#9889; Live Sync - Real-time Multi-device</div>
-        <div class="set-sub">Use Google Firebase to sync bills across all your devices in real time -- reception desk, doctor's room, and phone.</div>
-
-        <div class="note-collapsible" id="note-fb-howit" style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;margin-bottom:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px">
-            <strong style="font-size:12px;color:#7a5800"> How it works</strong>
-            <button class="note-toggle-btn" style="color:#7a5800" onclick="toggleNote('note-fb-howit')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow"></span></button>
-          </div>
-          <div class="note-body" style="padding:0 12px 12px;font-size:12px;color:#7a5800">
-            Create a free Firebase project at <a href="https://console.firebase.google.com" target="_blank" style="color:var(--pri)">console.firebase.google.com</a>, enable Realtime Database, copy your config below and all devices on the same config sync instantly.
-          </div>
-        </div>
-
-        <!-- SMART PASTE BOX -->
-        <div style="background:#f0fff4;border:1.5px solid #a5d6a7;border-radius:12px;padding:16px;margin-bottom:18px;color:#1b6e35">
-          <div style="font-size:14px;font-weight:700;margin-bottom:4px;color:#1b6e35">&#128274; Smart Paste -- Auto Fill Config</div>
-          <div style="font-size:11px;color:#4caf50;margin-bottom:12px">Copy your <code style="background:#c8f2d4;padding:1px 6px;border-radius:4px;color:#1b6e35">firebaseConfig</code> object from Firebase Console and paste it here -- all fields will fill automatically!</div>
-
-          <div style="background:#e2f7ea;border:1px solid #a5d6a7;border-radius:6px;padding:6px 10px;margin-bottom:10px;font-size:10px;color:#2e7d4f;font-family:'Courier New',monospace;line-height:1.6">
-            const firebaseConfig = {<br>
-            &nbsp;&nbsp;apiKey: "AIzaSy...",<br>
-            &nbsp;&nbsp;authDomain: "app.firebaseapp.com",<br>
-            &nbsp;&nbsp;databaseURL: "https://...",<br>
-            &nbsp;&nbsp;...<br>
-            };
-          </div>
-
-          <textarea id="fb-smart-paste-input" rows="5" placeholder="Paste your firebaseConfig here..." style="width:100%;background:#fff;border:1.5px solid #a5d6a7;border-radius:8px;padding:10px;color:#222;font-size:11px;font-family:'Courier New',monospace;resize:vertical;outline:none;margin-bottom:10px" oninput="fbSmartPastePreview(this.value)"></textarea>
-
-          <div id="fb-smart-preview" style="display:none;background:#dff5e7;border:1px solid #a5d6a7;border-radius:8px;padding:10px;margin-bottom:10px;font-size:11px;color:#1b6e35"></div>
-
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button onclick="fbSmartPasteApply()" style="background:#1b6e35;color:#fff;border:none;border-radius:7px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer">&#9889; Auto Fill All Fields</button>
-            <button onclick="fbSmartPasteClear()" style="background:#fff;color:#444;border:1.5px solid #a5d6a7;border-radius:7px;padding:9px 18px;font-size:12px;cursor:pointer">&#10006; Clear</button>
-          </div>
-          <div id="fb-smart-msg" style="display:none;margin-top:10px;font-size:12px;font-weight:700"></div>
-        </div>
-
-        <div class="sec">Firebase project config <span style="font-size:10px;color:#aaa;font-weight:400;margin-left:6px">-- or fill manually below</span></div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>API Key</label><input id="fb-apikey" placeholder="AIzaSy..."/></div>
-          <div class="set-group" style="flex:1"><label>Auth Domain</label><input id="fb-authdomain" placeholder="yourapp.firebaseapp.com"/></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:2"><label>Database URL</label><input id="fb-dburl" placeholder="https://yourapp-default-rtdb.firebaseio.com"/></div>
-          <div class="set-group" style="flex:1"><label>Project ID</label><input id="fb-projectid" placeholder="yourapp-12345"/></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>Storage Bucket</label><input id="fb-bucket" placeholder="yourapp.appspot.com"/></div>
-          <div class="set-group" style="flex:1"><label>Messaging Sender ID</label><input id="fb-senderid" placeholder="123456789"/></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>App ID</label><input id="fb-appid" placeholder="1:123456789:web:abc123"/></div>
-          <div class="set-group" style="flex:1"><label>Measurement ID (optional)</label><input id="fb-measurementid" placeholder="G-XXXXXXXXXX"/></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>Clinic / Sync Key</label><input id="fb-synckey" placeholder="niva-dental-ahmedabad"/><div class="hint">Unique key for this clinic's data path in the database</div></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1">
-            <label> Device Type <span style="font-size:10px;font-weight:400;color:#aaa">(Clinic Info  save )</span></label>
-            <select id="fb-devicetype" onchange="fbSaveDeviceType(this.value)" style="padding:7px 10px;border:1px solid #cdd5dd;border-radius:6px;font-size:13px;background:#fff;color:#222;width:100%">
-              <option value="shared"> Shared (mobile + desktop same data)</option>
-              <option value="mobile"> Mobile</option>
-              <option value="desktop"> Desktop</option>
-            </select>
-            <div class="hint">Mobile select   clinic info <code>clinic_info/mobile</code> , Desktop select   <code>clinic_info/desktop</code>  save  -- bills/expenses shared </div>
-          </div>
-        </div>
-
-        <div class="sec" style="margin-top:16px"> Firebase Authentication (Email &amp; Password)</div>
-        <div class="note-collapsible" id="note-fb-auth" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:12px">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px">
-            <strong style="font-size:11px;color:#1a5276"> Secure your data</strong>
-            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-fb-auth')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow"></span></button>
-          </div>
-          <div class="note-body" style="padding:0 12px 10px;font-size:11px;color:#1a5276">
-            Enable <strong>Email/Password</strong> sign-in in Firebase Console -> Authentication -> Sign-in method. Then enter your clinic's Firebase user credentials below. Data is stored under each user's UID, and Firebase Rules enforce that only the authenticated user can read/write their own data.
-          </div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1">
-            <label>Firebase Auth Email</label>
-            <input id="fb-email" type="email" placeholder="clinic@example.com" autocomplete="username"/>
-            <div class="hint">Email registered in Firebase Authentication</div>
-          </div>
-          <div class="set-group" style="flex:1">
-            <label>Firebase Auth Password</label>
-            <div style="position:relative">
-              <input id="fb-password" type="password" placeholder="Firebase account password" autocomplete="current-password" style="width:100%;padding-right:36px"/>
-              <button type="button" onclick="toggleFBPasswordVisibility()" title="Show/Hide password"
-                style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:#888;padding:0;line-height:1" id="fb-pw-eye"></button>
-            </div>
-            <div class="hint">Password for the Firebase user above</div>
-          </div>
-        </div>
-        <div id="fb-auth-status" style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:700"></div>
-
-        <div class="save-bar" style="margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-          <button class="btn bg" onclick="saveFBConfig()">&#10003; Save</button>
-          <button class="btn bo" onclick="testFBConnection()">&#9656; Test</button>
-          <button class="btn bd" onclick="fbSignOut()" id="fb-signout-btn" title="Sign out from Firebase Auth">&#128274; Sign Out</button>
-          <span class="saved-msg" id="fb-saved" style="grid-column:1/-1">&#10003; Config saved!</span>
-        </div>
-
-        <div class="sec">Sync status</div>
-        <div id="fb-status-box" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:14px;margin-bottom:14px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div id="fb-dot" style="width:12px;height:12px;border-radius:50%;background:#ccc;flex-shrink:0"></div>
-            <div>
-              <div id="fb-status-label" style="font-size:13px;font-weight:700;color:#555">Not connected</div>
-              <div id="fb-status-sub" style="font-size:11px;color:#aaa;margin-top:2px">Configure Firebase above to enable live sync</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="sec">Sync options</div>
-        <div class="toggle-row" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:10px 14px">
-          <div><div class="tlabel">Auto-sync new bills</div><div class="tsub">Every new bill will be pushed to Firebase instantly</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-fbautosync" checked onchange="saveFBSyncToggles()"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:10px 14px;margin-top:6px">
-          <div><div class="tlabel">Pull changes on open</div><div class="tsub">Latest data will be fetched from cloud when app opens</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-fbpull" checked onchange="saveFBSyncToggles()"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:10px 14px;margin-top:6px">
-          <div><div class="tlabel">Real-time listener</div><div class="tsub"> True real-time -- changes from other devices appear instantly (uses Firebase SSE push, no polling)</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-fbrealtime" checked onchange="saveFBSyncToggles()"/><span class="toggle-slider"></span></label>
-        </div>
-
-        <div class="sec" style="margin-top:16px">Manual sync</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-          <button class="btn bp" style="width:100%" onclick="openPushSelectModal()">&#8593; Push All</button>
-          <button class="btn bg" style="width:100%" onclick="fbPullAll()">&#8595; Pull All</button>
-          <button class="btn bo" style="width:100%" onclick="fbDisconnect()">&#9679; Disconnect</button>
-        </div>
-
-        <div class="note-collapsible collapsed" id="note-fb-steps" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:0">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px">
-            <strong style="font-size:11px;color:#1a5276"> Step-by-step setup</strong>
-            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-fb-steps')"><span class="note-toggle-label">Show</span> <span class="note-toggle-arrow"></span></button>
-          </div>
-          <div class="note-body" style="padding:0 12px 12px;font-size:11px;color:#1a5276;line-height:1.7">
-          1. Go to <strong>console.firebase.google.com</strong> -> Create project<br>
-          2. Build -> Realtime Database -> Create database<br>
-          3. <strong>Authentication -> Sign-in method -> Enable Email/Password</strong><br>
-          4. Authentication -> Users -> Add user (clinic email + password)<br>
-          5. Realtime Database -> Rules -> paste: <code style="background:#e3edf7;padding:1px 5px;border-radius:3px;font-size:10px">{"rules":{"$synckey":{"$uid":{".read":"auth!=null && auth.uid==$uid",".write":"auth!=null && auth.uid==$uid"}}}}</code><br>
-          6. Project Settings -> Your apps -> Add Web app -> Copy config<br>
-          7. Paste config + email + password above -> Save &amp; Connect
-          </div>
-        </div>
-
-        <!-- FIREBASE CONFIG BACKUP & RESTORE -->
-        <div class="sec" style="margin-top:20px">&#128190; Firebase Config Backup &amp; Restore</div>
-        <div style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:14px">
-          <div style="font-size:12px;color:#666;margin-bottom:12px">Save your Firebase configuration to a file so you can restore it later if cleared or moved to a new device.</div>
-          <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
-            <button class="btn bp" onclick="backupFBConfig()">&#128229; Backup Firebase Config</button>
-            <label class="btn bo" style="cursor:pointer;display:inline-flex;align-items:center;padding:7px 14px;font-size:12px;font-weight:700;margin:0">
-              &#128228; Restore Firebase Config
-              <input type="file" id="fb-restore-file" accept=".json" style="display:none" onchange="restoreFBConfig(this)"/>
-            </label>
-          </div>
-          <div id="fb-restore-msg" style="font-size:11px;margin-top:8px;display:none"></div>
-        </div>
-
-        <!-- AUTO WEEKLY FIREBASE BACKUP -->
-        <div class="sec" style="margin-top:20px">&#128197; Auto Weekly Firebase Backup</div>
-        <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:10px;padding:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <div>
-              <div style="font-size:13px;font-weight:700;color:var(--pri)">&#128197; Weekly Auto Backup to Firebase</div>
-              <div style="font-size:11px;color:#888;margin-top:2px">Automatically push a full data snapshot to Firebase every 7 days</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="tog-fb-weekly" onchange="saveFBWeeklySettings()"/>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-
-          <div id="fb-weekly-config" style="display:none">
-            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
-              <div class="f" style="min-width:130px;flex:1">
-                <label>Backup Day</label>
-                <select id="fb-weekly-day" onchange="saveFBWeeklySettings()">
-                  <option value="0">Sunday</option>
-                  <option value="1">Monday</option>
-                  <option value="2" selected>Tuesday</option>
-                  <option value="3">Wednesday</option>
-                  <option value="4">Thursday</option>
-                  <option value="5">Friday</option>
-                  <option value="6">Saturday</option>
-                </select>
-              </div>
-              <div class="f" style="min-width:110px;flex:1">
-                <label>Backup Time</label>
-                <select id="fb-weekly-time" onchange="saveFBWeeklySettings()">
-                  <option value="08:00">08:00 AM</option>
-                  <option value="09:00" selected>09:00 AM</option>
-                  <option value="10:00">10:00 AM</option>
-                  <option value="18:00">06:00 PM</option>
-                  <option value="20:00">08:00 PM</option>
-                  <option value="22:00">10:00 PM</option>
-                </select>
-              </div>
-              <div class="f" style="min-width:110px;flex:1">
-                <label>Keep Last N Backups</label>
-                <select id="fb-weekly-keep" onchange="saveFBWeeklySettings()">
-                  <option value="4" selected>4 weeks</option>
-                  <option value="8">8 weeks</option>
-                  <option value="12">12 weeks</option>
-                  <option value="0">All (no limit)</option>
-                </select>
-              </div>
-            </div>
-
-            <div style="background:#fff;border:1px solid var(--pri-light);border-radius:8px;padding:12px;margin-bottom:10px">
-              <div style="font-size:11px;font-weight:700;color:var(--pri);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">Backup Status</div>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <div id="fb-weekly-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;flex-shrink:0"></div>
-                <div style="flex:1">
-                  <div id="fb-weekly-status" style="font-size:12px;font-weight:700;color:#555">Not yet run</div>
-                  <div id="fb-weekly-last" style="font-size:11px;color:#aaa;margin-top:1px">Last backup: --</div>
-                </div>
-                <button class="btn bp sm" onclick="runFBWeeklyBackup(true)">&#128197; Backup Now</button>
-              </div>
-            </div>
-
-            <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:9px 12px;font-size:11px;color:#7a5c00">
-              &#9888; Backups are stored at <code style="background:#fef3c7;padding:1px 4px;border-radius:3px">weekly_backups/{date}/</code> in your Firebase Realtime Database. Firebase must be configured and connected above.
-            </div>
-          </div>
-        </div>
-
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- SUPABASE SYNC -->
       <div id="set-supabase" class="set-section">
-        <div class="set-title">&#9729; Supabase Sync (Backup)</div>
-        <div class="set-sub">Secondary cloud backup &mdash; data saved to both Firebase &amp; Supabase for maximum safety.</div>
-
-        <div id="sb-status-box" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
-          <div id="sb-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;flex-shrink:0"></div>
-          <div id="sb-status-msg" style="font-size:12px;color:#888">Not configured</div>
-        </div>
-
-        <div class="set-group">
-          <label>Supabase Project URL</label>
-          <input id="sb-url" type="url" placeholder="https://xyzxyz.supabase.co" oninput="sbSaveConfig()"/>
-          <div class="hint">Supabase &#8594; Project Settings &#8594; API &#8594; Project URL</div>
-        </div>
-        <div class="set-group">
-          <label>Supabase Anon Key</label>
-          <input id="sb-key" type="password" placeholder="eyJhbGci..." oninput="sbSaveConfig()"/>
-          <div class="hint">Supabase &#8594; Project Settings &#8594; API &#8594; anon public key</div>
-        </div>
-        <div class="set-group">
-          <label>&#128274; Security Secret Key</label>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input id="sb-secret" type="password" placeholder="Enter strong secret key" oninput="sbSaveConfig();var b=document.getElementById('sb-update-secret-btn');if(b){b.style.background='#c0392b';b.textContent='! Secret Changed -- Update in Supabase';}" style="flex:1"/>
-            <button type="button" onclick="(function(){var i=document.getElementById('sb-secret');i.type=i.type==='password'?'text':'password';})()" class="btn bo sm" style="flex-shrink:0;padding:7px 10px">&#128065;</button>
-          </div>
-          <div class="hint">! When you change the secret key, click <b> Update Secret in Supabase</b> below -- SQL will be generated automatically.</div>
-        </div>
-
-        <!-- SUPABASE AUTH -- recommended secure sign-in -->
-        <div class="set-group" id="sb-auth-block" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:12px">
-          <label style="margin-bottom:6px">&#128272; Secure Sign-In (recommended)</label>
-          <div class="hint" style="margin-bottom:8px">Create one login per clinic in Supabase Dashboard &#8594; Authentication &#8594; Users, then sign in here. This is required for the Auth-based security policies in the setup SQL below -- without signing in, only the legacy (less secure) scheme applies.</div>
-          <div id="sb-auth-status" style="font-size:12px;color:#888;margin-bottom:8px">Not signed in</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <input id="sb-auth-email" type="email" placeholder="clinic@example.com" style="flex:1;min-width:140px"/>
-            <input id="sb-auth-password" type="password" placeholder="Password" style="flex:1;min-width:120px"/>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn bp sm" onclick="sbAuthSignInUI()">&#128274; Sign In</button>
-            <button class="btn bo sm" onclick="sbAuthSignOutUI()">Sign Out</button>
-          </div>
-        </div>
-        <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:4px">
-          <button class="btn bp" onclick="sbTestConnection()">&#128268; Test Connection</button>
-          <button class="btn brec sm" onclick="sbUpdateSecretKey()" id="sb-update-secret-btn">&#128273; Update Secret in Supabase</button>
-          <button class="btn bg sm" onclick="if(typeof sbPollNow==='function'){sbPollNow();var m=document.getElementById('sb-test-msg');if(m){m.style.display='block';m.style.color=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim();m.textContent=' Polling Supabase for new data...';setTimeout(function(){m.textContent=' Poll complete -- UI updated';},2500);}}">&#128260; Sync Now</button>
-        </div>
-        <div id="sb-test-msg" style="font-size:12px;margin-top:10px;display:none"></div>
-
-        <!-- REALTIME STATUS -->
-        <div style="margin-top:14px;background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:12px;">
-          <div style="font-size:12px;font-weight:700;color:var(--pri);margin-bottom:6px"> Real-time Sync Status</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#555;margin-bottom:6px">
-            <span id="sb-rt-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;display:inline-block;flex-shrink:0;"></span>
-            <span id="sb-rt-msg">Not started -- configure URL &amp; Key above</span>
-          </div>
-          <div style="font-size:11px;color:#888;">App automatically polls Supabase every 30 seconds for new data from other devices. You can also press <b>Sync Now</b> above for instant update.</div>
-        </div>
-
-        <!-- PUSH / PULL -->
-        <div style="margin-top:18px">
-          <div class="sec" style="margin-bottom:10px">&#128260; Manual Push / Pull</div>
-
-          <!-- PUSH -->
-          <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:10px;padding:14px;margin-bottom:10px">
-            <div style="font-size:13px;font-weight:700;color:var(--pri);margin-bottom:4px">&#11014; Push -- Local -> Supabase</div>
-            <div style="font-size:11px;color:#666;margin-bottom:10px"> local data Supabase  upload </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
-              <button class="btn bp sm" style="width:100%" onclick="sbPushTable('niva_bills','bills')">&#128196; Bills</button>
-              <button class="btn bp sm" style="width:100%" onclick="sbPushTable('niva_appointments','appointments')">&#128197; Appts</button>
-              <button class="btn bp sm" style="width:100%" onclick="sbPushTable('niva_expenses','expenses')">&#128176; Expenses</button>
-              <button class="btn bp sm" style="width:100%" onclick="sbPushTable('niva_patient_files','patientFiles')">&#128101; Patients</button>
-              <button class="btn bp sm" style="width:100%" onclick="sbPushTable('niva_stock','stock')">&#128230; Stock</button>
-              <button class="btn bp sm" style="width:100%" onclick="sbPushLogo(document.getElementById('sb-push-msg'))">&#128444; Logo</button>
-              <button class="btn bp sm" style="width:100%" onclick="(function(){var m=document.getElementById('sb-push-msg');if(m){m.style.display='block';m.style.color='var(--pri)';m.textContent=' Clinic info push...';}window.sbSyncClinic&&window.sbSyncClinic().then(function(){if(m){m.style.color='#1b6e35';m.textContent=' Clinic info pushed to Supabase!';}}).catch(function(e){if(m){m.style.color='#c0392b';m.textContent=' '+e.message;}});})()">&#127968; Clinic Info</button>
-            </div>
-            <button class="btn bp" style="width:100%" onclick="sbFullSync()">&#11014; Push All Data</button>
-            <div id="sb-push-msg" style="font-size:12px;margin-top:8px;display:none"></div>
-          </div>
-
-          <!-- PULL -->
-          <div style="background:#f0fff4;border:1px solid #a9dfbf;border-radius:10px;padding:14px">
-            <div style="font-size:13px;font-weight:700;color:#1b6e35;margin-bottom:4px">&#11015; Pull -- Supabase -> Local</div>
-            <div style="font-size:11px;color:#666;margin-bottom:10px">Supabase  data  device  restore </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
-              <button class="btn bo sm" style="width:100%" onclick="sbPullTable('niva_bills','bills')">&#128196; Bills</button>
-              <button class="btn bo sm" style="width:100%" onclick="sbPullTable('niva_appointments','appointments')">&#128197; Appts</button>
-              <button class="btn bo sm" style="width:100%" onclick="sbPullTable('niva_expenses','expenses')">&#128176; Expenses</button>
-              <button class="btn bo sm" style="width:100%" onclick="sbPullTable('niva_patient_files','patientFiles')">&#128101; Patients</button>
-              <button class="btn bo sm" style="width:100%" onclick="sbPullTable('niva_stock','stock')">&#128230; Stock</button>
-              <button class="btn bo sm" style="width:100%" onclick="sbPullLogo(document.getElementById('sb-pull-msg'))">&#128444; Logo</button>
-              <button class="btn bo sm" style="width:100%" onclick="window.sbPullClinic&&window.sbPullClinic(document.getElementById('sb-pull-msg'))">&#127968; Clinic Info</button>
-            </div>
-            <button class="btn bo" style="width:100%" onclick="sbPullAll()">&#11015; Pull All Data (Restore)</button>
-            <div id="sb-pull-msg" style="font-size:12px;margin-top:8px;display:none"></div>
-            <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:8px;margin-top:10px;font-size:11px;color:#7a5c00">
-              &#9888; Pull  local data Supabase  data  merge .  data delete  .
-            </div>
-          </div>
-        </div>
-
-
-        <!-- SETTINGS EXPORT / IMPORT -->
-        <div style="margin-top:20px">
-          <div class="sec" style="margin-bottom:10px">&#9881; Settings Backup -- Export / Import</div>
-          <div style="font-size:12px;color:#666;margin-bottom:12px">Clinic info, billing options, theme, Firebase &amp; Supabase config -- save everything in one file or restore from backup.</div>
-          <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:10px;padding:14px;margin-bottom:10px">
-            <div style="font-size:13px;font-weight:700;color:var(--pri);margin-bottom:4px">&#11014; Export Settings</div>
-            <div style="font-size:11px;color:#666;margin-bottom:10px">Download all your settings as a <b>.json</b> file.</div>
-            <button class="btn bp" style="width:100%" onclick="nivaExportSettings()">&#11014; Download Settings Backup</button>
-            <div id="sb-export-msg" style="font-size:12px;margin-top:8px;display:none"></div>
-          </div>
-          <div style="background:#f0fff4;border:1px solid #a9dfbf;border-radius:10px;padding:14px">
-            <div style="font-size:13px;font-weight:700;color:#1b6e35;margin-bottom:4px">&#11015; Import Settings</div>
-            <div style="font-size:11px;color:#666;margin-bottom:10px">Select a previously exported <b>.json</b> settings file to restore.</div>
-            <label style="display:block;background:#1b6e35;color:#fff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:6px;cursor:pointer;text-align:center;width:100%;box-sizing:border-box">
-              &#11015; Select Settings File
-              <input type="file" accept=".json" style="display:none" onchange="nivaImportSettings(this)">
-            </label>
-            <div id="sb-import-msg" style="font-size:12px;margin-top:8px;display:none"></div>
-            <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:8px;margin-top:10px;font-size:11px;color:#7a5c00">
-              ! Importing will replace your existing settings. Bills &amp; patient data will not be affected.
-            </div>
-          </div>
-        </div>
-
-        <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:12px;margin-top:16px;font-size:12px;color:#7a5c00">
-          &#9888; <b>Setup required:</b> Click <b>Test Connection</b> after entering credentials &mdash; tables will be auto-created.
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- LOCAL SERVER SYNC -->
 
       <!-- PRINT FORMAT -->
       <div id="set-printformat" class="set-section">
-        <div class="set-title">&#128438; Print Format &amp; Page Setup</div>
-        <div class="set-sub">Configure page layout, pre-printed stationery options, margins, and what to show/hide on prints.</div>
-
-        <div class="sec">Bill &amp; Receipt Layout Template</div>
-        <div class="set-group" style="margin-bottom:16px">
-          <label>Choose print template</label>
-          <select id="pf-template" onchange="updatePrintPreview()">
-            <option value="classic">Classic - Single column, bordered box</option>
-            <option value="a4pro">A4 Professional - Two-column header, color accent bar, itemised table</option>
-            <option value="a5compact">A5 Compact - Minimalist, center-logo, clean lines</option>
-            <option value="a4dental">A4 Dental Premium - Full-width color header, treatment table, tooth icon, signature line</option>
-            <option value="a5modern">A5 Modern Card - Bold accent, two-tone layout, compact summary card style</option>
-          </select>
-          <div class="hint">Each template has its own layout. Paper size &amp; margin settings below still apply.</div>
-        </div>
-
-        <div class="sec">Paper &amp; page size</div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>Paper size</label>
-            <select id="pf-size">
-              <option value="A4">A4 (210  297mm)</option>
-              <option value="A5">A5 (148  210mm)</option>
-              <option value="Letter">Letter (216  279mm)</option>
-              <option value="thermal80">Thermal 80mm</option>
-              <option value="custom">Custom</option>
-            </select>
-          </div>
-          <div class="set-group" style="flex:1"><label>Orientation</label>
-            <select id="pf-orient"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>Top margin (mm)</label><input id="pf-mt" type="number" value="10" min="0" max="80"/></div>
-          <div class="set-group" style="flex:1"><label>Bottom margin (mm)</label><input id="pf-mb" type="number" value="10" min="0" max="80"/></div>
-          <div class="set-group" style="flex:1"><label>Left margin (mm)</label><input id="pf-ml" type="number" value="10" min="0" max="80"/></div>
-          <div class="set-group" style="flex:1"><label>Right margin (mm)</label><input id="pf-mr" type="number" value="10" min="0" max="80"/></div>
-        </div>
-
-        <div class="sec" style="margin-top:4px">Pre-printed stationery options</div>
-        <div class="note-collapsible" id="note-pf-stationery" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:12px">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px">
-            <strong style="font-size:12px;color:#1a5276"> Pre-printed stationery tip</strong>
-            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-pf-stationery')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow"></span></button>
-          </div>
-          <div class="note-body" style="padding:0 14px 10px;font-size:12px;color:#1a5276">
-            Use these when printing on stationery that already has your clinic name/logo pre-printed at the top.
-          </div>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Hide clinic name &amp; header</div><div class="tsub">Do not print clinic name, address, phone on bill (for pre-printed letterhead)</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-hideheader"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Hide clinic logo area</div><div class="tsub">Skip the top logo/name block entirely</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-hidelogo"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Hide footer tagline</div><div class="tsub">Do not print the footer message</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-hidefooter"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Compact mode (smaller fonts)</div><div class="tsub">Reduce font sizes for denser layouts</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-compact"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Show border/box around bill</div><div class="tsub">Print outer border rectangle around the bill</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-border" checked/><span class="toggle-slider"></span></label>
-        </div>
-
-        <div class="sec" style="margin-top:4px">Top spacing for pre-printed header</div>
-        <div class="row">
-          <div class="set-group" style="flex:1">
-            <label>Blank space at top (mm)</label>
-            <input id="pf-topspace" type="number" value="0" min="0" max="100" placeholder="0"/>
-            <div class="hint">Adds blank space at top to align below your pre-printed letterhead</div>
-          </div>
-          <div class="set-group" style="flex:1">
-            <label>Font size (pt)</label>
-            <input id="pf-fontsize" type="number" value="11" min="7" max="16"/>
-          </div>
-        </div>
-
-        <div class="sec">Bill layout preview</div>
-        <div style="margin-bottom:6px"><span id="pp-template-badge" style="background:var(--pri);color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700"> Classic</span></div>
-        <div id="print-preview-box" style="background:#fff;border:1px solid #cdd5dd;border-radius:8px;padding:14px;font-size:11px;color:#555;max-width:340px;transition:border .2s">
-        </div>
-
-        <div class="save-bar" style="margin-top:16px">
-          <button class="btn bg" style="flex:1" onclick="savePrintFormat()">&#10003; Save Print Settings</button>
-          <button class="btn bp sm" style="flex:1" onclick="doTestPrint()">&#128438; Test Print</button>
-          <span class="saved-msg" id="pf-saved">&#10003; Saved!</span>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- PRESCRIPTION PRINT FORMAT -->
       <div id="set-rxprintformat" class="set-section">
-        <div class="set-title">&#128138; Prescription Print Settings</div>
-        <div class="set-sub">Configure page layout, paper size, margins, and pre-printed stationery options specifically for prescription printing.</div>
-
-        <div class="sec">Paper &amp; Page Size</div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>Paper size</label>
-            <select id="rxpf-size">
-              <option value="A4">A4 (210  297mm)</option>
-              <option value="A5">A5 (148  210mm)</option>
-              <option value="Letter">Letter (216  279mm)</option>
-              <option value="custom">Custom</option>
-            </select>
-          </div>
-          <div class="set-group" style="flex:1"><label>Orientation</label>
-            <select id="rxpf-orient"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1"><label>Top margin (mm)</label><input id="rxpf-mt" type="number" value="10" min="0" max="80"/></div>
-          <div class="set-group" style="flex:1"><label>Bottom margin (mm)</label><input id="rxpf-mb" type="number" value="10" min="0" max="80"/></div>
-          <div class="set-group" style="flex:1"><label>Left margin (mm)</label><input id="rxpf-ml" type="number" value="10" min="0" max="80"/></div>
-          <div class="set-group" style="flex:1"><label>Right margin (mm)</label><input id="rxpf-mr" type="number" value="10" min="0" max="80"/></div>
-        </div>
-        <div class="row">
-          <div class="set-group" style="flex:1">
-            <label>Font size (pt)</label>
-            <input id="rxpf-fontsize" type="number" value="11" min="7" max="16"/>
-          </div>
-        </div>
-
-        <div class="sec" style="margin-top:4px">Pre-printed Stationery Options</div>
-        <div class="note-collapsible" id="note-rxpf-stationery" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:12px">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px">
-            <strong style="font-size:12px;color:#1a5276">&#128161; Pre-printed stationery tip</strong>
-            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-rxpf-stationery')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow">&#9660;</span></button>
-          </div>
-          <div class="note-body" style="padding:0 14px 10px;font-size:12px;color:#1a5276">
-            Use these when printing on prescription pads that already have your clinic name/logo/letterhead pre-printed at the top. Hide the header and set a top spacing to align content correctly below your pre-printed letterhead.
-          </div>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Hide clinic name &amp; header</div><div class="tsub">Do not print clinic name, address, phone on prescription (for pre-printed letterhead)</div></div>
-          <label class="toggle"><input type="checkbox" id="rxpf-hideheader"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Hide clinic logo</div><div class="tsub">Skip the logo block on prescription printout</div></div>
-          <label class="toggle"><input type="checkbox" id="rxpf-hidelogo"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div><div class="tlabel">Hide legal disclaimer footer</div><div class="tsub">Do not print the medicolegal disclaimer at bottom</div></div>
-          <label class="toggle"><input type="checkbox" id="rxpf-hidefooter"/><span class="toggle-slider"></span></label>
-        </div>
-
-        <div class="sec" style="margin-top:4px">Top Spacing for Pre-printed Header</div>
-        <div class="row">
-          <div class="set-group" style="flex:1">
-            <label>Blank space at top (mm)</label>
-            <input id="rxpf-topspace" type="number" value="0" min="0" max="150" placeholder="0"/>
-            <div class="hint">Adds blank space at top so prescription content starts below your pre-printed letterhead/pad header</div>
-          </div>
-        </div>
-
-        <div class="save-bar" style="margin-top:16px">
-          <button class="btn bg" onclick="saveRxPrintFormat()">&#10003; Save Prescription Print Settings</button>
-          <span class="saved-msg" id="rxpf-saved">&#10003; Saved!</span>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- APPOINTMENT MESSAGE TEMPLATE -->
       <div id="set-apptmsg" class="set-section">
-        <div class="set-title">&#128241; Appointment Message Template</div>
-        <div class="set-sub">Customize the WhatsApp/SMS message sent when booking appointments. Use the placeholders shown below.</div>
-
-        <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#1a5276">
-          <div style="font-weight:700;margin-bottom:6px">&#128196; Available Placeholders:</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px">
-            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{patient}</code>
-            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{date}</code>
-            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{time}</code>
-            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{doctor}</code>
-            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{purpose}</code>
-            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{notes}</code>
-            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{clinic}</code>
-            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{address}</code>
-            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{phone}</code>
-          </div>
-          <div style="margin-top:8px;font-size:11px;color:#555">
-            &#9888; Use <strong>*text*</strong> for <strong>bold</strong> in WhatsApp &nbsp;|&nbsp; Use <strong>_text_</strong> for <em>italic</em>
-          </div>
-        </div>
-
-        <div class="set-group">
-          <label>WhatsApp Message Template</label>
-          <textarea id="apptmsg-wa-tmpl" style="min-height:200px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6" placeholder="Enter WhatsApp message template..." oninput="updateApptMsgPreview()"></textarea>
-          <div class="hint">This template is used for both "Book Appointment" (from bill view) and "Save &amp; Send WhatsApp" (from Appointments tab).</div>
-        </div>
-
-        <div class="set-group">
-          <label>SMS Message Template</label>
-          <textarea id="apptmsg-sms-tmpl" style="min-height:80px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6" placeholder="Enter SMS message template..."></textarea>
-          <div class="hint">Plain text only for SMS. Keep it short -- no bold/italic formatting.</div>
-        </div>
-
-        <!-- Live Preview -->
-        <div class="set-group">
-          <label>Live Preview</label>
-          <div style="background:#075e54;border-radius:10px;padding:12px 14px;min-height:80px">
-            <div id="apptmsg-preview-box" style="background:#dcf8c6;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Courier New',monospace;line-height:1.6;color:#111;white-space:pre-wrap;word-break:break-word"></div>
-          </div>
-        </div>
-
-        <div class="save-bar">
-          <button class="btn bp" style="flex:1" onclick="saveApptMsgTemplate()">&#10003; Save Template</button>
-          <button class="btn bo" style="flex:1" onclick="resetApptMsgTemplate()">&#8635; Reset to Default</button>
-          <span class="saved-msg" id="apptmsg-saved">&#10003; Saved!</span>
-        </div>
-
-        <!-- Doctor Reminder Templates -->
-        <div style="margin-top:22px;padding-top:18px;border-top:2px solid #e0e8ee">
-          <div style="font-weight:700;font-size:13px;color:var(--pri);margin-bottom:4px"> Doctor Reminder Templates</div>
-          <div style="font-size:12px;color:#666;margin-bottom:12px">Doctor  appointment reminder WhatsApp/SMS   template.  placeholders  :</div>
-
-          <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1a5276">
-            <div style="font-weight:700;margin-bottom:6px"> Available Placeholders:</div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px">
-              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{doctor}</code>
-              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{patient}</code>
-              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{date}</code>
-              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{time}</code>
-              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{purpose}</code>
-              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{clinic}</code>
-              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{address}</code>
-              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{phone}</code>
-            </div>
-            <div style="margin-top:8px;font-size:11px;color:#555">! WhatsApp: <strong>*text*</strong> = bold &nbsp;|&nbsp; SMS: plain text only, short </div>
-          </div>
-
-          <div class="set-group">
-            <label> Doctor WhatsApp Reminder Template</label>
-            <textarea id="drmsg-wa-tmpl" style="min-height:180px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6;width:100%;padding:8px 10px;border:1px solid #cdd5dd;border-radius:6px;resize:vertical" placeholder="Doctor reminder WhatsApp template..." oninput="updateDrMsgPreview()"></textarea>
-            <div class="hint">Doctor  appointment schedule reminder WhatsApp message.</div>
-          </div>
-
-          <div class="set-group">
-            <label> Doctor SMS Reminder Template</label>
-            <textarea id="drmsg-sms-tmpl" style="min-height:70px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6;width:100%;padding:8px 10px;border:1px solid #cdd5dd;border-radius:6px;resize:vertical" placeholder="Doctor reminder SMS template..."></textarea>
-            <div class="hint">Plain text, short. Doctor SMS reminder.</div>
-          </div>
-
-          <!-- Live Preview -->
-          <div class="set-group">
-            <label>Live Preview (WA)</label>
-            <div style="background:#075e54;border-radius:10px;padding:12px 14px;min-height:60px">
-              <div id="drmsg-preview-box" style="background:#dcf8c6;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Courier New',monospace;line-height:1.6;color:#111;white-space:pre-wrap;word-break:break-word"></div>
-            </div>
-          </div>
-
-          <div class="save-bar">
-            <button class="btn bp" style="flex:1" onclick="saveDrMsgTemplate()">&#10003; Save Dr. Template</button>
-            <button class="btn bo" style="flex:1" onclick="resetDrMsgTemplate()">&#8635; Reset to Default</button>
-            <span class="saved-msg" id="drmsg-saved" style="display:none;color:#1b6e35;font-size:12px">&#10003; Saved!</span>
-          </div>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
 
       <!-- AFFIRMATION SETTINGS -->
       <div id="set-affirmation" class="set-section">
-        <div class="set-title">&#127775; Affirmation</div>
-        <div class="set-sub">Daily motivational quote shown in the topbar above date &amp; time.</div>
-        <div class="toggle-row" style="margin-top:16px">
-          <div><div class="tlabel">Show Affirmation</div><div class="tsub">Display daily quote in topbar</div></div>
-          <label class="toggle"><input type="checkbox" id="tog-affirmation" onchange="saveAffirmationSettings()"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="sec" style="margin-top:18px">Language</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-          <button id="affirm-lang-en" class="btn bo sm" onclick="setAffirmLang('en')" style="font-size:12px">&#127482;&#127480; English</button>
-          <button id="affirm-lang-gu" class="btn bo sm" onclick="setAffirmLang('gu')" style="font-size:12px">&#127470;&#127475; Gujarati</button>
-          <button id="affirm-lang-hi" class="btn bo sm" onclick="setAffirmLang('hi')" style="font-size:12px">&#127470;&#127475; Hindi</button>
-        </div>
-        <div style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:12px 14px;margin-top:16px">
-          <div style="font-size:11px;color:#888;font-weight:600;margin-bottom:6px">CURRENT QUOTE</div>
-          <div id="affirm-preview" style="font-size:13px;color:#444;font-style:italic;line-height:1.6">Loading...</div>
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn bo sm" onclick="refreshAffirmation()" style="font-size:12px">&#128260; Refresh Quote</button>
-            <span class="saved-msg" id="affirm-saved" style="margin-left:4px;align-self:center"></span>
-          </div>
-        </div>
-        <div class="sec" style="margin-top:20px">Custom Affirmations</div>
-        <div class="set-sub" style="margin-bottom:10px">Tara khud na quotes add karo. Jo hoy toh in ma thi j rotate thase.</div>
-        <div style="display:flex;gap:8px;margin-bottom:10px">
-          <input id="affirm-custom-inp" type="text" placeholder="Taro quote ahiya type karo..." style="flex:1;padding:8px 10px;border:1px solid #cdd5dd;border-radius:6px;font-size:13px"/>
-          <button class="btn bg sm" onclick="addCustomAffirm()" style="font-size:12px;white-space:nowrap">+ Add</button>
-        </div>
-        <div id="affirm-custom-list" style="display:flex;flex-direction:column;gap:6px"></div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- ABOUT -->
       <div id="set-about" class="set-section">
-
-        <!-- ACTIVATION STATUS CARD -->
-        <div id="set-activation-card" style="margin-bottom:16px;border-radius:10px;border:1.5px solid #e0e8ee;overflow:hidden">
-          <div id="set-act-header" style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:#f8fafc">
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:22px"></span>
-              <div>
-                <div style="font-size:13px;font-weight:700;color:#222" id="set-act-title">License Status</div>
-                <div style="font-size:11px;color:#888;margin-top:2px" id="set-act-sub">Checking...</div>
-              </div>
-            </div>
-            <div id="set-act-badge" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:#fef9e7;color:#8a5d0a">...</div>
-          </div>
-          <div id="set-act-body" style="padding:14px 16px;border-top:1px solid #e0e8ee;display:none">
-            <div style="position:relative;margin-bottom:8px">
-              <input id="set-act-key-inp" type="password" placeholder="Enter activation key..."
-                style="width:100%;padding:9px 42px 9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;box-sizing:border-box;outline:none;text-align:center;letter-spacing:2px;font-family:Arial,sans-serif"/>
-              <button type="button" onclick="(function(){var i=document.getElementById('set-act-key-inp');var b=document.getElementById('set-act-eye');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'':'';})()" id="set-act-eye"
-                style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:2px"></button>
-            </div>
-            <button onclick="setActFromSettings()" style="width:100%;padding:10px;background:var(--pri);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif"> Activate Now</button>
-            <div id="set-act-msg" style="font-size:12px;min-height:18px;margin-top:8px;text-align:center"></div>
-          </div>
-        </div>
-
-        <!-- APP ICON (PWA / Home Screen icon) -->
-        <div style="margin-bottom:16px;border:1.5px solid #e0e8ee;border-radius:10px;padding:14px 16px">
-          <div style="font-size:13px;font-weight:700;color:#222;margin-bottom:2px">&#128241; App Icon</div>
-          <div style="font-size:11px;color:#888;margin-bottom:12px">This icon shows in the browser tab and when you add this app to your home screen.</div>
-          <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
-            <div style="width:72px;height:72px;border:2px dashed #cdd5dd;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#f8fafc;overflow:hidden;flex-shrink:0">
-              <img id="appicon-preview" src="" alt="" style="max-width:100%;max-height:100%;object-fit:contain;display:none"/>
-              <span id="appicon-placeholder" style="font-size:24px;color:#ccc">&#128241;</span>
-            </div>
-            <div style="flex:1;min-width:200px">
-              <label class="btn bo" style="cursor:pointer;display:inline-block;padding:7px 14px;font-size:12px;font-weight:700;margin-bottom:6px">&#128247; Choose Icon Image <input type="file" id="appicon-upload" accept="image/*" style="display:none" onchange="handleAppIconUpload(this)"/></label>
-              <div style="font-size:11px;color:#aaa;line-height:1.6">Use a square image (e.g. 512&times;512px) for best results.<br>On mobile, remove and re-add the app to your home screen to see the new icon.</div>
-              <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-                <button class="btn bo sm" onclick="removeAppIconConfirm()">&#128465; Remove Icon</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="about-box">
-          <div class="logo"></div>
-          <h2 id="about-clinic-name"></h2>
-          <p id="about-addr" style="color:var(--pri);margin-bottom:10px"></p>
-          <p>Daily Cash Book &amp; Billing Software<br>Version 2.0 &nbsp;|&nbsp; Built for dental clinics</p>
-          <hr style="margin:14px 0;border:none;border-top:1px solid #eee"/>
-          <p><strong>Features:</strong> Daily cash book &bull; Patient billing &bull; Appointments &bull; Receipt generation &bull; Bill printing &bull; Data export &bull; Theme customisation</p>
-          <hr style="margin:14px 0;border:none;border-top:1px solid #eee"/>
-          <div style="background:linear-gradient(135deg,#f0fff4,#e8f8f0);border:1.5px solid #a9dfbf;border-radius:10px;padding:14px 18px;margin:10px 0">
-            <div style="font-size:13px;font-weight:700;color:#1b6e35;margin-bottom:4px">&#9679; Clinic Management Software</div>
-            <div style="font-size:12px;color:#555;margin-bottom:2px">Development by</div>
-            <div style="font-size:18px;font-weight:900;color:#27ae60;letter-spacing:.5px">GreenCheck inc.</div>
-            <div style="font-size:10px;color:#aaa;margin-top:6px">Empowering clinics with smart software solutions</div>
-          </div>
-          <hr style="margin:14px 0;border:none;border-top:1px solid #eee"/>
-          <p style="font-size:11px;color:#bbb">All data stored locally in your browser.<br>No internet required after download.</p>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
 
       <!-- LOCK & SECURITY -->
       <div id="set-security" class="set-section">
-        <div class="set-title">&#128274; Lock &amp; Security</div>
-        <div class="set-sub">Protect the app with a 6-digit PIN. Enabled by default -- toggle off to open the app without a PIN.</div>
-
-        <!-- Toggle row -->
-        <div class="set-group">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#f8fafc;border:1px solid #e0e8ee;border-radius:10px;margin-bottom:8px">
-            <div>
-              <div style="font-size:13px;font-weight:700;color:#222">&#128274; Lock Screen PIN</div>
-              <div style="font-size:11px;color:#888;margin-top:2px">Require 6-digit PIN on app open</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="tog-lock-pin" onchange="toggleLockPin(this.checked)"/>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <!-- Inline disable confirmation (replaces confirm() dialog) -->
-          <div id="lock-disable-confirm" style="display:none;background:#fff8e1;border:1.5px solid #f9ca24;border-radius:9px;padding:13px;margin-bottom:12px">
-            <div style="font-size:12px;font-weight:700;color:#856404;margin-bottom:6px">&#9888; Disable Lock Screen?</div>
-            <div style="font-size:11px;color:#555;margin-bottom:10px">Anyone with device access will be able to open the app without a PIN.</div>
-            <div style="display:flex;gap:8px">
-              <button class="btn bd sm" onclick="confirmDisableLock()" style="flex:1">Yes, Disable</button>
-              <button class="btn bo sm" onclick="cancelDisableLock()" style="flex:1">Cancel</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- PIN Setup area (shown when toggle is ON) -->
-        <div id="sec-pin-setup" style="display:none">
-          <div class="set-group">
-            <div style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:18px">
-              <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px">Set / Change 6-Digit PIN</div>
-
-              <!-- Current PIN (shown only if PIN already set) -->
-              <div id="sec-cur-pin-row" style="margin-bottom:10px;display:none">
-                <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CURRENT PIN</label>
-                <div style="display:flex;gap:6px">
-                  <input id="sec-cur-pin" type="password" inputmode="numeric" maxlength="6" placeholder="******"
-                    style="flex:1;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif"
-                    onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"/>
-                </div>
-              </div>
-
-              <div style="margin-bottom:10px">
-                <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">NEW PIN (6 digits)</label>
-                <input id="sec-new-pin" type="password" inputmode="numeric" maxlength="6" placeholder="******"
-                  style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif"
-                  onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"
-                  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)"/>
-              </div>
-
-              <div style="margin-bottom:14px">
-                <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CONFIRM NEW PIN</label>
-                <input id="sec-conf-pin" type="password" inputmode="numeric" maxlength="6" placeholder="******"
-                  style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif"
-                  onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"
-                  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)"/>
-              </div>
-
-              <div id="sec-pin-err" style="color:#c0392b;font-size:12px;margin-bottom:10px;min-height:16px"></div>
-              <button class="btn bp" onclick="saveNewPin()" style="width:100%">&#128274; Save PIN</button>
-            </div>
-          </div>
-
-          <!-- Remove PIN -->
-          <div id="sec-remove-row" style="margin-top:10px;display:none">
-            <button class="btn bd sm" onclick="showRemovePinForm()" id="sec-remove-btn" style="width:100%">&#128275; Remove PIN Protection</button>
-            <!-- Inline Remove PIN form (shown on click) -->
-            <div id="sec-remove-form" style="display:none;margin-top:10px;background:#fff5f5;border:1.5px solid #f0b8b3;border-radius:9px;padding:14px">
-              <div style="font-size:12px;font-weight:700;color:#c0392b;margin-bottom:8px">&#128275; Remove PIN Protection</div>
-              <div style="font-size:11px;color:#555;margin-bottom:10px">Enter your current PIN to confirm removal.</div>
-              <input id="sec-remove-pin-input" type="password" inputmode="numeric" maxlength="6" placeholder="Enter current 6-digit PIN"
-                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif;margin-bottom:8px"
-                onfocus="this.style.borderColor='#c0392b'" onblur="this.style.borderColor='#cdd5dd'"
-                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)"/>
-              <div id="sec-remove-pin-err" style="color:#c0392b;font-size:12px;margin-bottom:8px;min-height:14px"></div>
-              <div style="display:flex;gap:8px">
-                <button class="btn bd" onclick="confirmRemovePin()" style="flex:1">&#10003; Confirm Remove</button>
-                <button class="btn bo" onclick="hideRemovePinForm()" style="flex:1">Cancel</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-<!-- Info when lock is OFF -->
-        <div id="sec-lock-off-msg" style="display:none;background:#fff8e1;border:1px solid #f9ca24;border-radius:8px;padding:12px 14px;font-size:12px;color:#856404">
-          &#9888; Lock screen is <strong>disabled</strong>. Anyone with access to this device can open the app without a PIN.
-        </div>
-
-        <!--  LOGIN CREDENTIALS  -->
-        <div style="margin-top:22px">
-          <div class="sec" style="margin-bottom:14px">&#128100; Login Credentials</div>
-
-          <!-- Login On/Off Toggle -->
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#f8fafc;border:1px solid #e0e8ee;border-radius:10px;margin-bottom:16px">
-            <div>
-              <div style="font-size:13px;font-weight:700;color:#222">&#128275; Login Screen</div>
-              <div style="font-size:11px;color:#888;margin-top:2px" id="login-toggle-sub">Show login screen on app start</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="tog-login-screen" onchange="toggleLoginScreen(this.checked)"/>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-
-          <!-- Change Credentials Card -->
-          <div id="login-creds-card" style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:18px">
-            <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px">Change Username &amp; Password</div>
-
-            <div style="margin-bottom:10px">
-              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">NEW USERNAME</label>
-              <input id="cred-user" type="text" placeholder="Enter new username" autocomplete="off"
-                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
-                onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"/>
-            </div>
-
-            <div style="margin-bottom:10px">
-              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CURRENT PASSWORD</label>
-              <input id="cred-cur-pass" type="password" placeholder="Enter current password" autocomplete="off"
-                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
-                onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"/>
-            </div>
-
-            <div style="margin-bottom:10px">
-              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">NEW PASSWORD</label>
-              <input id="cred-new-pass" type="password" placeholder="New password (min 4 chars)" autocomplete="off"
-                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
-                onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"/>
-            </div>
-
-            <div style="margin-bottom:14px">
-              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CONFIRM NEW PASSWORD</label>
-              <input id="cred-conf-pass" type="password" placeholder="Confirm new password" autocomplete="off"
-                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
-                onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"/>
-            </div>
-
-            <div id="cred-err" style="color:#c0392b;font-size:12px;margin-bottom:10px;min-height:16px"></div>
-            <div id="cred-ok" style="color:#1b6e35;font-size:12px;margin-bottom:10px;min-height:16px;display:none">&#10003; Credentials updated successfully!</div>
-
-            <button class="btn bp" onclick="saveLoginCreds()" style="width:100%">&#128274; Save Credentials</button>
-            <div style="margin-top:10px;font-size:11px;color:#aaa;text-align:center">Leave username blank to keep current username</div>
-          </div>
-
-          <!-- AUTHORIZED EMAILS -->
-          <div style="margin-top:22px;background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:18px">
-            <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">&#128231; Authorized Google Emails</div>
-            <div style="font-size:12px;color:#888;margin-bottom:12px">Only these emails can login with Google. Leave empty to allow any Google account.</div>
-            <div style="display:flex;gap:8px;margin-bottom:10px">
-              <input id="allowed-email-inp" type="email" placeholder="email@gmail.com" style="flex:1;padding:8px 10px;border:1.5px solid #cdd5dd;border-radius:6px;font-size:13px;outline:none"/>
-              <button class="btn bg sm" onclick="addAllowedEmail()" style="white-space:nowrap;font-size:12px">+ Add</button>
-            </div>
-            <div id="allowed-email-list" style="display:flex;flex-direction:column;gap:6px"></div>
-            <div id="allowed-email-msg" style="font-size:12px;color:#27ae60;margin-top:6px;min-height:16px"></div>
-          </div>
-        </div>
-
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- == STAFF ROLES & ACCESS CONTROL == -->
       <div id="set-staffroles" class="set-section">
-        <div class="set-title">&#128101; Staff Roles &amp; Access Control</div>
-        <div class="set-sub">Add staff emails and assign roles. On login, access is automatically restricted based on their role.</div>
-
-        <div style="margin-top:16px">
-          <div style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.6;background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:10px 12px">
-            <strong>Doctor (Admin)</strong> -- full access to everything.<br>
-            <strong>Receptionist</strong> -- only allowed tabs below. Cannot access Cashbook, Expenses, Reports, Settings by default.<br>
-            Add staff emails and assign roles. On login, access is automatically restricted.
-          </div>
-
-          <!-- Add Staff Member -->
-          <div style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:16px;margin-bottom:12px">
-            <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">&#43; Add Staff Member</div>
-            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-              <input id="staff-email-inp" type="email" placeholder="staff@email.com" style="flex:2;min-width:160px;padding:8px 10px;border:1.5px solid #cdd5dd;border-radius:6px;font-size:13px;outline:none"/>
-              <select id="staff-role-inp" onchange="staffRoleChanged()" style="flex:1;min-width:130px;padding:8px 10px;border:1.5px solid #cdd5dd;border-radius:6px;font-size:13px;outline:none;background:#fff">
-                <option value="doctor">&#128104;&#8205;&#9877;&#65039; Doctor (Admin)</option>
-                <option value="reception">&#129333; Receptionist</option>
-              </select>
-            </div>
-            <!-- Custom permission checkboxes (shown for reception) -->
-            <div id="staff-perm-box" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:12px;margin-bottom:10px">
-              <div style="font-size:11px;font-weight:700;color:#666;margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px">&#128274; Allowed Tabs for this Staff</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dashboard" checked style="accent-color:var(--pri)"> Dashboard</label>
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-newbill" checked style="accent-color:var(--pri)"> Add Patient / Bill</label>
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-cashbook" style="accent-color:var(--pri)"> View Patient</label>
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-patientfile" checked style="accent-color:var(--pri)"> Patient File</label>
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-appointments" checked style="accent-color:var(--pri)"> Appointments</label>
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-prescription" checked style="accent-color:var(--pri)"> Prescription</label>
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-stock" style="accent-color:var(--pri)"> Stock</label>
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-viewbills" style="accent-color:var(--pri)"> Cash Book</label>
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-expenses" style="accent-color:var(--pri)"> Expenses</label>
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-reports" style="accent-color:var(--pri)"> Reports</label>
-                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-settings" style="accent-color:var(--pri)"> Settings</label>
-              </div>
-              <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e0e8ee">
-                <div style="font-size:11px;font-weight:700;color:#666;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#9998; Data Actions</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-canedit" checked style="accent-color:var(--pri)"> Can Edit Records</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-candelete" style="accent-color:var(--pri)"> Can Delete Records</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-cancollect" checked style="accent-color:var(--pri)"> Can Collect Payment</label>
-                </div>
-              </div>
-              <!-- DASHBOARD VISIBILITY FOR THIS STAFF -->
-              <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e0e8ee">
-                <div style="font-size:11px;font-weight:700;color:#666;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">&#128203; Dashboard Cards Visibility</div>
-                <div style="font-size:11px;color:#aaa;margin-bottom:8px">Reception login  dashboard   cards / panels </div>
-                <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:6px;letter-spacing:.3px">Today's Stats</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px">
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-todayCollected" checked style="accent-color:var(--pri)"> Today Collected OK</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-cashToday" checked style="accent-color:var(--pri)"> Cash Today</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-upiToday" checked style="accent-color:var(--pri)"> UPI Today</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-patientsToday" checked style="accent-color:var(--pri)"> Patients Today</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-overallPending" checked style="accent-color:var(--pri)"> Overall Pending</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-todayExpenses" checked style="accent-color:var(--pri)"> Today Expenses</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-netProfitToday" checked style="accent-color:var(--pri)"> Net Profit Today</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-unpaidExpBills" checked style="accent-color:var(--pri)"> Unpaid Exp. Bills</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-followUpDue" checked style="accent-color:var(--pri)"> Follow-Up Due </label>
-                </div>
-                <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:6px;letter-spacing:.3px">Monthly Cards</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px">
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monCollected" checked style="accent-color:var(--pri)"> Monthly Collected</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monBilled" checked style="accent-color:var(--pri)"> Monthly Billed</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monPending" checked style="accent-color:var(--pri)"> Monthly Pending</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monCash" checked style="accent-color:var(--pri)"> Cash (Month)</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monUPI" checked style="accent-color:var(--pri)"> UPI (Month)</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monPatients" checked style="accent-color:var(--pri)"> Patients (Month)</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monExpenses" checked style="accent-color:var(--pri)"> Monthly Expenses</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monNet" checked style="accent-color:var(--pri)"> Net Profit (Month)</label>
-                </div>
-                <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:6px;letter-spacing:.3px">Panels</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-panelMonthlyIncome" checked style="accent-color:var(--pri)"> Monthly Income Panel</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-panelIncomeTrend" checked style="accent-color:var(--pri)"> 12-Month Trend</label>
-                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-panelPatientGraph" checked style="accent-color:var(--pri)"> Patient Graph</label>
-                </div>
-              </div>
-            </div>
-            <div id="staff-add-msg" style="font-size:12px;color:#27ae60;min-height:16px;margin-bottom:8px"></div>
-            <button class="btn bg" onclick="addStaffMember()" style="width:100%">&#43; Add Staff Member</button>
-          </div>
-
-          <!-- Staff List -->
-          <div id="staff-member-list" style="display:flex;flex-direction:column;gap:8px"></div>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
       <!-- == BANKING & PAYMENTS == -->
       <div id="set-banking" class="set-section">
-        <div class="set-title">&#128179; Banking &amp; Payments</div>
-        <div class="set-sub">Add your UPI, QR and bank details. These appear in the payment popup when collecting from patients.</div>
-
-        <!-- UPI Details -->
-        <div class="set-group" style="margin-top:16px">
-          <div class="sec">UPI &amp; QR Payment</div>
-          <div class="row">
-            <div class="set-group" style="flex:1">
-              <label>UPI ID</label>
-              <input id="bk-upi-id" placeholder="e.g. clinic@upi or 9876543210@paytm"/>
-              <div class="hint">Used to generate payment links &amp; QR code</div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="set-group" style="flex:1">
-              <label>UPI Display Name</label>
-              <input id="bk-upi-name" placeholder="e.g. Niva Dental Clinic"/>
-              <div class="hint">Name shown on UPI payment screen</div>
-            </div>
-          </div>
-          <!-- UPI Barcode / QR Image Upload -->
-          <div class="row">
-            <div class="set-group" style="flex:1">
-              <label style="font-size:11px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:.4px">UPI QR / Barcode Image</label>
-              <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-top:6px">
-                <div id="bk-qr-preview-wrap" style="display:none;flex-shrink:0">
-                  <img id="bk-qr-preview-img" src="" style="width:110px;height:110px;object-fit:contain;border:1.5px solid #e0e8ee;border-radius:8px;background:#f8fafc;display:block"/>
-                  <button onclick="removeBkQrImage()" style="margin-top:5px;width:110px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:4px 0;font-size:11px;color:#c0392b;cursor:pointer;font-weight:700">&#10005; Remove</button>
-                </div>
-                <div style="flex:1;min-width:180px">
-                  <label for="bk-qr-file" style="display:inline-flex;align-items:center;gap:6px;background:var(--pri);color:#fff;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px">
-                    &#128247; Upload QR / Barcode Image
-                    <input type="file" id="bk-qr-file" accept="image/*" style="display:none" onchange="handleBkQrUpload(event)"/>
-                  </label>
-                  <div class="hint" style="margin-top:4px">Upload your UPI QR code or payment barcode image. It will appear on printed bills and can be shared via WhatsApp.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Bank Account Details -->
-        <div class="set-group" style="margin-top:6px">
-          <div class="sec" style="display:flex;align-items:center;justify-content:space-between">
-            <span>Bank Account (for NEFT / IMPS / RTGS)</span>
-            <button class="btn bp sm" onclick="openSmartPaste()" style="font-size:11px;padding:4px 10px;display:inline-flex;align-items:center;gap:5px">&#128203; Smart Paste</button>
-          </div>
-
-          <!-- Smart Paste Panel -->
-          <div id="smart-paste-panel" style="display:none;background:#f0f8fb;border:1.5px solid #b2dce8;border-radius:9px;padding:14px;margin-bottom:12px">
-            <div style="font-size:12px;font-weight:700;color:var(--pri);margin-bottom:6px">&#128203; Smart Paste -- Auto-fill from copied text</div>
-            <div style="font-size:11px;color:#555;margin-bottom:9px">Copy your bank detail SMS / message / PDF text, then paste it below. Fields will be filled automatically.</div>
-            <textarea id="smart-paste-input" rows="4" placeholder="Paste bank details here...&#10;&#10;e.g. Account Holder: Niva Dental Clinic&#10;Bank: HDFC Bank | A/C: 00001234567890 | IFSC: HDFC0001234&#10;Branch: Naranpura, Ahmedabad | Type: Current" style="width:100%;padding:8px 10px;border:1.5px solid #b2dce8;border-radius:7px;font-size:12px;font-family:Arial,sans-serif;background:#fff;color:#222;outline:none;resize:vertical;line-height:1.6"></textarea>
-            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center">
-              <button class="btn bp" onclick="runSmartParse()" style="font-size:12px;padding:6px 14px">&#10003; Parse &amp; Fill Fields</button>
-              <button class="btn bo" onclick="closeSmartPaste()" style="font-size:12px;padding:6px 12px">Cancel</button>
-              <span id="smart-paste-msg" style="font-size:11px;font-weight:700;color:#1b6e35;display:none"></span>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="set-group" style="flex:1">
-              <label>Account Holder Name</label>
-              <input id="bk-ac-name" placeholder="e.g. Niva Dental Clinic"/>
-            </div>
-            <div class="set-group" style="flex:1">
-              <label>Bank Name</label>
-              <input id="bk-bank-name" placeholder="e.g. HDFC Bank"/>
-            </div>
-          </div>
-          <div class="row">
-            <div class="set-group" style="flex:1">
-              <label>Account Number</label>
-              <input id="bk-ac-num" placeholder="e.g. 00001234567890" inputmode="numeric"/>
-            </div>
-            <div class="set-group" style="flex:1">
-              <label>IFSC Code</label>
-              <input id="bk-ifsc" placeholder="e.g. HDFC0001234" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"/>
-            </div>
-          </div>
-          <div class="row">
-            <div class="set-group" style="flex:1">
-              <label>Branch Name</label>
-              <input id="bk-branch" placeholder="e.g. Naranpura Branch, Ahmedabad"/>
-            </div>
-            <div class="set-group" style="flex:1">
-              <label>Account Type</label>
-              <select id="bk-ac-type">
-                <option value="Current">Current Account</option>
-                <option value="Savings">Savings Account</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Preview -->
-        <div style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:10px;padding:14px;margin-bottom:16px" id="bk-preview-wrap" style="display:none">
-          <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Preview -- Payment Popup will show:</div>
-          <div id="bk-preview-text" style="font-size:12px;color:#444;line-height:1.8"></div>
-        </div>
-
-        <!-- Print Options -->
-        <div class="set-group" style="margin-top:6px">
-          <div class="sec">Print Options</div>
-          <div class="toggle-row">
-            <div><div class="tlabel">&#128247; Show UPI QR / Barcode in bill</div><div class="tsub">Print uploaded UPI QR / barcode image at the bottom of the bill</div></div>
-            <label class="toggle"><input type="checkbox" id="tog-showqr"/><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div><div class="tlabel">&#127963; Show bank account details in bill</div><div class="tsub">Print NEFT / IMPS bank account info at the bottom of the bill</div></div>
-            <label class="toggle"><input type="checkbox" id="tog-showbank"/><span class="toggle-slider"></span></label>
-          </div>
-        </div>
-
-        <div class="save-bar">
-          <button class="btn bg" onclick="saveBankingDetails()">&#10003; Save Banking Details</button>
-          <span class="saved-msg" id="banking-saved">&#10003; Saved!</span>
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
 
 <!-- == BANKING & PAYMENTS SETTINGS SECTION == -->
@@ -4458,29 +3052,7 @@ function showLockAfterSplash(){
 
       <!-- DOCTORS -->
       <div id="set-doctors" class="set-section">
-        <div class="set-title"> Doctors</div>
-        <div class="set-sub">Save doctor names and mobile numbers. When an appointment is set, you can send WhatsApp / SMS reminders directly to the doctor.</div>
-        <div id="doctor-list-wrap" style="margin-bottom:16px"></div>
-        <div style="background:#f8fafc;border:1.5px dashed #b2dce8;border-radius:10px;padding:16px;margin-bottom:16px">
-          <div class="sec" style="margin-bottom:12px"> Add / Edit Doctor</div>
-          <div class="row">
-            <div class="f"><label>Doctor Name *</label><input id="dr-add-name" placeholder="e.g. Dr. Rakesh N Patel"/></div>
-            <div class="f"><label>Mobile Number *</label><input id="dr-add-phone" type="tel" inputmode="numeric" placeholder="e.g. 9876543210" maxlength="10"/></div>
-          </div>
-          <div class="row">
-            <div class="f"><label>Speciality (optional)</label><input id="dr-add-spec" placeholder="e.g. Orthodontist, Endodontist"/></div>
-            <div class="f" style="max-width:180px"><label>Schedule Days</label><input id="dr-add-days" placeholder="e.g. Mon-Sat"/></div>
-          </div>
-          <input type="hidden" id="dr-edit-id"/>
-          <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
-            <button class="btn bg" onclick="drSave()">&#10003; Save Doctor</button>
-            <button class="btn bo" onclick="drCancelEdit()">Cancel</button>
-            <span id="dr-save-msg" style="font-size:12px;color:#1b6e35;font-weight:700;display:none;align-self:center">&#10003; Saved!</span>
-          </div>
-        </div>
-        <div style="font-size:11px;color:#888;padding:8px 12px;background:#fff8e8;border:1px solid #f0d8a0;border-radius:7px">
-           <strong>Tip:</strong> When booking an appointment, select a doctor from the dropdown -- WhatsApp/SMS reminder buttons will appear automatically with a pre-built message for that doctor.
-        </div>
+        <div class="settings-lazy-placeholder" style="padding:30px;text-align:center;color:#aaa;font-size:12px">Loading...</div>
       </div>
     </div><!-- /settings-content -->
   </div><!-- /settings-grid -->
@@ -5270,6 +3842,37 @@ function showLockAfterSplash(){
 </script>
 <script>
 /* ============================================================================
+   SETTINGS PARTIALS LOADER -- fetches each Settings section's HTML from its
+   own file under settings-html/ and drops it into its placeholder div.
+   Runs immediately (before the splash screen even finishes) so all Settings
+   markup is in the DOM well before the user can reach the Settings tab.
+   Requires http(s):// hosting (e.g. GitHub Pages) -- fetch() cannot read
+   local files over a plain file:// URL.
+   ============================================================================ */
+window._nivaSettingsReadyPromise = (function(){
+  var names = ['clinic','theme','billing','data','email','firebase','supabase',
+    'printformat','rxprintformat','apptmsg','affirmation','about','security',
+    'staffroles','banking','doctors'];
+  var jobs = names.map(function(name){
+    return fetch('settings-html/set-'+name+'.html')
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+      .then(function(html){
+        var el = document.getElementById('set-'+name);
+        if(el) el.outerHTML = html;
+      })
+      .catch(function(err){
+        console.error('[Settings loader] failed to load section "'+name+'":', err);
+        var el = document.getElementById('set-'+name);
+        if(el) el.innerHTML = '<div style="padding:24px;text-align:center;color:#c0392b;font-size:12px">'+
+          '&#9888; Could not load this settings section (' + name + '). '+
+          'If you are opening this file directly (file://), please host it over http(s) instead, e.g. via GitHub Pages.</div>';
+      });
+  });
+  return Promise.all(jobs);
+})();
+</script>
+<script>
+/* ============================================================================
    NIVA DENTAL -- CODE MAP / TABLE OF CONTENTS
    ----------------------------------------------------------------------------
    This is ONE file (no build step, no bundler) -- kept as a single file on
@@ -5329,11 +3932,6 @@ try{
   if(ld){CFG.logo.data=ld;}
 }catch(e){}
 // Also try IDB for logo (IDB load happens async in _nivaIdbReady above)
-// Load saved app icon (favicon / home-screen icon) if one was set
-try{
-  const aic=localStorage.getItem('niva_app_icon');
-  if(aic&&typeof applyAppIcon==='function')applyAppIcon(aic);
-}catch(e){}
 
 //  APPLY THEME 
 function hexToRgb(hex){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return{r,g,b};}
@@ -8143,7 +6741,6 @@ function showSetSection(name,btn){
   if(name==='data'){updateDataStats();initAutoSaveUI();}
   if(name==='apptmsg'){loadApptMsgForm();}
   if(name==='affirmation'){loadAffirmationSettings();}
-  if(name==='about'){loadAppIcon();}
   if(name==='dashboard'){renderPatientGraph();renderIncomeGraph();setTimeout(renderIncomeGraph,150);setTimeout(function(){ if(window.applyMobAffirmCard) window.applyMobAffirmCard(); },100);}
   if(name==='email'||name==='firebase'||name==='supabase'){
     var body=document.getElementById('adv-sync-body');
@@ -8266,58 +6863,6 @@ function saveClinic(){
   const m=document.getElementById('clinic-saved');m.classList.add('show');setTimeout(()=>m.classList.remove('show'),2500);
 }
 
-function applyAppIcon(dataUrl){
-  // Update (or create) favicon + apple-touch-icon links so tab icon / home-screen icon reflect the custom image
-  ['icon','shortcut icon','apple-touch-icon'].forEach(function(rel){
-    var link=document.querySelector('link[rel="'+rel+'"]');
-    if(!link){link=document.createElement('link');link.rel=rel;document.head.appendChild(link);}
-    if(dataUrl){link.href=dataUrl;link.type='image/png';}
-  });
-  if(!dataUrl){
-    // Reset to original default icon
-    var l1=document.querySelector('link[rel="icon"]');if(l1)l1.href='icon192.png';
-    var l2=document.querySelector('link[rel="apple-touch-icon"]');if(l2)l2.href='icon192.png';
-  }
-}
-function handleAppIconUpload(input){
-  const file=input.files[0];if(!file)return;
-  if(file.size>1024*1024){
-    if(!confirm('Image is '+Math.round(file.size/1024)+'KB. Large images may slow loading. Continue?'))return;
-  }
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const dataUrl=e.target.result;
-    try{localStorage.setItem('niva_app_icon',dataUrl);}catch(e){
-      console.warn('[NivaIDB] App icon too large for localStorage, saved to IDB only.');
-    }
-    idbKVSet('niva_app_icon',dataUrl).catch(e=>console.warn('[NivaIDB] app icon save:',e));
-    document.getElementById('appicon-preview').src=dataUrl;
-    document.getElementById('appicon-preview').style.display='block';
-    document.getElementById('appicon-placeholder').style.display='none';
-    applyAppIcon(dataUrl);
-  };
-  reader.readAsDataURL(file);
-}
-function removeAppIconConfirm(){
-  if(!confirm('Remove the custom app icon and go back to the default?'))return;
-  try{localStorage.removeItem('niva_app_icon');}catch(e){}
-  idbKVSet('niva_app_icon','').catch(e=>console.warn('[NivaIDB] app icon remove:',e));
-  document.getElementById('appicon-preview').style.display='none';
-  document.getElementById('appicon-preview').src='';
-  document.getElementById('appicon-placeholder').style.display='block';
-  applyAppIcon('');
-}
-function loadAppIcon(){
-  try{
-    var d=localStorage.getItem('niva_app_icon');
-    if(d){
-      applyAppIcon(d);
-      var p=document.getElementById('appicon-preview'),ph=document.getElementById('appicon-placeholder');
-      if(p){p.src=d;p.style.display='block';}
-      if(ph)ph.style.display='none';
-    }
-  }catch(e){}
-}
 function handleLogoUpload(input){
   const file=input.files[0];if(!file)return;
   if(file.size>500*1024){
@@ -13200,7 +11745,16 @@ function showTab(name,btn){
   if(_fabNewbill) _fabNewbill.style.display=_fabHide.includes(name)?'none':'';
   if(_fabAppt) _fabAppt.style.display=_fabHide.includes(name)?'none':'';
   if(_fabStock) _fabStock.style.display=_fabHide.includes(name)?'none':'';
-  if(name==='settings'){loadClinicForm();renderThemeGrid();loadBillingForm();loadEmailForm();loadFBForm();loadPFForm();loadApptMsgForm();setTimeout(refreshSetActivationCard,50);showSetSection('clinic',document.querySelector('.setnav button:first-child'));}
+  if(name==='settings'){
+    var _nivaDoSettingsInit=function(){
+      loadClinicForm();renderThemeGrid();loadBillingForm();loadEmailForm();loadFBForm();loadPFForm();loadApptMsgForm();setTimeout(refreshSetActivationCard,50);showSetSection('clinic',document.querySelector('.setnav button:first-child'));
+    };
+    if(window._nivaSettingsReadyPromise && typeof window._nivaSettingsReadyPromise.then==='function'){
+      window._nivaSettingsReadyPromise.then(_nivaDoSettingsInit);
+    } else {
+      _nivaDoSettingsInit();
+    }
+  }
   if(name==='expenses')renderExp();
   if(name==='reports'){setTimeout(()=>{
     const now=new Date();
@@ -18449,6 +17003,8 @@ if (typeof svAppt === 'undefined') {
     var tog = document.getElementById('tog-lock-pin');
     if(tog) tog.checked = false;
     localStorage.setItem('niva_lock_enabled','0');
+    localStorage.setItem('niva_bio_enabled','0');
+    localStorage.removeItem('niva_bio_cred_id');
     refreshSecurityUI();
   };
 
@@ -18481,6 +17037,7 @@ if (typeof svAppt === 'undefined') {
       var el=document.getElementById(id);if(el)el.value='';
     });
     var e=document.getElementById('sec-pin-err');if(e)e.textContent='';
+    if(typeof window.refreshBiometricUI==='function') window.refreshBiometricUI();
   };
 
   window.saveNewPin = async function(){
@@ -18538,6 +17095,8 @@ if (typeof svAppt === 'undefined') {
     if(h !== getStoredPin()){ err.textContent = 'Incorrect PIN. Please try again.'; inp.value=''; inp.focus(); return; }
     localStorage.removeItem('niva_pin_v1');
     localStorage.setItem('niva_lock_enabled','0');
+    localStorage.setItem('niva_bio_enabled','0');
+    localStorage.removeItem('niva_bio_cred_id');
     resetPinAttempts();
     window.hideRemovePinForm();
     refreshSecurityUI();
@@ -18549,6 +17108,170 @@ if (typeof svAppt === 'undefined') {
   //  Init: lockscreen is hidden by default, splash will call showLockAfterSplash() 
   // Just set up lockout tick if needed (for when lockscreen IS shown)
   if(getPinAttempts().lockedUntil > Date.now()) startPinLockoutTick();
+
+})();
+
+//  ========================================================= 
+//  FINGERPRINT / FACE UNLOCK  (WebAuthn platform authenticator) 
+//  Works as a shortcut alongside the PIN -- it never replaces the PIN
+//  as the underlying secret; a successful biometric assertion just
+//  unlocks the app the same way a correct PIN entry does.
+//  ========================================================= 
+(function(){
+
+  function b64uEnc(buf){
+    var bytes = new Uint8Array(buf), bin = '';
+    for(var i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+  function b64uDec(str){
+    str = str.replace(/-/g,'+').replace(/_/g,'/');
+    while(str.length % 4) str += '=';
+    var bin = atob(str), arr = new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+    return arr.buffer;
+  }
+
+  function webauthnSupported(){
+    return !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create && navigator.credentials.get);
+  }
+
+  window.isBiometricAvailable = async function(){
+    try{
+      if(!webauthnSupported()) return false;
+      if(typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable !== 'function') return false;
+      return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    }catch(e){ return false; }
+  };
+
+  function bioEnabled(){ return localStorage.getItem('niva_bio_enabled')==='1' && !!localStorage.getItem('niva_bio_cred_id'); }
+
+  async function enrollBiometric(){
+    var challenge = crypto.getRandomValues(new Uint8Array(32));
+    var userId = localStorage.getItem('niva_bio_user_id');
+    if(!userId){
+      userId = b64uEnc(crypto.getRandomValues(new Uint8Array(16)).buffer);
+      localStorage.setItem('niva_bio_user_id', userId);
+    }
+    var clinicName = (typeof CFG!=='undefined' && CFG.clinic && CFG.clinic.name) ? CFG.clinic.name : 'Clinic App';
+    var cred = await navigator.credentials.create({
+      publicKey:{
+        challenge: challenge,
+        rp:{ name: clinicName },
+        user:{ id: b64uDec(userId), name:'app-lock', displayName: clinicName+' App Lock' },
+        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+        authenticatorSelection:{ authenticatorAttachment:'platform', userVerification:'required', residentKey:'preferred' },
+        timeout:60000,
+        attestation:'none'
+      }
+    });
+    if(!cred) throw new Error('Setup was cancelled.');
+    localStorage.setItem('niva_bio_cred_id', b64uEnc(cred.rawId));
+  }
+
+  window.toggleBiometric = async function(checked){
+    var tog = document.getElementById('tog-lock-bio');
+    if(checked){
+      var hasPIN = !!localStorage.getItem('niva_pin_v1');
+      if(!hasPIN){
+        alert('Please set a 6-digit PIN first (below), then enable Fingerprint/Face unlock.');
+        if(tog) tog.checked = false;
+        window.refreshBiometricUI();
+        return;
+      }
+      var avail = await window.isBiometricAvailable();
+      if(!avail){
+        alert('Fingerprint/Face unlock is not available on this device or browser.');
+        if(tog) tog.checked = false;
+        window.refreshBiometricUI();
+        return;
+      }
+      try{
+        await enrollBiometric();
+        localStorage.setItem('niva_bio_enabled','1');
+        alert('OK Fingerprint/Face unlock enabled!');
+      }catch(e){
+        alert('Could not set up Fingerprint/Face unlock: '+(e && e.message ? e.message : e));
+        localStorage.setItem('niva_bio_enabled','0');
+        localStorage.removeItem('niva_bio_cred_id');
+        if(tog) tog.checked = false;
+      }
+    } else {
+      localStorage.setItem('niva_bio_enabled','0');
+      localStorage.removeItem('niva_bio_cred_id');
+    }
+    window.refreshBiometricUI();
+  };
+
+  window.refreshBiometricUI = async function(){
+    var hasPIN = !!localStorage.getItem('niva_pin_v1');
+    var avail = await window.isBiometricAvailable();
+    var enabled = bioEnabled();
+    var tog = document.getElementById('tog-lock-bio');
+    var unsupportedMsg = document.getElementById('bio-unsupported-msg');
+    var needPinMsg = document.getElementById('bio-needpin-msg');
+    if(tog){ tog.checked = enabled; tog.disabled = !avail || !hasPIN; }
+    if(unsupportedMsg) unsupportedMsg.style.display = avail ? 'none' : 'block';
+    if(needPinMsg) needPinMsg.style.display = (avail && !hasPIN) ? 'block' : 'none';
+  };
+
+  // Called from the lock screen, either automatically on show or via the button tap.
+  // silent=true suppresses the on-screen error message (used for the automatic attempt).
+  window.tryBiometricUnlock = async function(silent){
+    if(!bioEnabled()) return false;
+    var credId = localStorage.getItem('niva_bio_cred_id');
+    var icon = document.getElementById('lock-bio-icon'), label = document.getElementById('lock-bio-label');
+    try{
+      if(icon) icon.textContent = '⏳';
+      if(label) label.textContent = 'Verifying...';
+      var challenge = crypto.getRandomValues(new Uint8Array(32));
+      var assertion = await navigator.credentials.get({
+        publicKey:{
+          challenge: challenge,
+          allowCredentials:[{ id: b64uDec(credId), type:'public-key', transports:['internal'] }],
+          userVerification:'required',
+          timeout:60000
+        }
+      });
+      if(!assertion) throw new Error('No assertion returned');
+
+      // Success -- unlock exactly like a correct PIN entry
+      if(typeof resetPinAttempts === 'function') resetPinAttempts();
+      localStorage.setItem('niva_unlocked','1');
+      localStorage.setItem('niva_login_time', Date.now().toString());
+      var ls = document.getElementById('lockscreen');
+      if(ls){
+        ls.style.transition = 'opacity 0.3s ease';
+        ls.style.opacity = '0';
+        setTimeout(function(){
+          ls.style.display = 'none'; ls.style.opacity = '1';
+          if(typeof window._checkLoginAfterUnlock === 'function') window._checkLoginAfterUnlock();
+        }, 300);
+      }
+      return true;
+    }catch(e){
+      if(icon) icon.textContent = '🔒';
+      if(label) label.textContent = 'Unlock with Fingerprint / Face';
+      if(!silent){
+        var errEl = document.getElementById('lock-err');
+        if(errEl) errEl.textContent = 'Fingerprint/Face unlock failed or was cancelled.';
+      }
+      return false;
+    }
+  };
+
+  // Show the biometric row on the lock screen and, if enabled, try it automatically
+  // (most platforms surface the native Face ID / fingerprint prompt right away).
+  window._nivaShowBioRowIfEnabled = async function(){
+    var row = document.getElementById('lock-bio-row');
+    if(!row) return;
+    if(bioEnabled() && await window.isBiometricAvailable()){
+      row.style.display = 'block';
+      setTimeout(function(){ window.tryBiometricUnlock(true); }, 350);
+    } else {
+      row.style.display = 'none';
+    }
+  };
 
 })();
 
