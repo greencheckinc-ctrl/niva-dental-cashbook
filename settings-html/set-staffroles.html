@@ -1,0 +1,88 @@
+      <div id="set-staffroles" class="set-section">
+        <div class="set-title">&#128101; Staff Roles &amp; Access Control</div>
+        <div class="set-sub">Add staff emails and assign roles. On login, access is automatically restricted based on their role.</div>
+
+        <div style="margin-top:16px">
+          <div style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.6;background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:10px 12px">
+            <strong>Doctor (Admin)</strong> -- full access to everything.<br>
+            <strong>Receptionist</strong> -- only allowed tabs below. Cannot access Cashbook, Expenses, Reports, Settings by default.<br>
+            Add staff emails and assign roles. On login, access is automatically restricted.
+          </div>
+
+          <!-- Add Staff Member -->
+          <div style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:16px;margin-bottom:12px">
+            <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">&#43; Add Staff Member</div>
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+              <input id="staff-email-inp" type="email" placeholder="staff@email.com" style="flex:2;min-width:160px;padding:8px 10px;border:1.5px solid #cdd5dd;border-radius:6px;font-size:13px;outline:none"/>
+              <select id="staff-role-inp" onchange="staffRoleChanged()" style="flex:1;min-width:130px;padding:8px 10px;border:1.5px solid #cdd5dd;border-radius:6px;font-size:13px;outline:none;background:#fff">
+                <option value="doctor">&#128104;&#8205;&#9877;&#65039; Doctor (Admin)</option>
+                <option value="reception">&#129333; Receptionist</option>
+              </select>
+            </div>
+            <!-- Custom permission checkboxes (shown for reception) -->
+            <div id="staff-perm-box" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:12px;margin-bottom:10px">
+              <div style="font-size:11px;font-weight:700;color:#666;margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px">&#128274; Allowed Tabs for this Staff</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dashboard" checked style="accent-color:var(--pri)"> Dashboard</label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-newbill" checked style="accent-color:var(--pri)"> Add Patient / Bill</label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-cashbook" style="accent-color:var(--pri)"> View Patient</label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-patientfile" checked style="accent-color:var(--pri)"> Patient File</label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-appointments" checked style="accent-color:var(--pri)"> Appointments</label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-prescription" checked style="accent-color:var(--pri)"> Prescription</label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-stock" style="accent-color:var(--pri)"> Stock</label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-viewbills" style="accent-color:var(--pri)"> Cash Book</label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-expenses" style="accent-color:var(--pri)"> Expenses</label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-reports" style="accent-color:var(--pri)"> Reports</label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-settings" style="accent-color:var(--pri)"> Settings</label>
+              </div>
+              <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e0e8ee">
+                <div style="font-size:11px;font-weight:700;color:#666;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">&#9998; Data Actions</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-canedit" checked style="accent-color:var(--pri)"> Can Edit Records</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-candelete" style="accent-color:var(--pri)"> Can Delete Records</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-cancollect" checked style="accent-color:var(--pri)"> Can Collect Payment</label>
+                </div>
+              </div>
+              <!-- DASHBOARD VISIBILITY FOR THIS STAFF -->
+              <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e0e8ee">
+                <div style="font-size:11px;font-weight:700;color:#666;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">&#128203; Dashboard Cards Visibility</div>
+                <div style="font-size:11px;color:#aaa;margin-bottom:8px">Reception login  dashboard   cards / panels </div>
+                <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:6px;letter-spacing:.3px">Today's Stats</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px">
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-todayCollected" checked style="accent-color:var(--pri)"> Today Collected OK</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-cashToday" checked style="accent-color:var(--pri)"> Cash Today</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-upiToday" checked style="accent-color:var(--pri)"> UPI Today</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-patientsToday" checked style="accent-color:var(--pri)"> Patients Today</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-overallPending" checked style="accent-color:var(--pri)"> Overall Pending</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-todayExpenses" checked style="accent-color:var(--pri)"> Today Expenses</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-netProfitToday" checked style="accent-color:var(--pri)"> Net Profit Today</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-unpaidExpBills" checked style="accent-color:var(--pri)"> Unpaid Exp. Bills</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-followUpDue" checked style="accent-color:var(--pri)"> Follow-Up Due </label>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:6px;letter-spacing:.3px">Monthly Cards</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px">
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monCollected" checked style="accent-color:var(--pri)"> Monthly Collected</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monBilled" checked style="accent-color:var(--pri)"> Monthly Billed</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monPending" checked style="accent-color:var(--pri)"> Monthly Pending</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monCash" checked style="accent-color:var(--pri)"> Cash (Month)</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monUPI" checked style="accent-color:var(--pri)"> UPI (Month)</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monPatients" checked style="accent-color:var(--pri)"> Patients (Month)</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monExpenses" checked style="accent-color:var(--pri)"> Monthly Expenses</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-monNet" checked style="accent-color:var(--pri)"> Net Profit (Month)</label>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:6px;letter-spacing:.3px">Panels</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-panelMonthlyIncome" checked style="accent-color:var(--pri)"> Monthly Income Panel</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-panelIncomeTrend" checked style="accent-color:var(--pri)"> 12-Month Trend</label>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid #e0e8ee;background:#fff"><input type="checkbox" id="sp-dc-panelPatientGraph" checked style="accent-color:var(--pri)"> Patient Graph</label>
+                </div>
+              </div>
+            </div>
+            <div id="staff-add-msg" style="font-size:12px;color:#27ae60;min-height:16px;margin-bottom:8px"></div>
+            <button class="btn bg" onclick="addStaffMember()" style="width:100%">&#43; Add Staff Member</button>
+          </div>
+
+          <!-- Staff List -->
+          <div id="staff-member-list" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+      </div>

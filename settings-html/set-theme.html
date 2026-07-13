@@ -1,0 +1,34 @@
+      <div id="set-theme" class="set-section">
+        <div class="set-title">&#127912; Theme &amp; Colors</div>
+        <div class="set-sub">Choose a preset theme or set a custom primary color.</div>
+        <div class="sec">Preset themes</div>
+        <div class="theme-grid" id="theme-grid"></div>
+        <div class="sec" style="margin-top:20px">Custom color</div>
+        <div class="color-row">
+          <input type="color" id="custom-color" value="var(--pri)" oninput="previewCustom(this.value)"/>
+          <span class="clabel">Primary color<br><span style="font-size:11px;color:#aaa;font-weight:400">Used for topbar, buttons, highlights</span></span>
+          <span class="cval" id="custom-hex">var(--pri)</span>
+        </div>
+        <div class="save-bar">
+          <button class="btn bg" style="flex:1" onclick="saveTheme()">&#10003; Apply Theme</button>
+          <button class="btn bo" style="flex:1" onclick="resetTheme()">Reset Default</button>
+          <span class="saved-msg" id="theme-saved">&#10003; Theme applied!</span>
+        </div>
+        <div class="sec" style="margin-top:20px">Auto from Logo</div>
+        <div style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:12px 14px">
+          <div style="font-size:12px;color:#555;margin-bottom:10px">Automatically extract the dominant colour from your clinic logo and set it as theme.</div>
+          <!-- Logo Preview -->
+          <div id="auto-logo-preview-wrap" style="display:none;margin-bottom:10px;text-align:center">
+            <img id="auto-logo-preview-img" src="" alt="Clinic Logo" style="max-height:72px;max-width:100%;object-fit:contain;border-radius:8px;border:1px solid #e0e8ee;background:#fff;padding:4px"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div id="logo-color-preview" style="width:36px;height:36px;border-radius:6px;border:2px solid #e0e8ee;background:#eee;flex-shrink:0"></div>
+            <div>
+              <div id="logo-color-hex" style="font-size:13px;font-weight:700;color:#333">--</div>
+              <div style="font-size:11px;color:#aaa">Extracted colour</div>
+            </div>
+            <button class="btn bo" onclick="extractLogoColor()" style="margin-left:auto">&#127752; Extract from Logo</button>
+            <button class="btn bg" id="apply-logo-color-btn" onclick="applyLogoColor()" style="display:none">&#10003; Apply this colour</button>
+          </div>
+        </div>
+      </div>

@@ -1,0 +1,25 @@
+      <div id="set-doctors" class="set-section">
+        <div class="set-title"> Doctors</div>
+        <div class="set-sub">Save doctor names and mobile numbers. When an appointment is set, you can send WhatsApp / SMS reminders directly to the doctor.</div>
+        <div id="doctor-list-wrap" style="margin-bottom:16px"></div>
+        <div style="background:#f8fafc;border:1.5px dashed #b2dce8;border-radius:10px;padding:16px;margin-bottom:16px">
+          <div class="sec" style="margin-bottom:12px"> Add / Edit Doctor</div>
+          <div class="row">
+            <div class="f"><label>Doctor Name *</label><input id="dr-add-name" placeholder="e.g. Dr. Rakesh N Patel"/></div>
+            <div class="f"><label>Mobile Number *</label><input id="dr-add-phone" type="tel" inputmode="numeric" placeholder="e.g. 9876543210" maxlength="10"/></div>
+          </div>
+          <div class="row">
+            <div class="f"><label>Speciality (optional)</label><input id="dr-add-spec" placeholder="e.g. Orthodontist, Endodontist"/></div>
+            <div class="f" style="max-width:180px"><label>Schedule Days</label><input id="dr-add-days" placeholder="e.g. Mon-Sat"/></div>
+          </div>
+          <input type="hidden" id="dr-edit-id"/>
+          <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
+            <button class="btn bg" onclick="drSave()">&#10003; Save Doctor</button>
+            <button class="btn bo" onclick="drCancelEdit()">Cancel</button>
+            <span id="dr-save-msg" style="font-size:12px;color:#1b6e35;font-weight:700;display:none;align-self:center">&#10003; Saved!</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#888;padding:8px 12px;background:#fff8e8;border:1px solid #f0d8a0;border-radius:7px">
+           <strong>Tip:</strong> When booking an appointment, select a doctor from the dropdown -- WhatsApp/SMS reminder buttons will appear automatically with a pre-built message for that doctor.
+        </div>
+      </div>

@@ -1,0 +1,94 @@
+      <div id="set-printformat" class="set-section">
+        <div class="set-title">&#128438; Print Format &amp; Page Setup</div>
+        <div class="set-sub">Configure page layout, pre-printed stationery options, margins, and what to show/hide on prints.</div>
+
+        <div class="sec">Bill &amp; Receipt Layout Template</div>
+        <div class="set-group" style="margin-bottom:16px">
+          <label>Choose print template</label>
+          <select id="pf-template" onchange="updatePrintPreview()">
+            <option value="classic">Classic - Single column, bordered box</option>
+            <option value="a4pro">A4 Professional - Two-column header, color accent bar, itemised table</option>
+            <option value="a5compact">A5 Compact - Minimalist, center-logo, clean lines</option>
+            <option value="a4dental">A4 Dental Premium - Full-width color header, treatment table, tooth icon, signature line</option>
+            <option value="a5modern">A5 Modern Card - Bold accent, two-tone layout, compact summary card style</option>
+          </select>
+          <div class="hint">Each template has its own layout. Paper size &amp; margin settings below still apply.</div>
+        </div>
+
+        <div class="sec">Paper &amp; page size</div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>Paper size</label>
+            <select id="pf-size">
+              <option value="A4">A4 (210  297mm)</option>
+              <option value="A5">A5 (148  210mm)</option>
+              <option value="Letter">Letter (216  279mm)</option>
+              <option value="thermal80">Thermal 80mm</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="set-group" style="flex:1"><label>Orientation</label>
+            <select id="pf-orient"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>Top margin (mm)</label><input id="pf-mt" type="number" value="10" min="0" max="80"/></div>
+          <div class="set-group" style="flex:1"><label>Bottom margin (mm)</label><input id="pf-mb" type="number" value="10" min="0" max="80"/></div>
+          <div class="set-group" style="flex:1"><label>Left margin (mm)</label><input id="pf-ml" type="number" value="10" min="0" max="80"/></div>
+          <div class="set-group" style="flex:1"><label>Right margin (mm)</label><input id="pf-mr" type="number" value="10" min="0" max="80"/></div>
+        </div>
+
+        <div class="sec" style="margin-top:4px">Pre-printed stationery options</div>
+        <div class="note-collapsible" id="note-pf-stationery" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px">
+            <strong style="font-size:12px;color:#1a5276"> Pre-printed stationery tip</strong>
+            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-pf-stationery')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow"></span></button>
+          </div>
+          <div class="note-body" style="padding:0 14px 10px;font-size:12px;color:#1a5276">
+            Use these when printing on stationery that already has your clinic name/logo pre-printed at the top.
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tlabel">Hide clinic name &amp; header</div><div class="tsub">Do not print clinic name, address, phone on bill (for pre-printed letterhead)</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-hideheader"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tlabel">Hide clinic logo area</div><div class="tsub">Skip the top logo/name block entirely</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-hidelogo"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tlabel">Hide footer tagline</div><div class="tsub">Do not print the footer message</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-hidefooter"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tlabel">Compact mode (smaller fonts)</div><div class="tsub">Reduce font sizes for denser layouts</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-compact"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tlabel">Show border/box around bill</div><div class="tsub">Print outer border rectangle around the bill</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-border" checked/><span class="toggle-slider"></span></label>
+        </div>
+
+        <div class="sec" style="margin-top:4px">Top spacing for pre-printed header</div>
+        <div class="row">
+          <div class="set-group" style="flex:1">
+            <label>Blank space at top (mm)</label>
+            <input id="pf-topspace" type="number" value="0" min="0" max="100" placeholder="0"/>
+            <div class="hint">Adds blank space at top to align below your pre-printed letterhead</div>
+          </div>
+          <div class="set-group" style="flex:1">
+            <label>Font size (pt)</label>
+            <input id="pf-fontsize" type="number" value="11" min="7" max="16"/>
+          </div>
+        </div>
+
+        <div class="sec">Bill layout preview</div>
+        <div style="margin-bottom:6px"><span id="pp-template-badge" style="background:var(--pri);color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700"> Classic</span></div>
+        <div id="print-preview-box" style="background:#fff;border:1px solid #cdd5dd;border-radius:8px;padding:14px;font-size:11px;color:#555;max-width:340px;transition:border .2s">
+        </div>
+
+        <div class="save-bar" style="margin-top:16px">
+          <button class="btn bg" style="flex:1" onclick="savePrintFormat()">&#10003; Save Print Settings</button>
+          <button class="btn bp sm" style="flex:1" onclick="doTestPrint()">&#128438; Test Print</button>
+          <span class="saved-msg" id="pf-saved">&#10003; Saved!</span>
+        </div>
+      </div>

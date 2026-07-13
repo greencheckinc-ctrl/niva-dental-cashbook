@@ -1,0 +1,178 @@
+      <div id="set-security" class="set-section">
+        <div class="set-title">&#128274; Lock &amp; Security</div>
+        <div class="set-sub">Protect the app with a 6-digit PIN, plus an optional fingerprint/face unlock shortcut. PIN enabled by default -- toggle off to open the app without a PIN.</div>
+
+        <!-- Toggle row -->
+        <div class="set-group">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#f8fafc;border:1px solid #e0e8ee;border-radius:10px;margin-bottom:8px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#222">&#128274; Lock Screen PIN</div>
+              <div style="font-size:11px;color:#888;margin-top:2px">Require 6-digit PIN on app open</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="tog-lock-pin" onchange="toggleLockPin(this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <!-- Inline disable confirmation (replaces confirm() dialog) -->
+          <div id="lock-disable-confirm" style="display:none;background:#fff8e1;border:1.5px solid #f9ca24;border-radius:9px;padding:13px;margin-bottom:12px">
+            <div style="font-size:12px;font-weight:700;color:#856404;margin-bottom:6px">&#9888; Disable Lock Screen?</div>
+            <div style="font-size:11px;color:#555;margin-bottom:10px">Anyone with device access will be able to open the app without a PIN.</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn bd sm" onclick="confirmDisableLock()" style="flex:1">Yes, Disable</button>
+              <button class="btn bo sm" onclick="cancelDisableLock()" style="flex:1">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fingerprint / Face Unlock toggle -->
+        <div class="set-group">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#f8fafc;border:1px solid #e0e8ee;border-radius:10px;margin-bottom:8px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#222">&#128272; Fingerprint / Face Unlock</div>
+              <div style="font-size:11px;color:#888;margin-top:2px">Use your device's fingerprint or face recognition as a quick unlock shortcut</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="tog-lock-bio" onchange="toggleBiometric(this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div id="bio-unsupported-msg" style="display:none;background:#f0f4f7;border:1px solid #e0e8ee;border-radius:8px;padding:10px 14px;font-size:11px;color:#888;margin-bottom:8px">
+            &#8505; Fingerprint/Face unlock isn't available -- either this browser/device doesn't support it, or no fingerprint/face is enrolled in your device's system settings.
+          </div>
+          <div id="bio-needpin-msg" style="display:none;background:#fff8e1;border:1px solid #f9ca24;border-radius:8px;padding:10px 14px;font-size:11px;color:#856404;margin-bottom:8px">
+            &#9888; Set up a 6-digit PIN below first. Fingerprint/Face unlock works as a shortcut alongside your PIN.
+          </div>
+        </div>
+
+        <!-- PIN Setup area (shown when toggle is ON) -->
+        <div id="sec-pin-setup" style="display:none">
+          <div class="set-group">
+            <div style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:18px">
+              <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px">Set / Change 6-Digit PIN</div>
+
+              <!-- Current PIN (shown only if PIN already set) -->
+              <div id="sec-cur-pin-row" style="margin-bottom:10px;display:none">
+                <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CURRENT PIN</label>
+                <div style="display:flex;gap:6px">
+                  <input id="sec-cur-pin" type="password" inputmode="numeric" maxlength="6" placeholder="******"
+                    style="flex:1;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif"
+                    onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"/>
+                </div>
+              </div>
+
+              <div style="margin-bottom:10px">
+                <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">NEW PIN (6 digits)</label>
+                <input id="sec-new-pin" type="password" inputmode="numeric" maxlength="6" placeholder="******"
+                  style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif"
+                  onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"
+                  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)"/>
+              </div>
+
+              <div style="margin-bottom:14px">
+                <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CONFIRM NEW PIN</label>
+                <input id="sec-conf-pin" type="password" inputmode="numeric" maxlength="6" placeholder="******"
+                  style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif"
+                  onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"
+                  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)"/>
+              </div>
+
+              <div id="sec-pin-err" style="color:#c0392b;font-size:12px;margin-bottom:10px;min-height:16px"></div>
+              <button class="btn bp" onclick="saveNewPin()" style="width:100%">&#128274; Save PIN</button>
+            </div>
+          </div>
+
+          <!-- Remove PIN -->
+          <div id="sec-remove-row" style="margin-top:10px;display:none">
+            <button class="btn bd sm" onclick="showRemovePinForm()" id="sec-remove-btn" style="width:100%">&#128275; Remove PIN Protection</button>
+            <!-- Inline Remove PIN form (shown on click) -->
+            <div id="sec-remove-form" style="display:none;margin-top:10px;background:#fff5f5;border:1.5px solid #f0b8b3;border-radius:9px;padding:14px">
+              <div style="font-size:12px;font-weight:700;color:#c0392b;margin-bottom:8px">&#128275; Remove PIN Protection</div>
+              <div style="font-size:11px;color:#555;margin-bottom:10px">Enter your current PIN to confirm removal.</div>
+              <input id="sec-remove-pin-input" type="password" inputmode="numeric" maxlength="6" placeholder="Enter current 6-digit PIN"
+                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;font-family:Arial,sans-serif;margin-bottom:8px"
+                onfocus="this.style.borderColor='#c0392b'" onblur="this.style.borderColor='#cdd5dd'"
+                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)"/>
+              <div id="sec-remove-pin-err" style="color:#c0392b;font-size:12px;margin-bottom:8px;min-height:14px"></div>
+              <div style="display:flex;gap:8px">
+                <button class="btn bd" onclick="confirmRemovePin()" style="flex:1">&#10003; Confirm Remove</button>
+                <button class="btn bo" onclick="hideRemovePinForm()" style="flex:1">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+<!-- Info when lock is OFF -->
+        <div id="sec-lock-off-msg" style="display:none;background:#fff8e1;border:1px solid #f9ca24;border-radius:8px;padding:12px 14px;font-size:12px;color:#856404">
+          &#9888; Lock screen is <strong>disabled</strong>. Anyone with access to this device can open the app without a PIN.
+        </div>
+
+        <!--  LOGIN CREDENTIALS  -->
+        <div style="margin-top:22px">
+          <div class="sec" style="margin-bottom:14px">&#128100; Login Credentials</div>
+
+          <!-- Login On/Off Toggle -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#f8fafc;border:1px solid #e0e8ee;border-radius:10px;margin-bottom:16px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#222">&#128275; Login Screen</div>
+              <div style="font-size:11px;color:#888;margin-top:2px" id="login-toggle-sub">Show login screen on app start</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="tog-login-screen" onchange="toggleLoginScreen(this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <!-- Change Credentials Card -->
+          <div id="login-creds-card" style="background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:18px">
+            <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px">Change Username &amp; Password</div>
+
+            <div style="margin-bottom:10px">
+              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">NEW USERNAME</label>
+              <input id="cred-user" type="text" placeholder="Enter new username" autocomplete="off"
+                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
+                onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"/>
+            </div>
+
+            <div style="margin-bottom:10px">
+              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CURRENT PASSWORD</label>
+              <input id="cred-cur-pass" type="password" placeholder="Enter current password" autocomplete="off"
+                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
+                onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"/>
+            </div>
+
+            <div style="margin-bottom:10px">
+              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">NEW PASSWORD</label>
+              <input id="cred-new-pass" type="password" placeholder="New password (min 4 chars)" autocomplete="off"
+                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
+                onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"/>
+            </div>
+
+            <div style="margin-bottom:14px">
+              <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px">CONFIRM NEW PASSWORD</label>
+              <input id="cred-conf-pass" type="password" placeholder="Confirm new password" autocomplete="off"
+                style="width:100%;padding:9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;outline:none;font-family:Arial,sans-serif"
+                onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim()" onblur="this.style.borderColor='#cdd5dd'"/>
+            </div>
+
+            <div id="cred-err" style="color:#c0392b;font-size:12px;margin-bottom:10px;min-height:16px"></div>
+            <div id="cred-ok" style="color:#1b6e35;font-size:12px;margin-bottom:10px;min-height:16px;display:none">&#10003; Credentials updated successfully!</div>
+
+            <button class="btn bp" onclick="saveLoginCreds()" style="width:100%">&#128274; Save Credentials</button>
+            <div style="margin-top:10px;font-size:11px;color:#aaa;text-align:center">Leave username blank to keep current username</div>
+          </div>
+
+          <!-- AUTHORIZED EMAILS -->
+          <div style="margin-top:22px;background:#fff;border:1px solid #e0e8ee;border-radius:10px;padding:18px">
+            <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">&#128231; Authorized Google Emails</div>
+            <div style="font-size:12px;color:#888;margin-bottom:12px">Only these emails can login with Google. Leave empty to allow any Google account.</div>
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+              <input id="allowed-email-inp" type="email" placeholder="email@gmail.com" style="flex:1;padding:8px 10px;border:1.5px solid #cdd5dd;border-radius:6px;font-size:13px;outline:none"/>
+              <button class="btn bg sm" onclick="addAllowedEmail()" style="white-space:nowrap;font-size:12px">+ Add</button>
+            </div>
+            <div id="allowed-email-list" style="display:flex;flex-direction:column;gap:6px"></div>
+            <div id="allowed-email-msg" style="font-size:12px;color:#27ae60;margin-top:6px;min-height:16px"></div>
+          </div>
+        </div>
+
+      </div>

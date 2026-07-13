@@ -1,0 +1,95 @@
+      <div id="set-apptmsg" class="set-section">
+        <div class="set-title">&#128241; Appointment Message Template</div>
+        <div class="set-sub">Customize the WhatsApp/SMS message sent when booking appointments. Use the placeholders shown below.</div>
+
+        <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#1a5276">
+          <div style="font-weight:700;margin-bottom:6px">&#128196; Available Placeholders:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{patient}</code>
+            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{date}</code>
+            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{time}</code>
+            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{doctor}</code>
+            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{purpose}</code>
+            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{notes}</code>
+            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{clinic}</code>
+            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{address}</code>
+            <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{phone}</code>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#555">
+            &#9888; Use <strong>*text*</strong> for <strong>bold</strong> in WhatsApp &nbsp;|&nbsp; Use <strong>_text_</strong> for <em>italic</em>
+          </div>
+        </div>
+
+        <div class="set-group">
+          <label>WhatsApp Message Template</label>
+          <textarea id="apptmsg-wa-tmpl" style="min-height:200px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6" placeholder="Enter WhatsApp message template..." oninput="updateApptMsgPreview()"></textarea>
+          <div class="hint">This template is used for both "Book Appointment" (from bill view) and "Save &amp; Send WhatsApp" (from Appointments tab).</div>
+        </div>
+
+        <div class="set-group">
+          <label>SMS Message Template</label>
+          <textarea id="apptmsg-sms-tmpl" style="min-height:80px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6" placeholder="Enter SMS message template..."></textarea>
+          <div class="hint">Plain text only for SMS. Keep it short -- no bold/italic formatting.</div>
+        </div>
+
+        <!-- Live Preview -->
+        <div class="set-group">
+          <label>Live Preview</label>
+          <div style="background:#075e54;border-radius:10px;padding:12px 14px;min-height:80px">
+            <div id="apptmsg-preview-box" style="background:#dcf8c6;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Courier New',monospace;line-height:1.6;color:#111;white-space:pre-wrap;word-break:break-word"></div>
+          </div>
+        </div>
+
+        <div class="save-bar">
+          <button class="btn bp" style="flex:1" onclick="saveApptMsgTemplate()">&#10003; Save Template</button>
+          <button class="btn bo" style="flex:1" onclick="resetApptMsgTemplate()">&#8635; Reset to Default</button>
+          <span class="saved-msg" id="apptmsg-saved">&#10003; Saved!</span>
+        </div>
+
+        <!-- Doctor Reminder Templates -->
+        <div style="margin-top:22px;padding-top:18px;border-top:2px solid #e0e8ee">
+          <div style="font-weight:700;font-size:13px;color:var(--pri);margin-bottom:4px"> Doctor Reminder Templates</div>
+          <div style="font-size:12px;color:#666;margin-bottom:12px">Doctor  appointment reminder WhatsApp/SMS   template.  placeholders  :</div>
+
+          <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1a5276">
+            <div style="font-weight:700;margin-bottom:6px"> Available Placeholders:</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{doctor}</code>
+              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{patient}</code>
+              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{date}</code>
+              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{time}</code>
+              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{purpose}</code>
+              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{clinic}</code>
+              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{address}</code>
+              <code style="background:var(--pri-light);padding:2px 8px;border-radius:4px;font-size:11px">{phone}</code>
+            </div>
+            <div style="margin-top:8px;font-size:11px;color:#555">! WhatsApp: <strong>*text*</strong> = bold &nbsp;|&nbsp; SMS: plain text only, short </div>
+          </div>
+
+          <div class="set-group">
+            <label> Doctor WhatsApp Reminder Template</label>
+            <textarea id="drmsg-wa-tmpl" style="min-height:180px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6;width:100%;padding:8px 10px;border:1px solid #cdd5dd;border-radius:6px;resize:vertical" placeholder="Doctor reminder WhatsApp template..." oninput="updateDrMsgPreview()"></textarea>
+            <div class="hint">Doctor  appointment schedule reminder WhatsApp message.</div>
+          </div>
+
+          <div class="set-group">
+            <label> Doctor SMS Reminder Template</label>
+            <textarea id="drmsg-sms-tmpl" style="min-height:70px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6;width:100%;padding:8px 10px;border:1px solid #cdd5dd;border-radius:6px;resize:vertical" placeholder="Doctor reminder SMS template..."></textarea>
+            <div class="hint">Plain text, short. Doctor SMS reminder.</div>
+          </div>
+
+          <!-- Live Preview -->
+          <div class="set-group">
+            <label>Live Preview (WA)</label>
+            <div style="background:#075e54;border-radius:10px;padding:12px 14px;min-height:60px">
+              <div id="drmsg-preview-box" style="background:#dcf8c6;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Courier New',monospace;line-height:1.6;color:#111;white-space:pre-wrap;word-break:break-word"></div>
+            </div>
+          </div>
+
+          <div class="save-bar">
+            <button class="btn bp" style="flex:1" onclick="saveDrMsgTemplate()">&#10003; Save Dr. Template</button>
+            <button class="btn bo" style="flex:1" onclick="resetDrMsgTemplate()">&#8635; Reset to Default</button>
+            <span class="saved-msg" id="drmsg-saved" style="display:none;color:#1b6e35;font-size:12px">&#10003; Saved!</span>
+          </div>
+        </div>
+      </div>

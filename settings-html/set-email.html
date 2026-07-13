@@ -1,0 +1,55 @@
+      <div id="set-email" class="set-section">
+        <div style="margin-bottom:14px">
+          <button class="btn bo sm" onclick="showSetSection('clinic',null)" style="font-size:12px;padding:6px 14px">&#8592; Back to Settings</button>
+        </div>
+        <div class="set-title">&#128140; Email Sync &amp; Backup</div>
+        <div class="set-sub">Send your daily cash book and backup directly to your email. Uses your device's default mail app (no password stored).</div>
+
+        <div class="sec">Your email account</div>
+        <div class="row">
+          <div class="set-group" style="flex:2"><label>Your Email Address</label><input id="s-myemail" placeholder="yourname@gmail.com or yourname@outlook.com"/><div class="hint">Backup files will be sent to this address</div></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>CC Email (optional)</label><input id="s-ccemail" placeholder="accountant@example.com"/></div>
+          <div class="set-group" style="flex:1"><label>Your Name / Clinic</label><input id="s-sendername" placeholder="Niva Dental"/></div>
+        </div>
+        <div class="save-bar" style="margin-bottom:18px">
+          <button class="btn bg" onclick="saveEmailConfig()">&#10003; Save Email Settings</button>
+          <span class="saved-msg" id="email-cfg-saved">&#10003; Saved!</span>
+        </div>
+
+        <div class="sec">Send daily report</div>
+        <div style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:14px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:6px">&#128197; Today's Cash Book Report</div>
+          <div style="font-size:12px;color:#888;margin-bottom:12px">Sends today's bill summary as an HTML report attached to an email.</div>
+          <div style="display:flex;gap:9px;flex-wrap:wrap">
+            <button class="btn bp" onclick="emailTodayReport()">&#128140; Send Today's Report</button>
+            <button class="btn bg" onclick="emailAllData()">&#128140; Send Full Backup (JSON)</button>
+          </div>
+        </div>
+
+        <div class="sec">Auto-sync schedule</div>
+        <div class="toggle-row">
+          <div><div class="tlabel">Auto-email daily report</div><div class="tsub">Remind to send report each day when app is opened</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-autoemail"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tlabel">Send backup on every export</div><div class="tsub">Also email a copy whenever you export data</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-exportemail"/><span class="toggle-slider"></span></label>
+        </div>
+
+        <div class="sec" style="margin-top:16px">WhatsApp / SMS share</div>
+        <div style="background:#f0faf4;border:1px solid #b8e6c8;border-radius:8px;padding:14px;margin-bottom:10px">
+          <div style="font-size:12px;color:#555;margin-bottom:10px">Share today's collection summary via WhatsApp or SMS instantly.</div>
+          <div style="display:flex;gap:9px;flex-wrap:wrap">
+            <button class="btn bg" onclick="shareWhatsApp()">&#128242; Share on WhatsApp</button>
+            <button class="btn bo" onclick="shareSMS()">&#128172; Share via SMS</button>
+          </div>
+        </div>
+
+        <div class="sec">Sync history</div>
+        <div id="sync-history" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:12px;font-size:12px;color:#aaa;text-align:center">No sync history yet. Send a report above to get started.</div>
+        <div class="save-bar" style="margin-top:10px">
+          <button class="btn bo sm" onclick="clearSyncHistory()">Clear history</button>
+        </div>
+      </div>

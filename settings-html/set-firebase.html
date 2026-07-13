@@ -1,0 +1,240 @@
+      <div id="set-firebase" class="set-section">
+        <div style="margin-bottom:14px">
+          <button class="btn bo sm" onclick="showSetSection('clinic',null)" style="font-size:12px;padding:6px 14px">&#8592; Back to Settings</button>
+        </div>
+        <div class="set-title">&#9889; Live Sync - Real-time Multi-device</div>
+        <div class="set-sub">Use Google Firebase to sync bills across all your devices in real time -- reception desk, doctor's room, and phone.</div>
+
+        <div class="note-collapsible" id="note-fb-howit" style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px">
+            <strong style="font-size:12px;color:#7a5800"> How it works</strong>
+            <button class="note-toggle-btn" style="color:#7a5800" onclick="toggleNote('note-fb-howit')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow"></span></button>
+          </div>
+          <div class="note-body" style="padding:0 12px 12px;font-size:12px;color:#7a5800">
+            Create a free Firebase project at <a href="https://console.firebase.google.com" target="_blank" style="color:var(--pri)">console.firebase.google.com</a>, enable Realtime Database, copy your config below and all devices on the same config sync instantly.
+          </div>
+        </div>
+
+        <!-- SMART PASTE BOX -->
+        <div style="background:#f0fff4;border:1.5px solid #a5d6a7;border-radius:12px;padding:16px;margin-bottom:18px;color:#1b6e35">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px;color:#1b6e35">&#128274; Smart Paste -- Auto Fill Config</div>
+          <div style="font-size:11px;color:#4caf50;margin-bottom:12px">Copy your <code style="background:#c8f2d4;padding:1px 6px;border-radius:4px;color:#1b6e35">firebaseConfig</code> object from Firebase Console and paste it here -- all fields will fill automatically!</div>
+
+          <div style="background:#e2f7ea;border:1px solid #a5d6a7;border-radius:6px;padding:6px 10px;margin-bottom:10px;font-size:10px;color:#2e7d4f;font-family:'Courier New',monospace;line-height:1.6">
+            const firebaseConfig = {<br>
+            &nbsp;&nbsp;apiKey: "AIzaSy...",<br>
+            &nbsp;&nbsp;authDomain: "app.firebaseapp.com",<br>
+            &nbsp;&nbsp;databaseURL: "https://...",<br>
+            &nbsp;&nbsp;...<br>
+            };
+          </div>
+
+          <textarea id="fb-smart-paste-input" rows="5" placeholder="Paste your firebaseConfig here..." style="width:100%;background:#fff;border:1.5px solid #a5d6a7;border-radius:8px;padding:10px;color:#222;font-size:11px;font-family:'Courier New',monospace;resize:vertical;outline:none;margin-bottom:10px" oninput="fbSmartPastePreview(this.value)"></textarea>
+
+          <div id="fb-smart-preview" style="display:none;background:#dff5e7;border:1px solid #a5d6a7;border-radius:8px;padding:10px;margin-bottom:10px;font-size:11px;color:#1b6e35"></div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="fbSmartPasteApply()" style="background:#1b6e35;color:#fff;border:none;border-radius:7px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer">&#9889; Auto Fill All Fields</button>
+            <button onclick="fbSmartPasteClear()" style="background:#fff;color:#444;border:1.5px solid #a5d6a7;border-radius:7px;padding:9px 18px;font-size:12px;cursor:pointer">&#10006; Clear</button>
+          </div>
+          <div id="fb-smart-msg" style="display:none;margin-top:10px;font-size:12px;font-weight:700"></div>
+        </div>
+
+        <div class="sec">Firebase project config <span style="font-size:10px;color:#aaa;font-weight:400;margin-left:6px">-- or fill manually below</span></div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>API Key</label><input id="fb-apikey" placeholder="AIzaSy..."/></div>
+          <div class="set-group" style="flex:1"><label>Auth Domain</label><input id="fb-authdomain" placeholder="yourapp.firebaseapp.com"/></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:2"><label>Database URL</label><input id="fb-dburl" placeholder="https://yourapp-default-rtdb.firebaseio.com"/></div>
+          <div class="set-group" style="flex:1"><label>Project ID</label><input id="fb-projectid" placeholder="yourapp-12345"/></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>Storage Bucket</label><input id="fb-bucket" placeholder="yourapp.appspot.com"/></div>
+          <div class="set-group" style="flex:1"><label>Messaging Sender ID</label><input id="fb-senderid" placeholder="123456789"/></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>App ID</label><input id="fb-appid" placeholder="1:123456789:web:abc123"/></div>
+          <div class="set-group" style="flex:1"><label>Measurement ID (optional)</label><input id="fb-measurementid" placeholder="G-XXXXXXXXXX"/></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>Clinic / Sync Key</label><input id="fb-synckey" placeholder="niva-dental-ahmedabad"/><div class="hint">Unique key for this clinic's data path in the database</div></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1">
+            <label> Device Type <span style="font-size:10px;font-weight:400;color:#aaa">(Clinic Info  save )</span></label>
+            <select id="fb-devicetype" onchange="fbSaveDeviceType(this.value)" style="padding:7px 10px;border:1px solid #cdd5dd;border-radius:6px;font-size:13px;background:#fff;color:#222;width:100%">
+              <option value="shared"> Shared (mobile + desktop same data)</option>
+              <option value="mobile"> Mobile</option>
+              <option value="desktop"> Desktop</option>
+            </select>
+            <div class="hint">Mobile select   clinic info <code>clinic_info/mobile</code> , Desktop select   <code>clinic_info/desktop</code>  save  -- bills/expenses shared </div>
+          </div>
+        </div>
+
+        <div class="sec" style="margin-top:16px"> Firebase Authentication (Email &amp; Password)</div>
+        <div class="note-collapsible" id="note-fb-auth" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px">
+            <strong style="font-size:11px;color:#1a5276"> Secure your data</strong>
+            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-fb-auth')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow"></span></button>
+          </div>
+          <div class="note-body" style="padding:0 12px 10px;font-size:11px;color:#1a5276">
+            Enable <strong>Email/Password</strong> sign-in in Firebase Console -> Authentication -> Sign-in method. Then enter your clinic's Firebase user credentials below. Data is stored under each user's UID, and Firebase Rules enforce that only the authenticated user can read/write their own data.
+          </div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1">
+            <label>Firebase Auth Email</label>
+            <input id="fb-email" type="email" placeholder="clinic@example.com" autocomplete="username"/>
+            <div class="hint">Email registered in Firebase Authentication</div>
+          </div>
+          <div class="set-group" style="flex:1">
+            <label>Firebase Auth Password</label>
+            <div style="position:relative">
+              <input id="fb-password" type="password" placeholder="Firebase account password" autocomplete="current-password" style="width:100%;padding-right:36px"/>
+              <button type="button" onclick="toggleFBPasswordVisibility()" title="Show/Hide password"
+                style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:#888;padding:0;line-height:1" id="fb-pw-eye"></button>
+            </div>
+            <div class="hint">Password for the Firebase user above</div>
+          </div>
+        </div>
+        <div id="fb-auth-status" style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:700"></div>
+
+        <div class="save-bar" style="margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <button class="btn bg" onclick="saveFBConfig()">&#10003; Save</button>
+          <button class="btn bo" onclick="testFBConnection()">&#9656; Test</button>
+          <button class="btn bd" onclick="fbSignOut()" id="fb-signout-btn" title="Sign out from Firebase Auth">&#128274; Sign Out</button>
+          <span class="saved-msg" id="fb-saved" style="grid-column:1/-1">&#10003; Config saved!</span>
+        </div>
+
+        <div class="sec">Sync status</div>
+        <div id="fb-status-box" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:14px;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div id="fb-dot" style="width:12px;height:12px;border-radius:50%;background:#ccc;flex-shrink:0"></div>
+            <div>
+              <div id="fb-status-label" style="font-size:13px;font-weight:700;color:#555">Not connected</div>
+              <div id="fb-status-sub" style="font-size:11px;color:#aaa;margin-top:2px">Configure Firebase above to enable live sync</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec">Sync options</div>
+        <div class="toggle-row" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:10px 14px">
+          <div><div class="tlabel">Auto-sync new bills</div><div class="tsub">Every new bill will be pushed to Firebase instantly</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-fbautosync" checked onchange="saveFBSyncToggles()"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:10px 14px;margin-top:6px">
+          <div><div class="tlabel">Pull changes on open</div><div class="tsub">Latest data will be fetched from cloud when app opens</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-fbpull" checked onchange="saveFBSyncToggles()"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:10px 14px;margin-top:6px">
+          <div><div class="tlabel">Real-time listener</div><div class="tsub"> True real-time -- changes from other devices appear instantly (uses Firebase SSE push, no polling)</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-fbrealtime" checked onchange="saveFBSyncToggles()"/><span class="toggle-slider"></span></label>
+        </div>
+
+        <div class="sec" style="margin-top:16px">Manual sync</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+          <button class="btn bp" style="width:100%" onclick="openPushSelectModal()">&#8593; Push All</button>
+          <button class="btn bg" style="width:100%" onclick="fbPullAll()">&#8595; Pull All</button>
+          <button class="btn bo" style="width:100%" onclick="fbDisconnect()">&#9679; Disconnect</button>
+        </div>
+
+        <div class="note-collapsible collapsed" id="note-fb-steps" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px">
+            <strong style="font-size:11px;color:#1a5276"> Step-by-step setup</strong>
+            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-fb-steps')"><span class="note-toggle-label">Show</span> <span class="note-toggle-arrow"></span></button>
+          </div>
+          <div class="note-body" style="padding:0 12px 12px;font-size:11px;color:#1a5276;line-height:1.7">
+          1. Go to <strong>console.firebase.google.com</strong> -> Create project<br>
+          2. Build -> Realtime Database -> Create database<br>
+          3. <strong>Authentication -> Sign-in method -> Enable Email/Password</strong><br>
+          4. Authentication -> Users -> Add user (clinic email + password)<br>
+          5. Realtime Database -> Rules -> paste: <code style="background:#e3edf7;padding:1px 5px;border-radius:3px;font-size:10px">{"rules":{"$synckey":{"$uid":{".read":"auth!=null && auth.uid==$uid",".write":"auth!=null && auth.uid==$uid"}}}}</code><br>
+          6. Project Settings -> Your apps -> Add Web app -> Copy config<br>
+          7. Paste config + email + password above -> Save &amp; Connect
+          </div>
+        </div>
+
+        <!-- FIREBASE CONFIG BACKUP & RESTORE -->
+        <div class="sec" style="margin-top:20px">&#128190; Firebase Config Backup &amp; Restore</div>
+        <div style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:14px">
+          <div style="font-size:12px;color:#666;margin-bottom:12px">Save your Firebase configuration to a file so you can restore it later if cleared or moved to a new device.</div>
+          <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+            <button class="btn bp" onclick="backupFBConfig()">&#128229; Backup Firebase Config</button>
+            <label class="btn bo" style="cursor:pointer;display:inline-flex;align-items:center;padding:7px 14px;font-size:12px;font-weight:700;margin:0">
+              &#128228; Restore Firebase Config
+              <input type="file" id="fb-restore-file" accept=".json" style="display:none" onchange="restoreFBConfig(this)"/>
+            </label>
+          </div>
+          <div id="fb-restore-msg" style="font-size:11px;margin-top:8px;display:none"></div>
+        </div>
+
+        <!-- AUTO WEEKLY FIREBASE BACKUP -->
+        <div class="sec" style="margin-top:20px">&#128197; Auto Weekly Firebase Backup</div>
+        <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:10px;padding:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--pri)">&#128197; Weekly Auto Backup to Firebase</div>
+              <div style="font-size:11px;color:#888;margin-top:2px">Automatically push a full data snapshot to Firebase every 7 days</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="tog-fb-weekly" onchange="saveFBWeeklySettings()"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div id="fb-weekly-config" style="display:none">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
+              <div class="f" style="min-width:130px;flex:1">
+                <label>Backup Day</label>
+                <select id="fb-weekly-day" onchange="saveFBWeeklySettings()">
+                  <option value="0">Sunday</option>
+                  <option value="1">Monday</option>
+                  <option value="2" selected>Tuesday</option>
+                  <option value="3">Wednesday</option>
+                  <option value="4">Thursday</option>
+                  <option value="5">Friday</option>
+                  <option value="6">Saturday</option>
+                </select>
+              </div>
+              <div class="f" style="min-width:110px;flex:1">
+                <label>Backup Time</label>
+                <select id="fb-weekly-time" onchange="saveFBWeeklySettings()">
+                  <option value="08:00">08:00 AM</option>
+                  <option value="09:00" selected>09:00 AM</option>
+                  <option value="10:00">10:00 AM</option>
+                  <option value="18:00">06:00 PM</option>
+                  <option value="20:00">08:00 PM</option>
+                  <option value="22:00">10:00 PM</option>
+                </select>
+              </div>
+              <div class="f" style="min-width:110px;flex:1">
+                <label>Keep Last N Backups</label>
+                <select id="fb-weekly-keep" onchange="saveFBWeeklySettings()">
+                  <option value="4" selected>4 weeks</option>
+                  <option value="8">8 weeks</option>
+                  <option value="12">12 weeks</option>
+                  <option value="0">All (no limit)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid var(--pri-light);border-radius:8px;padding:12px;margin-bottom:10px">
+              <div style="font-size:11px;font-weight:700;color:var(--pri);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">Backup Status</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <div id="fb-weekly-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;flex-shrink:0"></div>
+                <div style="flex:1">
+                  <div id="fb-weekly-status" style="font-size:12px;font-weight:700;color:#555">Not yet run</div>
+                  <div id="fb-weekly-last" style="font-size:11px;color:#aaa;margin-top:1px">Last backup: --</div>
+                </div>
+                <button class="btn bp sm" onclick="runFBWeeklyBackup(true)">&#128197; Backup Now</button>
+              </div>
+            </div>
+
+            <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:9px 12px;font-size:11px;color:#7a5c00">
+              &#9888; Backups are stored at <code style="background:#fef3c7;padding:1px 4px;border-radius:3px">weekly_backups/{date}/</code> in your Firebase Realtime Database. Firebase must be configured and connected above.
+            </div>
+          </div>
+        </div>
+
+      </div>

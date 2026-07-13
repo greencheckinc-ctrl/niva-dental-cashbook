@@ -1,0 +1,68 @@
+      <div id="set-rxprintformat" class="set-section">
+        <div class="set-title">&#128138; Prescription Print Settings</div>
+        <div class="set-sub">Configure page layout, paper size, margins, and pre-printed stationery options specifically for prescription printing.</div>
+
+        <div class="sec">Paper &amp; Page Size</div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>Paper size</label>
+            <select id="rxpf-size">
+              <option value="A4">A4 (210  297mm)</option>
+              <option value="A5">A5 (148  210mm)</option>
+              <option value="Letter">Letter (216  279mm)</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="set-group" style="flex:1"><label>Orientation</label>
+            <select id="rxpf-orient"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>Top margin (mm)</label><input id="rxpf-mt" type="number" value="10" min="0" max="80"/></div>
+          <div class="set-group" style="flex:1"><label>Bottom margin (mm)</label><input id="rxpf-mb" type="number" value="10" min="0" max="80"/></div>
+          <div class="set-group" style="flex:1"><label>Left margin (mm)</label><input id="rxpf-ml" type="number" value="10" min="0" max="80"/></div>
+          <div class="set-group" style="flex:1"><label>Right margin (mm)</label><input id="rxpf-mr" type="number" value="10" min="0" max="80"/></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1">
+            <label>Font size (pt)</label>
+            <input id="rxpf-fontsize" type="number" value="11" min="7" max="16"/>
+          </div>
+        </div>
+
+        <div class="sec" style="margin-top:4px">Pre-printed Stationery Options</div>
+        <div class="note-collapsible" id="note-rxpf-stationery" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px">
+            <strong style="font-size:12px;color:#1a5276">&#128161; Pre-printed stationery tip</strong>
+            <button class="note-toggle-btn" style="color:#1a5276" onclick="toggleNote('note-rxpf-stationery')"><span class="note-toggle-label">Hide</span> <span class="note-toggle-arrow">&#9660;</span></button>
+          </div>
+          <div class="note-body" style="padding:0 14px 10px;font-size:12px;color:#1a5276">
+            Use these when printing on prescription pads that already have your clinic name/logo/letterhead pre-printed at the top. Hide the header and set a top spacing to align content correctly below your pre-printed letterhead.
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tlabel">Hide clinic name &amp; header</div><div class="tsub">Do not print clinic name, address, phone on prescription (for pre-printed letterhead)</div></div>
+          <label class="toggle"><input type="checkbox" id="rxpf-hideheader"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tlabel">Hide clinic logo</div><div class="tsub">Skip the logo block on prescription printout</div></div>
+          <label class="toggle"><input type="checkbox" id="rxpf-hidelogo"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="tlabel">Hide legal disclaimer footer</div><div class="tsub">Do not print the medicolegal disclaimer at bottom</div></div>
+          <label class="toggle"><input type="checkbox" id="rxpf-hidefooter"/><span class="toggle-slider"></span></label>
+        </div>
+
+        <div class="sec" style="margin-top:4px">Top Spacing for Pre-printed Header</div>
+        <div class="row">
+          <div class="set-group" style="flex:1">
+            <label>Blank space at top (mm)</label>
+            <input id="rxpf-topspace" type="number" value="0" min="0" max="150" placeholder="0"/>
+            <div class="hint">Adds blank space at top so prescription content starts below your pre-printed letterhead/pad header</div>
+          </div>
+        </div>
+
+        <div class="save-bar" style="margin-top:16px">
+          <button class="btn bg" onclick="saveRxPrintFormat()">&#10003; Save Prescription Print Settings</button>
+          <span class="saved-msg" id="rxpf-saved">&#10003; Saved!</span>
+        </div>
+      </div>

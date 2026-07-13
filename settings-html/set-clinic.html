@@ -1,1 +1,96 @@
+      <div id="set-clinic" class="set-section act">
+        <div class="set-title">&#127973; Clinic Information</div>
+        <div class="set-sub">This information appears on all bills and receipts.</div>
 
+        <div class="sec">Clinic logo</div>
+        <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px">
+          <div style="width:100px;height:100px;border:2px dashed #cdd5dd;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f8fafc;overflow:hidden;flex-shrink:0">
+            <img id="logo-preview" src="" alt="" style="max-width:100%;max-height:100%;object-fit:contain;display:none"/>
+            <span id="logo-placeholder" style="font-size:28px;color:#ccc">&#127973;</span>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:6px">UPLOAD LOGO IMAGE</label>
+            <label class="btn bo" style="cursor:pointer;display:inline-block;padding:7px 14px;font-size:12px;font-weight:700;margin-bottom:6px">&#128247; Choose Image <input type="file" id="logo-upload" accept="image/*" style="display:none" onchange="handleLogoUpload(this)"/></label>
+            <div style="font-size:11px;color:#aaa;line-height:1.6">Supports JPG, PNG, GIF, SVG<br>Recommended: square image, max 200KB<br>Shown on bills, receipts &amp; topbar</div>
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+              <button class="btn bo sm" onclick="removeLogoConfirm()">&#128465; Remove Logo</button>
+              <button class="btn bo sm" onclick="resizeLogo()">&#8621; Resize to fit</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-bottom:4px">
+          <label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:5px">LOGO POSITION ON BILL</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="logo-pos" id="lp-center" value="center" checked/> Center</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="logo-pos" id="lp-left" value="left"/> Left</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="logo-pos" id="lp-right" value="right"/> Right</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="logo-pos" id="lp-only" value="only"/> Logo only (no text name)</label>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;margin-top:8px">
+          <label style="font-size:11px;font-weight:700;color:#666">LOGO SIZE ON BILL</label>
+          <input type="range" id="logo-size" min="40" max="160" value="80" style="flex:1" oninput="document.getElementById('logo-size-val').textContent=this.value+'px'"/>
+          <span id="logo-size-val" style="font-size:12px;font-weight:700;color:#555;min-width:40px">80px</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+          <label style="font-size:11px;font-weight:700;color:#666;white-space:nowrap">TOPBAR LOGO SIZE</label>
+          <input type="range" id="logo-opacity" min="30" max="120" value="70" style="flex:1" oninput="document.getElementById('logo-opacity-val').textContent=this.value+'px';var l=document.getElementById('tb-logo');if(l){l.style.height=this.value+'px';l.style.width='auto';}"/>
+          <span id="logo-opacity-val" style="font-size:12px;font-weight:700;color:#555;min-width:40px">70px</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+          <label style="font-size:11px;font-weight:700;color:#666;white-space:nowrap">TOPBAR LOGO BG OPACITY</label>
+          <input type="range" id="logo-bg-opacity" min="0" max="100" value="100" style="flex:1" oninput="document.getElementById('logo-bg-opacity-val').textContent=this.value+'%';applyLogoBgOpacity(this.value);"/>
+          <span id="logo-bg-opacity-val" style="font-size:12px;font-weight:700;color:#555;min-width:40px">100%</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+          <label style="font-size:11px;font-weight:700;color:#666;white-space:nowrap">LOGO CORNER RADIUS</label>
+          <input type="range" id="logo-radius" min="0" max="50" value="10" style="flex:1" oninput="document.getElementById('logo-radius-val').textContent=this.value+'px';var l=document.getElementById('tb-logo');if(l)l.style.borderRadius=this.value+'px';"/>
+          <span id="logo-radius-val" style="font-size:12px;font-weight:700;color:#555;min-width:40px">10px</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+          <label style="font-size:11px;font-weight:700;color:#666;white-space:nowrap">PRINT LOGO SIZE</label>
+          <input type="range" id="logo-print-size" min="30" max="120" value="50" style="flex:1" oninput="document.getElementById('logo-print-size-val').textContent=this.value+'px';"/>
+          <span id="logo-print-size-val" style="font-size:12px;font-weight:700;color:#555;min-width:40px">50px</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+          <label style="font-size:11px;font-weight:700;color:#666;white-space:nowrap">LOGO BACKGROUND</label>
+          <label style="font-size:12px;cursor:pointer"><input type="radio" name="logo-bg" value="transparent" checked onchange="applyLogoBg(this.value)"> Transparent</label>
+          <label style="font-size:12px;cursor:pointer"><input type="radio" name="logo-bg" value="white" onchange="applyLogoBg(this.value)"> White</label>
+          <label style="font-size:12px;cursor:pointer"><input type="radio" name="logo-bg" value="custom" onchange="applyLogoBg(this.value)"> Custom</label>
+          <input type="color" id="logo-bg-color" value="#ffffff" style="width:32px;height:28px;border:none;border-radius:6px;cursor:pointer;padding:2px" oninput="if(document.querySelector('input[name=logo-bg]:checked').value==='custom')applyLogoBg('custom')"/>
+        </div>
+
+        <div class="sec">Clinic details</div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>Clinic Name</label><input id="s-name" placeholder="e.g. Niva Dental"/><div class="hint">Shown as heading on all bills</div></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:2"><label>Full Address</label><textarea id="s-addr" placeholder="e.g. Shop 5, Near XYZ Mall, Bhuyangdev, Ahmedabad"></textarea></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>Phone / Mobile</label><input id="s-phone" placeholder="079-XXXXXXXX or 9XXXXXXXXX"/></div>
+          <div class="set-group" style="flex:1"><label>Email (optional)</label><input id="s-email" placeholder="clinic@example.com"/></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>Default Doctor Name</label><input id="s-doctor" placeholder="e.g. Dr. Rakesh N Patel"/></div>
+          <div class="set-group" style="flex:1"><label>Registration / License No.</label><input id="s-reg" placeholder="e.g. MCI-XXXXX"/></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>Bill Footer / Tagline</label><input id="s-tag" placeholder="e.g. Your smile, our care"/></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>GST Number (optional)</label><input id="s-gst" placeholder="e.g. 24AAAAA0000A1Z5"/></div>
+          <div class="set-group" style="flex:1"><label>Website (optional)</label><input id="s-web" placeholder="www.yourdental.com"/></div>
+        </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label> Google Review Link <span style="font-weight:400;color:#aaa">(optional)</span></label><input id="s-reviewurl" placeholder="https://g.page/r/XXXXXX/review"/><div class="hint">Paste your Google Business "Write a Review" link. Patients will get this via WhatsApp after billing.</div></div>
+        </div>
+        <div class="save-bar">
+          <button class="btn bg" onclick="saveClinic()">&#10003; Save Clinic Info</button>
+          <span class="saved-msg" id="clinic-saved">&#10003; Saved successfully!</span>
+        </div>
+        <!-- Mobile sticky save -->
+        <div style="display:none" id="mob-clinic-save-bar" class="mob-sticky-save">
+          <button class="btn bg" style="flex:1;padding:14px;font-size:15px" onclick="saveClinic()">&#10003; Save Clinic Info</button>
+        </div>
+      </div>

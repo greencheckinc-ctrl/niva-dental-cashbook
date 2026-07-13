@@ -1,0 +1,130 @@
+      <div id="set-supabase" class="set-section">
+        <div class="set-title">&#9729; Supabase Sync (Backup)</div>
+        <div class="set-sub">Secondary cloud backup &mdash; data saved to both Firebase &amp; Supabase for maximum safety.</div>
+
+        <div id="sb-status-box" style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+          <div id="sb-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;flex-shrink:0"></div>
+          <div id="sb-status-msg" style="font-size:12px;color:#888">Not configured</div>
+        </div>
+
+        <div class="set-group">
+          <label>Supabase Project URL</label>
+          <input id="sb-url" type="url" placeholder="https://xyzxyz.supabase.co" oninput="sbSaveConfig()"/>
+          <div class="hint">Supabase &#8594; Project Settings &#8594; API &#8594; Project URL</div>
+        </div>
+        <div class="set-group">
+          <label>Supabase Anon Key</label>
+          <input id="sb-key" type="password" placeholder="eyJhbGci..." oninput="sbSaveConfig()"/>
+          <div class="hint">Supabase &#8594; Project Settings &#8594; API &#8594; anon public key</div>
+        </div>
+        <div class="set-group">
+          <label>&#128274; Security Secret Key</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input id="sb-secret" type="password" placeholder="Enter strong secret key" oninput="sbSaveConfig();var b=document.getElementById('sb-update-secret-btn');if(b){b.style.background='#c0392b';b.textContent='! Secret Changed -- Update in Supabase';}" style="flex:1"/>
+            <button type="button" onclick="(function(){var i=document.getElementById('sb-secret');i.type=i.type==='password'?'text':'password';})()" class="btn bo sm" style="flex-shrink:0;padding:7px 10px">&#128065;</button>
+          </div>
+          <div class="hint">! When you change the secret key, click <b> Update Secret in Supabase</b> below -- SQL will be generated automatically.</div>
+        </div>
+
+        <!-- SUPABASE AUTH -- recommended secure sign-in -->
+        <div class="set-group" id="sb-auth-block" style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:12px">
+          <label style="margin-bottom:6px">&#128272; Secure Sign-In (recommended)</label>
+          <div class="hint" style="margin-bottom:8px">Create one login per clinic in Supabase Dashboard &#8594; Authentication &#8594; Users, then sign in here. This is required for the Auth-based security policies in the setup SQL below -- without signing in, only the legacy (less secure) scheme applies.</div>
+          <div id="sb-auth-status" style="font-size:12px;color:#888;margin-bottom:8px">Not signed in</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <input id="sb-auth-email" type="email" placeholder="clinic@example.com" style="flex:1;min-width:140px"/>
+            <input id="sb-auth-password" type="password" placeholder="Password" style="flex:1;min-width:120px"/>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn bp sm" onclick="sbAuthSignInUI()">&#128274; Sign In</button>
+            <button class="btn bo sm" onclick="sbAuthSignOutUI()">Sign Out</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:4px">
+          <button class="btn bp" onclick="sbTestConnection()">&#128268; Test Connection</button>
+          <button class="btn brec sm" onclick="sbUpdateSecretKey()" id="sb-update-secret-btn">&#128273; Update Secret in Supabase</button>
+          <button class="btn bg sm" onclick="if(typeof sbPollNow==='function'){sbPollNow();var m=document.getElementById('sb-test-msg');if(m){m.style.display='block';m.style.color=getComputedStyle(document.documentElement).getPropertyValue('--pri').trim();m.textContent=' Polling Supabase for new data...';setTimeout(function(){m.textContent=' Poll complete -- UI updated';},2500);}}">&#128260; Sync Now</button>
+        </div>
+        <div id="sb-test-msg" style="font-size:12px;margin-top:10px;display:none"></div>
+
+        <!-- REALTIME STATUS -->
+        <div style="margin-top:14px;background:#f0f8ff;border:1px solid #b3d9f0;border-radius:8px;padding:12px;">
+          <div style="font-size:12px;font-weight:700;color:var(--pri);margin-bottom:6px"> Real-time Sync Status</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#555;margin-bottom:6px">
+            <span id="sb-rt-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;display:inline-block;flex-shrink:0;"></span>
+            <span id="sb-rt-msg">Not started -- configure URL &amp; Key above</span>
+          </div>
+          <div style="font-size:11px;color:#888;">App automatically polls Supabase every 30 seconds for new data from other devices. You can also press <b>Sync Now</b> above for instant update.</div>
+        </div>
+
+        <!-- PUSH / PULL -->
+        <div style="margin-top:18px">
+          <div class="sec" style="margin-bottom:10px">&#128260; Manual Push / Pull</div>
+
+          <!-- PUSH -->
+          <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:10px;padding:14px;margin-bottom:10px">
+            <div style="font-size:13px;font-weight:700;color:var(--pri);margin-bottom:4px">&#11014; Push -- Local -> Supabase</div>
+            <div style="font-size:11px;color:#666;margin-bottom:10px"> local data Supabase  upload </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
+              <button class="btn bp sm" style="width:100%" onclick="sbPushTable('niva_bills','bills')">&#128196; Bills</button>
+              <button class="btn bp sm" style="width:100%" onclick="sbPushTable('niva_appointments','appointments')">&#128197; Appts</button>
+              <button class="btn bp sm" style="width:100%" onclick="sbPushTable('niva_expenses','expenses')">&#128176; Expenses</button>
+              <button class="btn bp sm" style="width:100%" onclick="sbPushTable('niva_patient_files','patientFiles')">&#128101; Patients</button>
+              <button class="btn bp sm" style="width:100%" onclick="sbPushTable('niva_stock','stock')">&#128230; Stock</button>
+              <button class="btn bp sm" style="width:100%" onclick="sbPushLogo(document.getElementById('sb-push-msg'))">&#128444; Logo</button>
+              <button class="btn bp sm" style="width:100%" onclick="(function(){var m=document.getElementById('sb-push-msg');if(m){m.style.display='block';m.style.color='var(--pri)';m.textContent=' Clinic info push...';}window.sbSyncClinic&&window.sbSyncClinic().then(function(){if(m){m.style.color='#1b6e35';m.textContent=' Clinic info pushed to Supabase!';}}).catch(function(e){if(m){m.style.color='#c0392b';m.textContent=' '+e.message;}});})()">&#127968; Clinic Info</button>
+            </div>
+            <button class="btn bp" style="width:100%" onclick="sbFullSync()">&#11014; Push All Data</button>
+            <div id="sb-push-msg" style="font-size:12px;margin-top:8px;display:none"></div>
+          </div>
+
+          <!-- PULL -->
+          <div style="background:#f0fff4;border:1px solid #a9dfbf;border-radius:10px;padding:14px">
+            <div style="font-size:13px;font-weight:700;color:#1b6e35;margin-bottom:4px">&#11015; Pull -- Supabase -> Local</div>
+            <div style="font-size:11px;color:#666;margin-bottom:10px">Supabase  data  device  restore </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
+              <button class="btn bo sm" style="width:100%" onclick="sbPullTable('niva_bills','bills')">&#128196; Bills</button>
+              <button class="btn bo sm" style="width:100%" onclick="sbPullTable('niva_appointments','appointments')">&#128197; Appts</button>
+              <button class="btn bo sm" style="width:100%" onclick="sbPullTable('niva_expenses','expenses')">&#128176; Expenses</button>
+              <button class="btn bo sm" style="width:100%" onclick="sbPullTable('niva_patient_files','patientFiles')">&#128101; Patients</button>
+              <button class="btn bo sm" style="width:100%" onclick="sbPullTable('niva_stock','stock')">&#128230; Stock</button>
+              <button class="btn bo sm" style="width:100%" onclick="sbPullLogo(document.getElementById('sb-pull-msg'))">&#128444; Logo</button>
+              <button class="btn bo sm" style="width:100%" onclick="window.sbPullClinic&&window.sbPullClinic(document.getElementById('sb-pull-msg'))">&#127968; Clinic Info</button>
+            </div>
+            <button class="btn bo" style="width:100%" onclick="sbPullAll()">&#11015; Pull All Data (Restore)</button>
+            <div id="sb-pull-msg" style="font-size:12px;margin-top:8px;display:none"></div>
+            <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:8px;margin-top:10px;font-size:11px;color:#7a5c00">
+              &#9888; Pull  local data Supabase  data  merge .  data delete  .
+            </div>
+          </div>
+        </div>
+
+
+        <!-- SETTINGS EXPORT / IMPORT -->
+        <div style="margin-top:20px">
+          <div class="sec" style="margin-bottom:10px">&#9881; Settings Backup -- Export / Import</div>
+          <div style="font-size:12px;color:#666;margin-bottom:12px">Clinic info, billing options, theme, Firebase &amp; Supabase config -- save everything in one file or restore from backup.</div>
+          <div style="background:#f0f8ff;border:1px solid #b3d9f0;border-radius:10px;padding:14px;margin-bottom:10px">
+            <div style="font-size:13px;font-weight:700;color:var(--pri);margin-bottom:4px">&#11014; Export Settings</div>
+            <div style="font-size:11px;color:#666;margin-bottom:10px">Download all your settings as a <b>.json</b> file.</div>
+            <button class="btn bp" style="width:100%" onclick="nivaExportSettings()">&#11014; Download Settings Backup</button>
+            <div id="sb-export-msg" style="font-size:12px;margin-top:8px;display:none"></div>
+          </div>
+          <div style="background:#f0fff4;border:1px solid #a9dfbf;border-radius:10px;padding:14px">
+            <div style="font-size:13px;font-weight:700;color:#1b6e35;margin-bottom:4px">&#11015; Import Settings</div>
+            <div style="font-size:11px;color:#666;margin-bottom:10px">Select a previously exported <b>.json</b> settings file to restore.</div>
+            <label style="display:block;background:#1b6e35;color:#fff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:6px;cursor:pointer;text-align:center;width:100%;box-sizing:border-box">
+              &#11015; Select Settings File
+              <input type="file" accept=".json" style="display:none" onchange="nivaImportSettings(this)">
+            </label>
+            <div id="sb-import-msg" style="font-size:12px;margin-top:8px;display:none"></div>
+            <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:8px;margin-top:10px;font-size:11px;color:#7a5c00">
+              ! Importing will replace your existing settings. Bills &amp; patient data will not be affected.
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:12px;margin-top:16px;font-size:12px;color:#7a5c00">
+          &#9888; <b>Setup required:</b> Click <b>Test Connection</b> after entering credentials &mdash; tables will be auto-created.
+        </div>
+      </div>

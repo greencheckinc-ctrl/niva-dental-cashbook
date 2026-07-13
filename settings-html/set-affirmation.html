@@ -1,0 +1,29 @@
+      <div id="set-affirmation" class="set-section">
+        <div class="set-title">&#127775; Affirmation</div>
+        <div class="set-sub">Daily motivational quote shown in the topbar above date &amp; time.</div>
+        <div class="toggle-row" style="margin-top:16px">
+          <div><div class="tlabel">Show Affirmation</div><div class="tsub">Display daily quote in topbar</div></div>
+          <label class="toggle"><input type="checkbox" id="tog-affirmation" onchange="saveAffirmationSettings()"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="sec" style="margin-top:18px">Language</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button id="affirm-lang-en" class="btn bo sm" onclick="setAffirmLang('en')" style="font-size:12px">&#127482;&#127480; English</button>
+          <button id="affirm-lang-gu" class="btn bo sm" onclick="setAffirmLang('gu')" style="font-size:12px">&#127470;&#127475; Gujarati</button>
+          <button id="affirm-lang-hi" class="btn bo sm" onclick="setAffirmLang('hi')" style="font-size:12px">&#127470;&#127475; Hindi</button>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e0e8ee;border-radius:8px;padding:12px 14px;margin-top:16px">
+          <div style="font-size:11px;color:#888;font-weight:600;margin-bottom:6px">CURRENT QUOTE</div>
+          <div id="affirm-preview" style="font-size:13px;color:#444;font-style:italic;line-height:1.6">Loading...</div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn bo sm" onclick="refreshAffirmation()" style="font-size:12px">&#128260; Refresh Quote</button>
+            <span class="saved-msg" id="affirm-saved" style="margin-left:4px;align-self:center"></span>
+          </div>
+        </div>
+        <div class="sec" style="margin-top:20px">Custom Affirmations</div>
+        <div class="set-sub" style="margin-bottom:10px">Tara khud na quotes add karo. Jo hoy toh in ma thi j rotate thase.</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input id="affirm-custom-inp" type="text" placeholder="Taro quote ahiya type karo..." style="flex:1;padding:8px 10px;border:1px solid #cdd5dd;border-radius:6px;font-size:13px"/>
+          <button class="btn bg sm" onclick="addCustomAffirm()" style="font-size:12px;white-space:nowrap">+ Add</button>
+        </div>
+        <div id="affirm-custom-list" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>

@@ -1,0 +1,100 @@
+      <div id="set-data" class="set-section">
+        <div class="set-title">&#128190; Data &amp; Backup</div>
+        <div class="set-sub">Export your data or restore from a backup file.</div>
+
+        <!-- AUTO-SAVE FILE PATH -->
+        <div class="sec">&#128204; Auto-Save File (Local Storage)</div>
+        <div style="background:#f0f8ff;border:1px solid #b8d8f0;border-radius:8px;padding:14px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;color:var(--pri);margin-bottom:5px">&#128196; Auto-save on Logout</div>
+          <div style="font-size:12px;color:#555;margin-bottom:12px">Choose a file on your device. Every time you log out, all data (bills + expenses + settings) will be automatically saved to that file -- overwriting it each time. No duplicate files.</div>
+          <div class="dir-box" style="margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:16px">&#128196;</span>
+              <div style="flex:1">
+                <div class="dir-path" id="autosave-path-display" style="color:var(--pri);font-weight:700;font-size:12px">No file selected</div>
+                <div class="dir-info" id="autosave-path-sub" style="font-size:11px;color:#aaa;margin-top:2px">Click "Choose File" to pick a save location</div>
+              </div>
+              <span id="autosave-status-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;display:inline-block;flex-shrink:0" title="Not configured"></span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button class="btn bp" onclick="chooseAutoSaveFile()">&#128193; Choose File</button>
+            <button class="btn bg" onclick="saveNow()" id="save-now-btn" style="display:none">&#128190; Save Now</button>
+            <button class="btn bo" onclick="clearAutoSavePath()" id="clear-path-btn" style="display:none">&#10005; Remove</button>
+          </div>
+          <div style="margin-top:10px">
+            <div class="toggle-row" style="padding:8px 0;border:none">
+              <div><div class="tlabel" style="font-size:12px">Auto-save on logout</div><div class="tsub">Automatically overwrite the file when you log out</div></div>
+              <label class="toggle"><input type="checkbox" id="tog-autosave-logout" onchange="saveAutoSaveSettings()"/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row" style="padding:8px 0;border:none;border-top:1px solid #e8edf0;margin-top:4px">
+              <div><div class="tlabel" style="font-size:12px">&#128204; Auto-save on close / background</div><div class="tsub">Silently save when app is closed, tab hidden, or you navigate away</div></div>
+              <label class="toggle"><input type="checkbox" id="tog-autosave-exit" onchange="saveAutoSaveSettings()"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div id="autosave-last-saved" style="font-size:11px;color:#aaa;margin-top:6px;display:none">&#10003; Last saved: <span id="autosave-last-time">--</span></div>
+          <div id="autosave-fs-warning" style="display:none;margin-top:10px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:9px 12px;font-size:11px;color:#7a5c00">
+            &#9888; Your browser does not support the File System Access API. Use <strong>Chrome</strong> or <strong>Edge</strong> for this feature. You can still use manual export below.
+          </div>
+        </div>
+
+        <!-- MANUAL EXPORT -->
+        <div class="sec">Save / Export</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px">
+          <button class="btn bp" onclick="exportJSON()">&#128229; Export All Data (JSON)</button>
+          <button class="btn bg" onclick="exportCSV()">&#128229; Export Bills (CSV)</button>
+          <button class="btn bora" onclick="exportHTMLReport()">&#128229; Save Full Report (HTML)</button>
+        </div>
+
+        <!-- IMPORT -->
+        <div class="sec">Import / Restore</div>
+        <div style="margin-bottom:14px">
+          <label class="btn bo" style="cursor:pointer;display:inline-block;padding:7px 14px;font-size:12px;font-weight:700">&#128229; Import Backup (JSON) <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(this)"/></label>
+          <span style="font-size:11px;color:#aaa;margin-left:10px">Select a previously exported .json file</span>
+        </div>
+
+        <!-- DANGER -->
+        <div class="sec">Danger zone</div>
+        <div style="background:#fff8f8;border:1px solid #fcc;border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:12px">
+
+          <!-- Option 1: Clear Data Only -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:12px;border-bottom:1px solid #fdd">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#c0392b">&#128203; Clear All Data Only</div>
+              <div style="font-size:11px;color:#aaa;margin-top:2px">Deletes bills, expenses, appointments and patient files. Keeps clinic settings, Firebase &amp; server config intact.</div>
+            </div>
+            <button class="btn bd sm" onclick="clearDataOnly()">&#128465; Clear Data</button>
+          </div>
+
+          <!-- Option 2: Clear Data + Firebase -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:12px;border-bottom:1px solid #fdd">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#c0392b">&#9889; Clear Data + Firebase Config</div>
+              <div style="font-size:11px;color:#aaa;margin-top:2px">Deletes bills, expenses, appointments, patient files and removes saved Firebase / Live Sync settings. Local Server config kept.</div>
+            </div>
+            <button class="btn bd sm" onclick="clearDataAndFirebase()">&#128465; Clear + Firebase</button>
+          </div>
+
+          <!-- Option 3: Clear Data + Local Server -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:12px;border-bottom:1px solid #fdd">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#c0392b">&#128257; Clear Data + Local Server Config</div>
+              <div style="font-size:11px;color:#aaa;margin-top:2px">Deletes bills, expenses, appointments and patient files. Firebase config kept.</div>
+            </div>
+            <button class="btn bd sm" onclick="clearDataAndLocalServer()">&#128465; Clear Bills &amp; Expenses</button>
+          </div>
+
+          <!-- Option 4: Clear Everything -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#7b0000">&#128465; Clear Everything</div>
+              <div style="font-size:11px;color:#aaa;margin-top:2px">Permanently deletes all bills, expenses, appointments, patient files, Firebase config, Local Server config and all settings. Cannot be undone.</div>
+            </div>
+            <button class="btn bd sm" style="background:#7b0000" onclick="clearAllData()">&#128465; Clear Everything</button>
+          </div>
+
+        </div>
+        <div class="save-bar" style="margin-top:12px">
+          <span style="font-size:12px;color:#888">Total bills stored: <strong id="total-bills-count">0</strong> &nbsp;|&nbsp; Storage used: <strong id="storage-used">--</strong></span>
+        </div>
+      </div>

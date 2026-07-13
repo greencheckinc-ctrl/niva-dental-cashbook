@@ -1,0 +1,44 @@
+      <div id="set-about" class="set-section">
+
+        <!-- ACTIVATION STATUS CARD -->
+        <div id="set-activation-card" style="margin-bottom:16px;border-radius:10px;border:1.5px solid #e0e8ee;overflow:hidden">
+          <div id="set-act-header" style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:#f8fafc">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:22px"></span>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#222" id="set-act-title">License Status</div>
+                <div style="font-size:11px;color:#888;margin-top:2px" id="set-act-sub">Checking...</div>
+              </div>
+            </div>
+            <div id="set-act-badge" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:#fef9e7;color:#8a5d0a">...</div>
+          </div>
+          <div id="set-act-body" style="padding:14px 16px;border-top:1px solid #e0e8ee;display:none">
+            <div style="position:relative;margin-bottom:8px">
+              <input id="set-act-key-inp" type="password" placeholder="Enter activation key..."
+                style="width:100%;padding:9px 42px 9px 12px;border:1.5px solid #cdd5dd;border-radius:7px;font-size:13px;box-sizing:border-box;outline:none;text-align:center;letter-spacing:2px;font-family:Arial,sans-serif"/>
+              <button type="button" onclick="(function(){var i=document.getElementById('set-act-key-inp');var b=document.getElementById('set-act-eye');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'':'';})()" id="set-act-eye"
+                style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:2px"></button>
+            </div>
+            <button onclick="setActFromSettings()" style="width:100%;padding:10px;background:var(--pri);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif"> Activate Now</button>
+            <div id="set-act-msg" style="font-size:12px;min-height:18px;margin-top:8px;text-align:center"></div>
+          </div>
+        </div>
+
+        <div class="about-box">
+          <div class="logo"></div>
+          <h2 id="about-clinic-name"></h2>
+          <p id="about-addr" style="color:var(--pri);margin-bottom:10px"></p>
+          <p>Daily Cash Book &amp; Billing Software<br>Version 2.0 &nbsp;|&nbsp; Built for dental clinics</p>
+          <hr style="margin:14px 0;border:none;border-top:1px solid #eee"/>
+          <p><strong>Features:</strong> Daily cash book &bull; Patient billing &bull; Appointments &bull; Receipt generation &bull; Bill printing &bull; Data export &bull; Theme customisation</p>
+          <hr style="margin:14px 0;border:none;border-top:1px solid #eee"/>
+          <div style="background:linear-gradient(135deg,#f0fff4,#e8f8f0);border:1.5px solid #a9dfbf;border-radius:10px;padding:14px 18px;margin:10px 0">
+            <div style="font-size:13px;font-weight:700;color:#1b6e35;margin-bottom:4px">&#9679; Clinic Management Software</div>
+            <div style="font-size:12px;color:#555;margin-bottom:2px">Development by</div>
+            <div style="font-size:18px;font-weight:900;color:#27ae60;letter-spacing:.5px">GreenCheck inc.</div>
+            <div style="font-size:10px;color:#aaa;margin-top:6px">Empowering clinics with smart software solutions</div>
+          </div>
+          <hr style="margin:14px 0;border:none;border-top:1px solid #eee"/>
+          <p style="font-size:11px;color:#bbb">All data stored locally in your browser.<br>No internet required after download.</p>
+        </div>
+      </div>
