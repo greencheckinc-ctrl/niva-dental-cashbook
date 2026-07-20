@@ -32,7 +32,7 @@
           <div class="hint" style="margin-bottom:8px">Create one login per clinic in Supabase Dashboard &#8594; Authentication &#8594; Users, then sign in here. This is required for the Auth-based security policies in the setup SQL below -- without signing in, only the legacy (less secure) scheme applies.</div>
           <div id="sb-auth-status" style="font-size:12px;color:#888;margin-bottom:8px">Not signed in</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <input id="sb-auth-email" type="email" placeholder="clinic@example.com" style="flex:1;min-width:140px"/>
+            <input id="sb-auth-email" type="email" placeholder="clinic@example.com" style="flex:1;min-width:140px" oninput="sbSaveAuthEmail()"/>
             <input id="sb-auth-password" type="password" placeholder="Password" style="flex:1;min-width:120px"/>
           </div>
           <div style="display:flex;gap:8px;margin-top:8px">
