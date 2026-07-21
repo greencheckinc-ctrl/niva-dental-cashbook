@@ -33,7 +33,14 @@
           <div id="sb-auth-status" style="font-size:12px;color:#888;margin-bottom:8px">Not signed in</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <input id="sb-auth-email" type="email" placeholder="clinic@example.com" style="flex:1;min-width:140px" oninput="sbSaveAuthEmail()"/>
-            <input id="sb-auth-password" type="password" placeholder="Password" style="flex:1;min-width:120px"/>
+            <input id="sb-auth-password" type="password" placeholder="Password" style="flex:1;min-width:120px" oninput="sbSaveAuthPwIfRemembered()"/>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-weight:400;font-size:12px;color:#555;cursor:pointer">
+            <input type="checkbox" id="sb-remember-pw" onchange="sbRememberPwToggle()" style="width:auto"/>
+            Remember password on this device
+          </label>
+          <div id="sb-remember-warning" style="display:none;font-size:11px;color:#7a5c00;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:6px 8px;margin-top:4px">
+            &#9888; Password will be stored on this device so anyone who unlocks this phone can sign in automatically. Only enable this on a device that stays with trusted clinic staff.
           </div>
           <div style="display:flex;gap:8px;margin-top:8px">
             <button class="btn bp sm" onclick="sbAuthSignInUI()">&#128274; Sign In</button>
