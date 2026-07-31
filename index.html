@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.supabase.co https://identitytoolkit.googleapis.com https://generativelanguage.googleapis.com https://api.allorigins.win https://zenquotes.io; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.supabase.co https://identitytoolkit.googleapis.com https://generativelanguage.googleapis.com https://api.allorigins.win https://zenquotes.io https://www.gstatic.com https://apis.google.com https://accounts.google.com https://securetoken.googleapis.com https://www.googleapis.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="var(--pri)"/>
@@ -7875,17 +7875,29 @@ function renderDash(){
     return rows;
   })();
 
-  document.getElementById('dstats').innerHTML=`
-    <div class="stat" style="border-left:3px solid #1b6e35;cursor:pointer" onclick="openTodayCollectedDetail()" title="Click to see details"><div class="lb">Today Collected OK <span style="font-size:9px;color:#1b6e35;font-weight:400">▶ details</span></div><div class="vl g">${cur}${todCollected.toLocaleString('en-IN')}</div></div>
-    <div class="stat"><div class="lb">Cash Today</div><div class="vl b">${cur}${cash.toLocaleString('en-IN')}</div></div>
-    <div class="stat"><div class="lb">UPI Today</div><div class="vl b">${cur}${upi.toLocaleString('en-IN')}</div></div>
-    <div class="stat"><div class="lb">Patients Today</div><div class="vl">${td.length + appointments.filter(a=>a.date===tod&&a.status==='Done'&&!todPatientNames.has(a.patient)).length}</div></div>
-    <div class="stat" style="border-left:3px solid #c0392b;cursor:pointer" onclick="openOverallPendingDetail()" title="Click to see pending details"><div class="lb">Overall Pending Dues <span style="font-size:9px;color:#c0392b;font-weight:400">▶ details</span></div><div class="vl r">${cur}${allPend.toLocaleString('en-IN')}</div></div>
-    <div class="stat"><div class="lb">Today Expenses</div><div class="vl r">${cur}${todExp.toLocaleString('en-IN')}</div></div>
-    <div class="stat" style="${netToday>=0?'border-left:3px solid #1b6e35':'border-left:3px solid #c0392b'}"><div class="lb">Net Profit Today</div><div class="vl ${netToday>=0?'g':'r'}">${cur}${netToday.toLocaleString('en-IN')}</div></div>
-    ${pendExp>0?`<div class="stat" style="border-left:3px solid #f39c12"><div class="lb">Unpaid Exp. Bills</div><div class="vl r">${cur}${pendExp.toLocaleString('en-IN')}</div></div>`:''}
+  // Show/hide entire panel sections (not just individual cards inside them)
+  // based on role permission -- receptionist role can have these panels
+  // hidden entirely, not just the stat cards within.
+  (function(){
+    var mip = document.getElementById('monthly-income-panel');
+    if(mip) mip.style.display = dcOn('panelMonthlyIncome') ? '' : 'none';
+    var itp = document.getElementById('income-trend-panel');
+    if(itp) itp.style.display = dcOn('panelIncomeTrend') ? '' : 'none';
+    var pgp = document.getElementById('patient-graph-panel');
+    if(pgp) pgp.style.display = dcOn('panelPatientGraph') ? '' : 'none';
+  })();
 
-    ${(function(){const fuCnt=appointments.filter(a=>a.status==='Scheduled'&&a.isFollowUp&&a.date>=tod).length;return fuCnt>0?`<div class="stat" style="border-left:3px solid #e67e22"><div class="lb">🔔 Follow-Up Due</div><div class="vl" style="color:#e67e22">${fuCnt}</div></div>`:''})()}`;
+  document.getElementById('dstats').innerHTML=`
+    ${dcOn('todayCollected')?`<div class="stat" style="border-left:3px solid #1b6e35;cursor:pointer" onclick="openTodayCollectedDetail()" title="Click to see details"><div class="lb">Today Collected OK <span style="font-size:9px;color:#1b6e35;font-weight:400">▶ details</span></div><div class="vl g">${cur}${todCollected.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('cashToday')?`<div class="stat"><div class="lb">Cash Today</div><div class="vl b">${cur}${cash.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('upiToday')?`<div class="stat"><div class="lb">UPI Today</div><div class="vl b">${cur}${upi.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('patientsToday')?`<div class="stat"><div class="lb">Patients Today</div><div class="vl">${td.length + appointments.filter(a=>a.date===tod&&a.status==='Done'&&!todPatientNames.has(a.patient)).length}</div></div>`:''}
+    ${dcOn('overallPending')?`<div class="stat" style="border-left:3px solid #c0392b;cursor:pointer" onclick="openOverallPendingDetail()" title="Click to see pending details"><div class="lb">Overall Pending Dues <span style="font-size:9px;color:#c0392b;font-weight:400">▶ details</span></div><div class="vl r">${cur}${allPend.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('todayExpenses')?`<div class="stat"><div class="lb">Today Expenses</div><div class="vl r">${cur}${todExp.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('netProfitToday')?`<div class="stat" style="${netToday>=0?'border-left:3px solid #1b6e35':'border-left:3px solid #c0392b'}"><div class="lb">Net Profit Today</div><div class="vl ${netToday>=0?'g':'r'}">${cur}${netToday.toLocaleString('en-IN')}</div></div>`:''}
+    ${(pendExp>0&&dcOn('unpaidExpBills'))?`<div class="stat" style="border-left:3px solid #f39c12"><div class="lb">Unpaid Exp. Bills</div><div class="vl r">${cur}${pendExp.toLocaleString('en-IN')}</div></div>`:''}
+
+    ${(function(){const fuCnt=appointments.filter(a=>a.status==='Scheduled'&&a.isFollowUp&&a.date>=tod).length;return (fuCnt>0&&dcOn('followUpDue'))?`<div class="stat" style="border-left:3px solid #e67e22"><div class="lb">🔔 Follow-Up Due</div><div class="vl" style="color:#e67e22">${fuCnt}</div></div>`:''})()}`;
   (function(){var el=document.getElementById('dstats');if(el){var cnt=el.children.length||8;el.style.gridTemplateColumns='repeat('+cnt+',1fr)';}})();
 
   //  MONTHLY INCOME PANEL 
@@ -7956,14 +7968,14 @@ function renderDash(){
   const titleEl=document.getElementById('monthly-panel-title');
   if(titleEl) titleEl.textContent=monLabel+' -- Income';
   if(mstatsEl) mstatsEl.innerHTML=`
-    <div class="stat" style="border-left:3px solid #1b6e35;cursor:pointer" onclick="showMonthlyCollectedDetail('${monYY}','${monLabel}')" title="Click to see payment details"><div class="lb">Monthly Collected <span style="font-size:9px;color:#1b6e35;opacity:.7">▼ Detail</span></div><div class="vl g">${cur}${monCollected.toLocaleString('en-IN')}</div></div>
-    <div class="stat" style="border-left:3px solid var(--pri)"><div class="lb">Monthly Billed</div><div class="vl b">${cur}${monBilled.toLocaleString('en-IN')}</div></div>
-    <div class="stat" style="border-left:3px solid #e67e22"><div class="lb">Monthly Pending</div><div class="vl" style="color:#e67e22">${cur}${monPend.toLocaleString('en-IN')}</div></div>
-    <div class="stat"><div class="lb">Cash (Month)</div><div class="vl b">${cur}${monCash.toLocaleString('en-IN')}</div></div>
-    <div class="stat"><div class="lb">UPI (Month)</div><div class="vl b">${cur}${monUPI.toLocaleString('en-IN')}</div></div>
-    <div class="stat"><div class="lb">Patients (Month)</div><div class="vl">${monPatients}</div></div>
-    <div class="stat" style="border-left:3px solid #c0392b;cursor:pointer" onclick="showMonthlyExpenseDetail('${monYY}','${monLabel}')" title="Click to see expense details"><div class="lb">Monthly Expenses <span style="font-size:9px;color:#c0392b;opacity:.7">▼ Detail</span></div><div class="vl r">${cur}${monExp.toLocaleString('en-IN')}</div></div>
-    <div class="stat" style="${monNet>=0?'border-left:3px solid #1b6e35':'border-left:3px solid #c0392b'}"><div class="lb">Net Profit (Month)</div><div class="vl ${monNet>=0?'g':'r'}">${cur}${monNet.toLocaleString('en-IN')}</div></div>`;
+    ${dcOn('monCollected')?`<div class="stat" style="border-left:3px solid #1b6e35;cursor:pointer" onclick="showMonthlyCollectedDetail('${monYY}','${monLabel}')" title="Click to see payment details"><div class="lb">Monthly Collected <span style="font-size:9px;color:#1b6e35;opacity:.7">▼ Detail</span></div><div class="vl g">${cur}${monCollected.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('monBilled')?`<div class="stat" style="border-left:3px solid var(--pri)"><div class="lb">Monthly Billed</div><div class="vl b">${cur}${monBilled.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('monPending')?`<div class="stat" style="border-left:3px solid #e67e22"><div class="lb">Monthly Pending</div><div class="vl" style="color:#e67e22">${cur}${monPend.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('monCash')?`<div class="stat"><div class="lb">Cash (Month)</div><div class="vl b">${cur}${monCash.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('monUPI')?`<div class="stat"><div class="lb">UPI (Month)</div><div class="vl b">${cur}${monUPI.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('monPatients')?`<div class="stat"><div class="lb">Patients (Month)</div><div class="vl">${monPatients}</div></div>`:''}
+    ${dcOn('monExpenses')?`<div class="stat" style="border-left:3px solid #c0392b;cursor:pointer" onclick="showMonthlyExpenseDetail('${monYY}','${monLabel}')" title="Click to see expense details"><div class="lb">Monthly Expenses <span style="font-size:9px;color:#c0392b;opacity:.7">▼ Detail</span></div><div class="vl r">${cur}${monExp.toLocaleString('en-IN')}</div></div>`:''}
+    ${dcOn('monNet')?`<div class="stat" style="${monNet>=0?'border-left:3px solid #1b6e35':'border-left:3px solid #c0392b'}"><div class="lb">Net Profit (Month)</div><div class="vl ${monNet>=0?'g':'r'}">${cur}${monNet.toLocaleString('en-IN')}</div></div>`:''}`;
   if(mstatsEl){var cnt=mstatsEl.children.length||8;mstatsEl.style.gridTemplateColumns='repeat('+cnt+',1fr)';}
 
   if(!td.length){
@@ -23717,6 +23729,14 @@ function appRefresh(){
 // ==========================================================
 
 const DEF_DASHCARDS={todayCollected:true,cashToday:true,upiToday:true,patientsToday:true,overallPending:true,todayExpenses:true,netProfitToday:true,unpaidExpBills:true,followUpDue:true,monCollected:true,monBilled:true,monPending:true,monCash:true,monUPI:true,monPatients:true,monExpenses:true,monNet:true,panelMonthlyIncome:true,panelIncomeTrend:true,panelPatientGraph:true};
+// Returns whether a given dashboard card/panel key is allowed to show for the
+// current user, based on CFG.dashCards (set from staff role permissions by
+// applyRoleRestrictions()). Defaults to visible (true) if unset -- e.g. for
+// the doctor account, or before any role restriction has been applied yet.
+function dcOn(key){
+  var dc = (typeof CFG!=='undefined' && CFG && CFG.dashCards) || null;
+  return !dc || dc[key]!==false;
+}
 
 var STAFF_ROLES_KEY  = 'niva_staff_roles';
 var CURRENT_ROLE_KEY = '_niva_current_role';
