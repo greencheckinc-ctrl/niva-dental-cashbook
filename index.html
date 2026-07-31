@@ -3943,6 +3943,14 @@ const THEMES=[
 ];
 
 //  LOAD / SAVE SETTINGS  #SEC:SETTINGS
+// Dashboard-card visibility defaults + helper -- defined early (before CFG
+// loads and before any render call could possibly fire) so it's always
+// available, no matter which code path triggers the first dashboard render.
+const DEF_DASHCARDS={todayCollected:true,cashToday:true,upiToday:true,patientsToday:true,overallPending:true,todayExpenses:true,netProfitToday:true,unpaidExpBills:true,followUpDue:true,monCollected:true,monBilled:true,monPending:true,monCash:true,monUPI:true,monPatients:true,monExpenses:true,monNet:true,panelMonthlyIncome:true,panelIncomeTrend:true,panelPatientGraph:true};
+function dcOn(key){
+  var dc = (typeof CFG!=='undefined' && CFG && CFG.dashCards) || null;
+  return !dc || dc[key]!==false;
+}
 function loadSettings(){
   try{return JSON.parse(localStorage.getItem('niva_settings')||'null');}catch(e){return null;}
 }
@@ -23728,15 +23736,8 @@ function appRefresh(){
 //  STAFF ROLES & ACCESS CONTROL  (ported from v14)
 // ==========================================================
 
-const DEF_DASHCARDS={todayCollected:true,cashToday:true,upiToday:true,patientsToday:true,overallPending:true,todayExpenses:true,netProfitToday:true,unpaidExpBills:true,followUpDue:true,monCollected:true,monBilled:true,monPending:true,monCash:true,monUPI:true,monPatients:true,monExpenses:true,monNet:true,panelMonthlyIncome:true,panelIncomeTrend:true,panelPatientGraph:true};
-// Returns whether a given dashboard card/panel key is allowed to show for the
-// current user, based on CFG.dashCards (set from staff role permissions by
-// applyRoleRestrictions()). Defaults to visible (true) if unset -- e.g. for
-// the doctor account, or before any role restriction has been applied yet.
-function dcOn(key){
-  var dc = (typeof CFG!=='undefined' && CFG && CFG.dashCards) || null;
-  return !dc || dc[key]!==false;
-}
+// (DEF_DASHCARDS and dcOn() are now defined earlier in the file, right
+// before CFG loads -- see #SEC:SETTINGS -- so they're always available.)
 
 var STAFF_ROLES_KEY  = 'niva_staff_roles';
 var CURRENT_ROLE_KEY = '_niva_current_role';
