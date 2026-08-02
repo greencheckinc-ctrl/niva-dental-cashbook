@@ -85,6 +85,9 @@
         <div class="row">
           <div class="set-group" style="flex:1"><label> Google Review Link <span style="font-weight:400;color:#aaa">(optional)</span></label><input id="s-reviewurl" placeholder="https://g.page/r/XXXXXX/review"/><div class="hint">Paste your Google Business "Write a Review" link. Patients will get this via WhatsApp after billing.</div></div>
         </div>
+        <div class="row">
+          <div class="set-group" style="flex:1"><label>&#128205; Clinic Location <span style="font-weight:400;color:#aaa">(Google Maps link, optional)</span></label><input id="s-location" placeholder="https://maps.app.goo.gl/XXXXXX or https://goo.gl/maps/XXXXXX"/><div class="hint">Open Google Maps &#8594; find your clinic &#8594; Share &#8594; Copy link. Used as the <code>{location}</code> placeholder in appointment &amp; doctor reminder messages so patients can tap to navigate.</div></div>
+        </div>
         <div class="save-bar">
           <button class="btn bg" onclick="saveClinic()">&#10003; Save Clinic Info</button>
           <span class="saved-msg" id="clinic-saved">&#10003; Saved successfully!</span>
